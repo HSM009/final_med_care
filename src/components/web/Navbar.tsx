@@ -30,7 +30,8 @@ export function Navbar() {
                 Logout
               </Button>
               <Link
-                to="/dashboard"
+                to="/"
+                // to="/dashboard"
                 className={buttonVariants({ variant: 'default' })}
               >
                 Dashboard

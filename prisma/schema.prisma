@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -7,8 +8,130 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
+model User {
+  id            String    @id
+  title         String?
+  name          String
+  email         String    @unique
+  qualification       String?
+  cellNo              String?
+
+  emailVerified Boolean   @default(false)
+  role          String?      @default("user") 
+
+  banned        Boolean?  @default(true)
+  bannedReason  String?   @default("Pending for admin for access")
+  banReason  String?      @default("Pending for admin for access")
+
+  bannedUntil   DateTime? @db.Timestamptz(3)      
+  banExpires   DateTime? @db.Timestamptz(3)      
+
+  impersonatedBy String?
+  impersonatorId String?
+  failedAttempts Int       @default(0)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  doctorDetails  PatientPrescription[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatorId    String?
+  impersonatedBy String?
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+
+model PatientRecord {
+  id                      Int         @id  @default(autoincrement())
+  med_care_id             String?  
+  name                    String?
+  age                     DateTime    @default(now())
+  gender                  Gender                @default(MALE)  
+  email                   String?
+  phone                   String?  
+  createdProfile          DateTime    @default(now())
+  activeStatus            Boolean     @default(true)
+  prescriptions   PatientPrescription[]
+  @@index([id])
+  @@unique([med_care_id])
+}
+
+model PatientPrescription {
+  id                      Int         @id  @default(autoincrement())
+  med_care_id             String?
+  note                    String? 
+  prescriptionsContent    String? 
+  createdPrescription     DateTime    @default(now())
+  relatedImages           String?
+  prescriptionImage       String?
+  activeStatus            Boolean     @default(true)
+  prescriptionSubmitted   Boolean     @default(false)
+  patientRecord           PatientRecord?  @relation(fields: [med_care_id], references: [med_care_id])
+  doctorId                String?
+  user                    User?     @relation(fields: [doctorId], references: [id])
+  @@index([id])
+}
+
+model MedicineList {
+  id                              Int         @id  @default(autoincrement())
+  medicineContentEnglish          String?  
+  medicineContentUrdu             String?
+  Dosage                          String?
+  createdPrescription             DateTime    @default(now())
+  activeStatus                    Boolean     @default(true)                        
+  @@index([id])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
