@@ -64,17 +64,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           {children}
           <Toaster closeButton position="top-center" />
         </ThemeProvider>
-        {/* <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          // plugins={[
-          //   {
-          //     name: 'Tanstack Router',
-          //     render: <TanStackRouterDevtoolsPanel />,
-          //   },
-          // ]}
-        /> */}
         <Scripts />
       </body>
     </html>

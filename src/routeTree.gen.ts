@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -39,15 +40,22 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminApproveUserRoute = ApiAdminApproveUserRouteImport.update({
+  id: '/api/admin/approve-user',
+  path: '/api/admin/approve-user',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/login/': typeof AuthLoginIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/login': typeof AuthLoginIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
@@ -56,19 +64,26 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/auth/$' | '/login/' | '/signUp/'
+  fullPaths:
+    | '/'
+    | '/api/admin/approve-user'
+    | '/api/auth/$'
+    | '/login/'
+    | '/signUp/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/auth/$' | '/login' | '/signUp'
+  to: '/' | '/api/admin/approve-user' | '/api/auth/$' | '/login' | '/signUp'
   id:
     | '__root__'
     | '/'
     | '/_auth'
+    | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/_auth/login/'
     | '/_auth/signUp/'
@@ -77,6 +92,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  ApiAdminApproveUserRoute: typeof ApiAdminApproveUserRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -117,6 +133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/approve-user': {
+      id: '/api/admin/approve-user'
+      path: '/api/admin/approve-user'
+      fullPath: '/api/admin/approve-user'
+      preLoaderRoute: typeof ApiAdminApproveUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -137,6 +160,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  ApiAdminApproveUserRoute: ApiAdminApproveUserRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
