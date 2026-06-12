@@ -1,7 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { addPatientSchema } from '#/schemas/auth'
-import { useTransition } from 'react'
 import { prisma } from '#/db'
 import {
   Field,
@@ -75,7 +74,6 @@ export const Route = createFileRoute('/dashboard/addPatient')({
 })
 function RouteComponent() {
   const navigate = useNavigate()
-  const [isPending, startTransition] = useTransition()
 
   const form = useForm({
     defaultValues: {
@@ -90,18 +88,16 @@ function RouteComponent() {
       onChange: addPatientSchema,
     },
     onSubmit: async ({ value }) => {
-      startTransition(async () => {
-        try {
-          await addPatientAction({ data: value })
-          toast.success('Account Creates Successfully.')
-          navigate({
-            to: '/dashboard/viewPatients',
-          })
-        } catch (error) {
-          console.error('Error creating patient:', error)
-          toast.error('Something went wrong saving the patient.')
-        }
-      })
+      try {
+        await addPatientAction({ data: value })
+        toast.success('Account Creates Successfully.')
+        navigate({
+          to: '/dashboard/viewPatients',
+        })
+      } catch (error) {
+        console.error('Error creating patient:', error)
+        toast.error('Something went wrong saving the patient.')
+      }
     },
   })
   return (
@@ -136,6 +132,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="HSM"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -170,6 +167,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="03211234567"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -202,6 +200,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="hsm#example.com"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -240,6 +239,7 @@ function RouteComponent() {
                           onBlur={field.handleBlur}
                           aria-invalid={isInvalid}
                           className="w-full cursor-pointer"
+                          disabled={form.state.isSubmitting}
                         >
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
@@ -296,11 +296,13 @@ function RouteComponent() {
             <div className="mt-6">
               <Button
                 className="cursor-pointer bg-green-800 hover:bg-green-700 text-white px-20 relative"
-                disabled={isPending}
+                disabled={form.state.isSubmitting}
                 type="submit"
               >
                 <span className="absolute inset-0 flex items-center justify-center">
-                  {isPending ? 'Creating Patient ID...' : 'Submit'}
+                  {form.state.isSubmitting
+                    ? 'Creating Patient ID...'
+                    : 'Submit'}
                 </span>
               </Button>
             </div>
