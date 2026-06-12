@@ -38,11 +38,11 @@ export const Route = createRootRoute({
   notFoundComponent: () => {
     return (
       <div>
-        <p className=" p-4 text-amber-700 ">Page Not found :( </p>
+        <p className=" p-4 text-primary ">Page Not found :( </p>
         <Link
           className={cn(
             ' block ml-4 mt-4 ',
-            buttonVariants({ variant: 'secondary' }),
+            buttonVariants({ variant: 'default' }),
           )}
           to="/"
         >
