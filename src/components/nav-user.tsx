@@ -1,7 +1,7 @@
 import { ChevronsUpDown, LogOut } from 'lucide-react'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useHandleSignOut, navUserProps } from '@/lib/types'
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import { useHandleSignOut, type navUserProps } from '#/lib/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,13 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '#/components/ui/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/components/ui/sidebar'
+} from '#/components/ui/sidebar'
 import { Link } from '@tanstack/react-router'
 
 export function NavUser({ user }: navUserProps) {

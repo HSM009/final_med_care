@@ -1,6 +1,6 @@
 import { BookmarkIcon, FilePlus, PlusIcon, ViewIcon } from 'lucide-react'
-import { NavPrimary } from '@/components/nav-primary'
-import { NavUser } from '@/components/nav-user'
+import { NavPrimary } from '#/components/nav-primary'
+import { NavUser } from '#/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
@@ -10,9 +10,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from '@/components/ui/sidebar'
+} from '#/components/ui/sidebar'
 import { Link, linkOptions } from '@tanstack/react-router'
-import { extendedUser, NavPrimaryProps } from '@/lib/types'
+import { type extendedUser, type NavPrimaryProps } from '#/lib/types'
 
 // This is sample data.
 const navItems: NavPrimaryProps['items'] = linkOptions([

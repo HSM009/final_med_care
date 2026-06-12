@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '#/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { NavAdminProps } from '@/lib/types'
-import { useState, ReactNode } from 'react'
+} from '#/components/ui/dialog'
+import { type NavAdminProps } from '#/lib/types'
+import { useState, type ReactNode } from 'react'
 import { AdminTemplateCard } from './adminTemplateCard'
 import {
   bannedUpdateSchema,
@@ -20,7 +20,7 @@ import {
   failedAttemptsUpdateSchema,
   qualificationUpdateSchema,
   roleUpdateSchema,
-} from '@/schemas/auth'
+} from '#/schemas/auth'
 interface ExtendedEditProps {
   data: NavAdminProps
   children: ReactNode

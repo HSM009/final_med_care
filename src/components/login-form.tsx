@@ -18,10 +18,12 @@ import { authClient } from '@/lib/auth-client'
 import { loginSchema } from '@/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { useTransition } from 'react'
 import { toast } from 'sonner'
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
   const form = useForm({
     defaultValues: {
       email: '',
@@ -31,49 +33,51 @@ export function LoginForm() {
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      authClient.signIn.email({
-        email: value.email,
-        password: value.password,
-        fetchOptions: {
-          onSuccess: () => {
-            navigate({ to: '/login' })
-            toast.success('Logged in successfully')
-          },
-          onError: ({ error }) => {
-            if (error.message?.startsWith('ADMIN_BANNED:')) {
-              toast.error('Your account has been banned by an administrator.')
-              return
-            }
-            if (error.message?.startsWith('ADMIN_REJECT_REGISTRATION:')) {
-              toast.error(
-                'Your account approval has been rejected by an administrator.',
-              )
-              return
-            }
-            if (error.message?.startsWith('LOCKOUT_EXPIRY:')) {
-              const parts = error.message.split(':')
-              const expiryTimestamp = parseInt(parts[1], 10)
-              const remainingMs = expiryTimestamp - Date.now()
-              const remainingMinutes = Math.ceil(remainingMs / (60 * 1000))
-              toast.error(
-                `Too many failed attempts. Your account is locked for another ${remainingMinutes} minute(s).`,
-              )
-              return
-            }
-            if (
-              error &&
-              (error.status === 401 ||
-                error.code === 'INVALID_EMAIL_OR_PASSWORD')
-            ) {
-              toast.error(
-                'This email is not registered, or the password you entered is incorrect.',
-              )
-              return
-            }
+      startTransition(async () => {
+        await authClient.signIn.email({
+          email: value.email,
+          password: value.password,
+          fetchOptions: {
+            onSuccess: () => {
+              navigate({ to: '/dashboard' })
+              toast.success('Logged in successfully')
+            },
+            onError: ({ error }) => {
+              if (error.message?.startsWith('ADMIN_BANNED:')) {
+                toast.error('Your account has been banned by an administrator.')
+                return
+              }
+              if (error.message?.startsWith('ADMIN_REJECT_REGISTRATION:')) {
+                toast.error(
+                  'Your account approval has been rejected by an administrator.',
+                )
+                return
+              }
+              if (error.message?.startsWith('LOCKOUT_EXPIRY:')) {
+                const parts = error.message.split(':')
+                const expiryTimestamp = parseInt(parts[1], 10)
+                const remainingMs = expiryTimestamp - Date.now()
+                const remainingMinutes = Math.ceil(remainingMs / (60 * 1000))
+                toast.error(
+                  `Too many failed attempts. Your account is locked for another ${remainingMinutes} minute(s).`,
+                )
+                return
+              }
+              if (
+                error &&
+                (error.status === 401 ||
+                  error.code === 'INVALID_EMAIL_OR_PASSWORD')
+              ) {
+                toast.error(
+                  'This email is not registered, or the password you entered is incorrect.',
+                )
+                return
+              }
 
-            toast.error(error.message || 'An unexpected error occurred.')
+              toast.error(error.message || 'An unexpected error occurred.')
+            },
           },
-        },
+        })
       })
     },
   })
@@ -112,7 +116,7 @@ export function LoginForm() {
                       placeholder="hsm@hsm.com"
                       type="email"
                       autoComplete="off"
-                      disabled={form.state.isSubmitting}
+                      disabled={isPending}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -140,7 +144,7 @@ export function LoginForm() {
                       placeholder="********"
                       type="password"
                       autoComplete="off"
-                      disabled={form.state.isSubmitting}
+                      disabled={isPending}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -152,10 +156,10 @@ export function LoginForm() {
             <Field>
               <Button
                 className="cursor-pointer"
-                disabled={form.state.isSubmitting}
+                disabled={isPending}
                 type="submit"
               >
-                {form.state.isSubmitting ? 'Logging in...' : 'Login'}
+                {isPending ? 'Logging in...' : 'Login'}
               </Button>
 
               <FieldDescription className="text-center">

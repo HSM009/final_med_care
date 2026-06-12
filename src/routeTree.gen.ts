@@ -9,13 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardViewPatientsRouteImport } from './routes/dashboard/viewPatients'
+import { Route as DashboardViewMedicineListRouteImport } from './routes/dashboard/viewMedicineList'
+import { Route as DashboardAdministerUserRouteImport } from './routes/dashboard/administerUser'
+import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addPatient'
+import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
+import { Route as DashboardPatientPrescriptionIdRouteImport } from './routes/dashboard/patientPrescription.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
 
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
@@ -24,6 +37,37 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardViewPatientsRoute = DashboardViewPatientsRouteImport.update({
+  id: '/viewPatients',
+  path: '/viewPatients',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardViewMedicineListRoute =
+  DashboardViewMedicineListRouteImport.update({
+    id: '/viewMedicineList',
+    path: '/viewMedicineList',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardAdministerUserRoute = DashboardAdministerUserRouteImport.update({
+  id: '/administerUser',
+  path: '/administerUser',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAddPatientRoute = DashboardAddPatientRouteImport.update({
+  id: '/addPatient',
+  path: '/addPatient',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAccountSettingRoute = DashboardAccountSettingRouteImport.update({
+  id: '/accountSetting',
+  path: '/accountSetting',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
 const AuthSignUpIndexRoute = AuthSignUpIndexRouteImport.update({
   id: '/signUp/',
@@ -35,6 +79,12 @@ const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const DashboardPatientPrescriptionIdRoute =
+  DashboardPatientPrescriptionIdRouteImport.update({
+    id: '/patientPrescription/$id',
+    path: '/patientPrescription/$id',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -48,15 +98,30 @@ const ApiAdminApproveUserRoute = ApiAdminApproveUserRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
+  '/dashboard/addPatient': typeof DashboardAddPatientRoute
+  '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
+  '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/login/': typeof AuthLoginIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
+  '/dashboard/addPatient': typeof DashboardAddPatientRoute
+  '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
+  '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/login': typeof AuthLoginIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
 }
@@ -64,8 +129,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
+  '/dashboard/addPatient': typeof DashboardAddPatientRoute
+  '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
+  '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
 }
@@ -73,18 +146,46 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dashboard'
+    | '/dashboard/accountSetting'
+    | '/dashboard/addPatient'
+    | '/dashboard/administerUser'
+    | '/dashboard/viewMedicineList'
+    | '/dashboard/viewPatients'
+    | '/dashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
+    | '/dashboard/patientPrescription/$id'
     | '/login/'
     | '/signUp/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/admin/approve-user' | '/api/auth/$' | '/login' | '/signUp'
+  to:
+    | '/'
+    | '/dashboard/accountSetting'
+    | '/dashboard/addPatient'
+    | '/dashboard/administerUser'
+    | '/dashboard/viewMedicineList'
+    | '/dashboard/viewPatients'
+    | '/dashboard'
+    | '/api/admin/approve-user'
+    | '/api/auth/$'
+    | '/dashboard/patientPrescription/$id'
+    | '/login'
+    | '/signUp'
   id:
     | '__root__'
     | '/'
     | '/_auth'
+    | '/dashboard'
+    | '/dashboard/accountSetting'
+    | '/dashboard/addPatient'
+    | '/dashboard/administerUser'
+    | '/dashboard/viewMedicineList'
+    | '/dashboard/viewPatients'
+    | '/dashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
+    | '/dashboard/patientPrescription/$id'
     | '/_auth/login/'
     | '/_auth/signUp/'
   fileRoutesById: FileRoutesById
@@ -92,12 +193,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   ApiAdminApproveUserRoute: typeof ApiAdminApproveUserRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_auth': {
       id: '/_auth'
       path: ''
@@ -112,6 +221,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/viewPatients': {
+      id: '/dashboard/viewPatients'
+      path: '/viewPatients'
+      fullPath: '/dashboard/viewPatients'
+      preLoaderRoute: typeof DashboardViewPatientsRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/viewMedicineList': {
+      id: '/dashboard/viewMedicineList'
+      path: '/viewMedicineList'
+      fullPath: '/dashboard/viewMedicineList'
+      preLoaderRoute: typeof DashboardViewMedicineListRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/administerUser': {
+      id: '/dashboard/administerUser'
+      path: '/administerUser'
+      fullPath: '/dashboard/administerUser'
+      preLoaderRoute: typeof DashboardAdministerUserRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/addPatient': {
+      id: '/dashboard/addPatient'
+      path: '/addPatient'
+      fullPath: '/dashboard/addPatient'
+      preLoaderRoute: typeof DashboardAddPatientRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/accountSetting': {
+      id: '/dashboard/accountSetting'
+      path: '/accountSetting'
+      fullPath: '/dashboard/accountSetting'
+      preLoaderRoute: typeof DashboardAccountSettingRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/_auth/signUp/': {
       id: '/_auth/signUp/'
       path: '/signUp'
@@ -125,6 +276,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login/'
       preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/dashboard/patientPrescription/$id': {
+      id: '/dashboard/patientPrescription/$id'
+      path: '/patientPrescription/$id'
+      fullPath: '/dashboard/patientPrescription/$id'
+      preLoaderRoute: typeof DashboardPatientPrescriptionIdRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -157,9 +315,34 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface DashboardRouteRouteChildren {
+  DashboardAccountSettingRoute: typeof DashboardAccountSettingRoute
+  DashboardAddPatientRoute: typeof DashboardAddPatientRoute
+  DashboardAdministerUserRoute: typeof DashboardAdministerUserRoute
+  DashboardViewMedicineListRoute: typeof DashboardViewMedicineListRoute
+  DashboardViewPatientsRoute: typeof DashboardViewPatientsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardPatientPrescriptionIdRoute: typeof DashboardPatientPrescriptionIdRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardAccountSettingRoute: DashboardAccountSettingRoute,
+  DashboardAddPatientRoute: DashboardAddPatientRoute,
+  DashboardAdministerUserRoute: DashboardAdministerUserRoute,
+  DashboardViewMedicineListRoute: DashboardViewMedicineListRoute,
+  DashboardViewPatientsRoute: DashboardViewPatientsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardPatientPrescriptionIdRoute: DashboardPatientPrescriptionIdRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
   ApiAdminApproveUserRoute: ApiAdminApproveUserRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

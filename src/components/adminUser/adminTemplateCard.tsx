@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AdminFieldCardProps } from '@/lib/types'
+import { type AdminFieldCardProps } from '@/lib/types'
 import { Field, FieldError, FieldGroup } from '../ui/field'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'

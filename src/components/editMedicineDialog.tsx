@@ -1,5 +1,5 @@
-import { EditMedicineDialogNavProps } from '@/lib/types'
-import { Button } from '@/components/ui/button'
+import { type EditMedicineDialogNavProps } from '#/lib/types'
+import { Button } from '#/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -9,20 +9,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { addOrUpdateMedicineSchema, updateMedicineSchema } from '@/schemas/auth'
+} from '#/components/ui/dialog'
+import { Input } from '#/components/ui/input'
+import { addOrUpdateMedicineSchema, updateMedicineSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { useState, useTransition, ReactNode } from 'react'
+import { useState, useTransition, type ReactNode } from 'react'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
 import { createServerFn } from '@tanstack/react-start'
-import { authFnMiddleware } from '@/middlewares/auth'
-import { prisma } from '@/db'
+import { authFnMiddleware } from '#/middlewares/auth'
+import { prisma } from '#/db'
 import { toast } from 'sonner'
 
 const updateMedicineAction = createServerFn({ method: 'POST' })
-  .inputValidator(updateMedicineSchema)
+  .validator(updateMedicineSchema)
   .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
     return await prisma.$transaction(async (tx) => {

@@ -6,8 +6,8 @@ import {
 } from '@tanstack/react-router'
 // import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 // import { TanStackDevtools } from '@tanstack/react-devtools'
-import { Toaster } from '@/components/ui/sonner'
-import { ThemeProvider } from '@/lib/theme-provider'
+import { Toaster } from '#/components/ui/sonner'
+import { ThemeProvider } from '#/lib/theme-provider'
 
 import appCss from '../styles.css?url'
 import { buttonVariants } from '#/components/ui/button'

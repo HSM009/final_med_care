@@ -1,26 +1,21 @@
-import { type EditPatientDialogNavProps } from '#/lib/types'
-import { Button } from '#/components/ui/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '#/components/ui/dialog'
-import { Input } from '#/components/ui/input'
-import { addPatientSchema, updatePatientSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
-import { useNavigate, useRouter } from '@tanstack/react-router'
-import { useState, useTransition, type ReactNode } from 'react'
-import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
-import { createServerFn } from '@tanstack/react-start'
-import { authFnMiddleware } from '#/middlewares/auth'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { addPatientSchema } from '#/schemas/auth'
+import { useTransition } from 'react'
 import { prisma } from '#/db'
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '#/components/ui/field'
+import { Input } from '#/components/ui/input'
+import { createServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
-import { DateOfBirthPicker } from './datePicker'
+import { Button } from '#/components/ui/button'
+import { authFnMiddleware } from '#/middlewares/auth'
+import { DateOfBirthPicker } from '#/components/datePicker'
+import { Card, CardContent } from '#/components/ui/card'
 import { Gender } from '#/generated/prisma/enums'
 import {
   Select,
@@ -28,53 +23,67 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select'
+} from '#/components/ui/select'
 
-const updatePatientAction = createServerFn({ method: 'POST' })
-  .validator(updatePatientSchema)
+const addPatientAction = createServerFn({ method: 'POST' })
+  .validator(addPatientSchema)
   .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
     return await prisma.$transaction(async (tx) => {
-      const newPatient = await tx.patientRecord.update({
-        where: { id: data.id },
+      const currentYear = new Date().getFullYear()
+      const lastPatientInYear = await tx.patientRecord.findFirst({
+        where: {
+          med_care_id: {
+            startsWith: `MC-${currentYear}-`,
+          },
+        },
+        orderBy: {
+          med_care_id: 'desc',
+        },
+        select: {
+          med_care_id: true,
+        },
+      })
+      let nextSerial = 1
+
+      if (lastPatientInYear && lastPatientInYear.med_care_id) {
+        const parts = lastPatientInYear.med_care_id.split('-')
+        const lastSerial = parseInt(parts[2], 10)
+        if (!isNaN(lastSerial)) {
+          nextSerial = lastSerial + 1
+        }
+      }
+
+      const paddedSerial = String(nextSerial).padStart(5, '0')
+      const generatedMedCareId = `MC-${currentYear}-${paddedSerial}`
+
+      const newPatient = await tx.patientRecord.create({
         data: {
           name: data.name,
           email: data.email,
           age: data.age,
-          phone: data.phone,
+          med_care_id: generatedMedCareId,
           gender: data.gender,
+          phone: data.phone,
         },
       })
       return newPatient
     })
   })
-
-interface ExtendedEditProps extends EditPatientDialogNavProps {
-  children: ReactNode
-}
-
-export function EditPatientDialog({
-  Id,
-  name,
-  email,
-  age,
-  phone,
-  gender,
-  children,
-}: ExtendedEditProps) {
+export const Route = createFileRoute('/dashboard/addPatient')({
+  component: RouteComponent,
+})
+function RouteComponent() {
   const navigate = useNavigate()
   const [isPending, startTransition] = useTransition()
-  const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
 
   const form = useForm({
-    // Fixed: Standardize initial value tracking layout directly against live model props
     defaultValues: {
-      name: name || '',
-      email: email || '',
-      age: age || new Date(),
-      phone: phone || '',
-      gender: gender as Gender,
+      name: '',
+      email: '',
+      age: new Date(),
+      phone: '',
+      gender: '' as Gender,
     },
     validators: {
       onSubmit: addPatientSchema,
@@ -83,50 +92,33 @@ export function EditPatientDialog({
     onSubmit: async ({ value }) => {
       startTransition(async () => {
         try {
-          // Fixed: Passing primary row identification field along with payload tracking data object
-          await updatePatientAction({ data: { ...value, id: Id } })
-          toast.success('Patient updated successfully.')
-          setIsOpen(false)
-
+          await addPatientAction({ data: value })
+          toast.success('Account Creates Successfully.')
           navigate({
             to: '/dashboard/viewPatients',
-            search: {
-              search: value.name.trim(),
-            },
           })
-
-          setTimeout(() => {
-            form.reset()
-          }, 100)
-
-          await router.invalidate()
         } catch (error) {
+          console.error('Error creating patient:', error)
           toast.error('Something went wrong saving the patient.')
         }
       })
     },
   })
-
   return (
-    <div className="inline-block  ">
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className="sm:max-w-sm">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
-            }}
-          >
-            <DialogHeader>
-              <DialogTitle>Edit Patient</DialogTitle>
-              <DialogDescription>
-                Modify the patient details below.
-              </DialogDescription>
-            </DialogHeader>
-
-            <FieldGroup className="py-4">
+    <div className="p-8">
+      <div className="text-3xl font-bold text-white mb-4 text-center">
+        Add New Patient!
+      </div>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
+      >
+        <Card className="mt-6">
+          <CardContent>
+            <FieldGroup>
               <form.Field
                 name="name"
                 children={(field) => {
@@ -134,9 +126,7 @@ export function EditPatientDialog({
                     field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name} className=" text-xs">
-                        Patient Name
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Full Name:</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
@@ -144,7 +134,7 @@ export function EditPatientDialog({
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="Enter name"
+                        placeholder="HSM"
                         autoComplete="off"
                       />
                       {isInvalid && (
@@ -155,8 +145,12 @@ export function EditPatientDialog({
                 }}
               />
             </FieldGroup>
+          </CardContent>
+        </Card>
 
-            <FieldGroup className="py-4">
+        <Card className="mt-6">
+          <CardContent>
+            <FieldGroup>
               <form.Field
                 name="phone"
                 children={(field) => {
@@ -164,8 +158,8 @@ export function EditPatientDialog({
                     field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name} className=" text-xs">
-                        Phone
+                      <FieldLabel htmlFor={field.name}>
+                        Phone Number:
                       </FieldLabel>
                       <Input
                         id={field.name}
@@ -174,7 +168,7 @@ export function EditPatientDialog({
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="Enter phone number"
+                        placeholder="03211234567"
                         autoComplete="off"
                       />
                       {isInvalid && (
@@ -185,8 +179,12 @@ export function EditPatientDialog({
                 }}
               />
             </FieldGroup>
+          </CardContent>
+        </Card>
 
-            <FieldGroup className="py-4">
+        <Card className="mt-6">
+          <CardContent>
+            <FieldGroup>
               <form.Field
                 name="email"
                 children={(field) => {
@@ -194,9 +192,7 @@ export function EditPatientDialog({
                     field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name} className=" text-xs">
-                        Patient Email
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Email:</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
@@ -204,7 +200,7 @@ export function EditPatientDialog({
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         aria-invalid={isInvalid}
-                        placeholder="Enter patient email"
+                        placeholder="hsm#example.com"
                         autoComplete="off"
                       />
                       {isInvalid && (
@@ -215,7 +211,11 @@ export function EditPatientDialog({
                 }}
               />
             </FieldGroup>
+          </CardContent>
+        </Card>
 
+        <Card className="mt-6">
+          <CardContent>
             <FieldGroup>
               <form.Field
                 name="gender"
@@ -225,13 +225,10 @@ export function EditPatientDialog({
 
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name} className=" text-xs">
-                        Gender
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Gender:</FieldLabel>
                       <Select
                         name={field.name}
                         value={field.state.value}
-                        defaultValue={field.state.value}
                         onValueChange={(value) =>
                           field.handleChange(
                             value as 'MALE' | 'FEMALE' | 'OTHER',
@@ -262,8 +259,12 @@ export function EditPatientDialog({
                 }}
               />
             </FieldGroup>
+          </CardContent>
+        </Card>
 
-            <FieldGroup className="py-4">
+        <Card className="mt-6">
+          <CardContent>
+            <FieldGroup>
               <form.Field
                 name="age"
                 children={(field) => {
@@ -271,12 +272,12 @@ export function EditPatientDialog({
                     field.state.meta.isTouched && !field.state.meta.isValid
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name} className=" text-xs">
-                        Date of Birth
+                      <FieldLabel htmlFor={field.name}>
+                        Date of Birth:
                       </FieldLabel>
                       <DateOfBirthPicker
-                        currentDate={field.state.value}
                         onDateChange={(date) => {
+                          // If date is undefined, fall back to today's date (or a default date)
                           field.handleChange(date ?? new Date())
                         }}
                       />
@@ -288,30 +289,24 @@ export function EditPatientDialog({
                 }}
               />
             </FieldGroup>
-
-            <DialogFooter className=" flex items-center">
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className=" cursor-pointer"
-                >
-                  Cancel
-                </Button>
-              </DialogClose>
+          </CardContent>
+        </Card>
+        <FieldGroup>
+          <Field>
+            <div className="mt-6">
               <Button
                 className="cursor-pointer bg-green-800 hover:bg-green-700 text-white px-20 relative"
                 disabled={isPending}
                 type="submit"
               >
                 <span className="absolute inset-0 flex items-center justify-center">
-                  {isPending ? 'Updating...' : 'Update Patient'}
+                  {isPending ? 'Creating Patient ID...' : 'Submit'}
                 </span>
               </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </Field>
+        </FieldGroup>
+      </form>
     </div>
   )
 }

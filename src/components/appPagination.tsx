@@ -6,8 +6,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination'
-import { AppPaginationNavProps } from '@/lib/types'
+} from '#/components/ui/pagination'
+import { type AppPaginationNavProps } from '#/lib/types'
 
 export function AppPagination({
   page,
