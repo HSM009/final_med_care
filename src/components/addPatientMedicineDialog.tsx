@@ -1,4 +1,3 @@
-import { createServerFn } from '@tanstack/react-start'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -10,43 +9,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog'
-import { authFnMiddleware } from '@/middlewares/auth'
-import { prisma } from '@/db'
 import { useEffect, useState, useTransition } from 'react'
-import { addPatientMedicineSearch } from '@/schemas/auth'
 import { Input } from './ui/input'
+import { searchPatientMedicineAction } from '#/server/actions'
 
-// Define a type representing your medicine database record layout
 export interface MedicineItem {
   id: number
   medicineContentEnglish: string
   medicineContentUrdu: string
   Dosage: string
-  // Add other fields matching your Prisma model if needed (e.g., dosage, type)
 }
 
 interface MedicineDialogProps {
   children: React.ReactNode
-  onSelectMedicine: (medicine: MedicineItem) => void // Callback to update parent array
+  onSelectMedicine: (medicine: MedicineItem) => void
 }
-
-export const searchPatientMedicineAction = createServerFn({ method: 'GET' })
-  .inputValidator(addPatientMedicineSearch)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    const searchString = data?.search?.trim()
-    if (!searchString) return []
-
-    return await prisma.medicineList.findMany({
-      where: {
-        medicineContentEnglish: {
-          contains: searchString,
-          mode: 'insensitive',
-        },
-      },
-      take: 10, // Safeguard performance by limiting rows returned
-    })
-  })
 
 export function MedicineDialog({
   children,
@@ -57,7 +34,6 @@ export function MedicineDialog({
   const [results, setResults] = useState<MedicineItem[]>([])
   const [isPending, startTransition] = useTransition()
 
-  // 1. Keep your input handler simple. It just tracks what the user is typing.
   const handleSearchChange = (value: string) => {
     setSearchQuery(value)
     if (!value.trim()) {
@@ -68,7 +44,6 @@ export function MedicineDialog({
   useEffect(() => {
     const trimmedQuery = searchQuery.trim()
 
-    // Guard Clause: Don't execute anything if character length is under 3 letters
     if (trimmedQuery.length < 3) {
       setResults([])
       return
@@ -115,7 +90,6 @@ export function MedicineDialog({
             autoComplete="off"
           />
 
-          {/* Results List View box */}
           <div className="max-h-48 overflow-y-auto border border-neutral-800 rounded-lg divide-y divide-neutral-800 bg-neutral-950">
             {isPending && results.length === 0 ? (
               <div className="p-3 text-sm text-neutral-400 text-center">

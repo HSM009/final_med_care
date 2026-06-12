@@ -1,67 +1,11 @@
-import { createServerFn } from '@tanstack/react-start'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { authFnMiddleware } from '@/middlewares/auth'
-import { prisma } from '@/db'
-import { formatDateToDMY } from '@/lib/types'
+import { formatDateToDMY } from '#/lib/types'
 import { AppPagination } from './appPagination'
 import { useEffect, useState, useTransition } from 'react'
 import { PescriptionDrawer } from './prescriptionDrawer'
+import { getPatientPrescriptions } from '#/server/actions'
 
 var o_PAGE_SIZE = 8
-
-// Server Function to fetch targeted prescription data logs
-export const getPatientPrescriptions = createServerFn({ method: 'GET' })
-  .inputValidator((medCareId: string) => medCareId)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data: medCareId }) => {
-    const prescriptions = await prisma.patientPrescription.findMany({
-      where: {
-        med_care_id: medCareId,
-      },
-      orderBy: {
-        createdPrescription: 'desc',
-      },
-      select: {
-        id: true,
-        med_care_id: true,
-        prescriptionsContent: true,
-        createdPrescription: true,
-        prescriptionSubmitted: true,
-        note: true,
-        user: {
-          select: {
-            name: true,
-            qualification: true,
-            cellNo: true,
-          },
-        },
-        patientRecord: {
-          select: {
-            name: true,
-            age: true,
-            phone: true,
-            gender: true,
-          },
-        },
-      },
-    })
-
-    return prescriptions.map((p) => ({
-      id: p.id,
-      med_care_id: p.med_care_id,
-      prescriptionsContent: p.prescriptionsContent,
-      createdPrescription: p.createdPrescription,
-      prescriptionSubmitted: p.prescriptionSubmitted,
-      doctorName: p.user?.name || 'Unknown Doctor',
-      doctorQualification: p.user?.qualification || 'Unknown Qualification',
-      doctorCellNo: p.user?.cellNo || 'Unknown Cell Number',
-      doctorNote: p.note || 'No note available',
-      patientName: p.patientRecord?.name || ' Unknown Patient',
-      patientAge: p.patientRecord?.age || new Date(),
-      patientPhone: p.patientRecord?.phone || 'Unknown Phone',
-      patientGender: p.patientRecord?.gender || 'Unknown Gender',
-    }))
-  })
 
 export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
   const [prescriptions, setPrescriptions] = useState<any[]>([])

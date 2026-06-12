@@ -2,7 +2,13 @@
 
 import { prisma } from '#/db'
 import { authFnMiddleware } from '#/middlewares/auth'
-import { addPatientSchema } from '#/schemas/auth'
+import {
+  addOrUpdateMedicineSchema,
+  addPatientMedicineSearch,
+  addPatientSchema,
+  updateMedicineSchema,
+  updatePatientSchema,
+} from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
 
 export const addPatientAction = createServerFn({ method: 'POST' })
@@ -45,6 +51,129 @@ export const addPatientAction = createServerFn({ method: 'POST' })
           med_care_id: generatedMedCareId,
           gender: data.gender,
           phone: data.phone,
+        },
+      })
+      return newPatient
+    })
+  })
+
+export const getPatientPrescriptions = createServerFn({ method: 'GET' })
+  .validator((medCareId: string) => medCareId)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data: medCareId }) => {
+    const prescriptions = await prisma.patientPrescription.findMany({
+      where: {
+        med_care_id: medCareId,
+      },
+      orderBy: {
+        createdPrescription: 'desc',
+      },
+      select: {
+        id: true,
+        med_care_id: true,
+        prescriptionsContent: true,
+        createdPrescription: true,
+        prescriptionSubmitted: true,
+        note: true,
+        user: {
+          select: {
+            name: true,
+            qualification: true,
+            cellNo: true,
+          },
+        },
+        patientRecord: {
+          select: {
+            name: true,
+            age: true,
+            phone: true,
+            gender: true,
+          },
+        },
+      },
+    })
+
+    return prescriptions.map((p) => ({
+      id: p.id,
+      med_care_id: p.med_care_id,
+      prescriptionsContent: p.prescriptionsContent,
+      createdPrescription: p.createdPrescription,
+      prescriptionSubmitted: p.prescriptionSubmitted,
+      doctorName: p.user?.name || 'Unknown Doctor',
+      doctorQualification: p.user?.qualification || 'Unknown Qualification',
+      doctorCellNo: p.user?.cellNo || 'Unknown Cell Number',
+      doctorNote: p.note || 'No note available',
+      patientName: p.patientRecord?.name || ' Unknown Patient',
+      patientAge: p.patientRecord?.age || new Date(),
+      patientPhone: p.patientRecord?.phone || 'Unknown Phone',
+      patientGender: p.patientRecord?.gender || 'Unknown Gender',
+    }))
+  })
+
+export const addMedicineAction = createServerFn({ method: 'POST' })
+  .validator(addOrUpdateMedicineSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    return await prisma.$transaction(async (tx) => {
+      const newMedicine = await tx.medicineList.create({
+        data: {
+          medicineContentEnglish: data.medicineContentEnglish,
+          medicineContentUrdu: data.medicineContentUrdu,
+          Dosage: data.Dosage,
+        },
+      })
+      return newMedicine
+    })
+  })
+
+export const searchPatientMedicineAction = createServerFn({ method: 'GET' })
+  .validator(addPatientMedicineSearch)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const searchString = data?.search?.trim()
+    if (!searchString) return []
+
+    return await prisma.medicineList.findMany({
+      where: {
+        medicineContentEnglish: {
+          contains: searchString,
+          mode: 'insensitive',
+        },
+      },
+      take: 10, // Safeguard performance by limiting rows returned
+    })
+  })
+
+export const updateMedicineAction = createServerFn({ method: 'POST' })
+  .validator(updateMedicineSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    return await prisma.$transaction(async (tx) => {
+      const newMedicine = await tx.medicineList.update({
+        where: { id: data.id }, // Fixed: id pulled safely from validator
+        data: {
+          medicineContentEnglish: data.medicineContentEnglish,
+          medicineContentUrdu: data.medicineContentUrdu,
+          Dosage: data.Dosage,
+        },
+      })
+      return newMedicine
+    })
+  })
+
+export const updatePatientAction = createServerFn({ method: 'POST' })
+  .validator(updatePatientSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    return await prisma.$transaction(async (tx) => {
+      const newPatient = await tx.patientRecord.update({
+        where: { id: data.id },
+        data: {
+          name: data.name,
+          email: data.email,
+          age: data.age,
+          phone: data.phone,
+          gender: data.gender,
         },
       })
       return newPatient

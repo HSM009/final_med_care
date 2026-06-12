@@ -11,14 +11,11 @@ import {
   DialogTrigger,
 } from '#/components/ui/dialog'
 import { Input } from '#/components/ui/input'
-import { addPatientSchema, updatePatientSchema } from '#/schemas/auth'
+import { addPatientSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { useState, useTransition, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
-import { createServerFn } from '@tanstack/react-start'
-import { authFnMiddleware } from '#/middlewares/auth'
-import { prisma } from '#/db'
 import { toast } from 'sonner'
 import { DateOfBirthPicker } from './datePicker'
 import { Gender } from '#/generated/prisma/enums'
@@ -29,25 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
-
-const updatePatientAction = createServerFn({ method: 'POST' })
-  .validator(updatePatientSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
-      const newPatient = await tx.patientRecord.update({
-        where: { id: data.id },
-        data: {
-          name: data.name,
-          email: data.email,
-          age: data.age,
-          phone: data.phone,
-          gender: data.gender,
-        },
-      })
-      return newPatient
-    })
-  })
+import { updatePatientAction } from '#/server/actions'
 
 interface ExtendedEditProps extends EditPatientDialogNavProps {
   children: ReactNode
@@ -63,7 +42,6 @@ export function EditPatientDialog({
   children,
 }: ExtendedEditProps) {
   const navigate = useNavigate()
-  const [isPending, startTransition] = useTransition()
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
@@ -81,29 +59,26 @@ export function EditPatientDialog({
       onChange: addPatientSchema,
     },
     onSubmit: async ({ value }) => {
-      startTransition(async () => {
-        try {
-          // Fixed: Passing primary row identification field along with payload tracking data object
-          await updatePatientAction({ data: { ...value, id: Id } })
-          toast.success('Patient updated successfully.')
-          setIsOpen(false)
+      try {
+        await updatePatientAction({ data: { ...value, id: Id } })
+        toast.success('Patient updated successfully.')
+        setIsOpen(false)
 
-          navigate({
-            to: '/dashboard/viewPatients',
-            search: {
-              search: value.name.trim(),
-            },
-          })
+        navigate({
+          to: '/dashboard/viewPatients',
+          search: {
+            search: value.name.trim(),
+          },
+        })
 
-          setTimeout(() => {
-            form.reset()
-          }, 100)
+        setTimeout(() => {
+          form.reset()
+        }, 100)
 
-          await router.invalidate()
-        } catch (error) {
-          toast.error('Something went wrong saving the patient.')
-        }
-      })
+        await router.invalidate()
+      } catch (error) {
+        toast.error('Something went wrong saving the patient.')
+      }
     },
   })
 
@@ -113,6 +88,7 @@ export function EditPatientDialog({
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="sm:max-w-sm">
           <form
+            noValidate
             onSubmit={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -146,6 +122,7 @@ export function EditPatientDialog({
                         aria-invalid={isInvalid}
                         placeholder="Enter name"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -176,6 +153,7 @@ export function EditPatientDialog({
                         aria-invalid={isInvalid}
                         placeholder="Enter phone number"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -206,6 +184,7 @@ export function EditPatientDialog({
                         aria-invalid={isInvalid}
                         placeholder="Enter patient email"
                         autoComplete="off"
+                        disabled={form.state.isSubmitting}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -301,11 +280,11 @@ export function EditPatientDialog({
               </DialogClose>
               <Button
                 className="cursor-pointer bg-green-800 hover:bg-green-700 text-white px-20 relative"
-                disabled={isPending}
+                disabled={form.state.isSubmitting}
                 type="submit"
               >
                 <span className="absolute inset-0 flex items-center justify-center">
-                  {isPending ? 'Updating...' : 'Update Patient'}
+                  {form.state.isSubmitting ? 'Updating...' : 'Update Patient'}
                 </span>
               </Button>
             </DialogFooter>

@@ -234,12 +234,17 @@ function RouteComponent() {
                       <FieldLabel htmlFor={field.name}>
                         Date of Birth:
                       </FieldLabel>
-                      <DateOfBirthPicker
-                        onDateChange={(date) => {
-                          // If date is undefined, fall back to today's date (or a default date)
-                          field.handleChange(date ?? new Date())
-                        }}
-                      />
+                      <React.Suspense
+                        fallback={
+                          <div className="h-10 w-full animate-pulse bg-gray-700 rounded" />
+                        }
+                      >
+                        <DateOfBirthPicker
+                          onDateChange={(date) =>
+                            field.handleChange(date ?? new Date())
+                          }
+                        />
+                      </React.Suspense>
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
                       )}
