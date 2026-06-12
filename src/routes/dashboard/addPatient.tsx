@@ -1,7 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { addPatientSchema } from '#/schemas/auth'
-import { prisma } from '#/db'
 import {
   Field,
   FieldError,
@@ -9,11 +8,8 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
-import { createServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
 import { Button } from '#/components/ui/button'
-import { authFnMiddleware } from '#/middlewares/auth'
-import { DateOfBirthPicker } from '#/components/datePicker'
 import { Card, CardContent } from '#/components/ui/card'
 import { Gender } from '#/generated/prisma/enums'
 import {
@@ -23,52 +19,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select'
+import React from 'react'
+import { addPatientAction } from '#/server/actions'
 
-const addPatientAction = createServerFn({ method: 'POST' })
-  .validator(addPatientSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
-      const currentYear = new Date().getFullYear()
-      const lastPatientInYear = await tx.patientRecord.findFirst({
-        where: {
-          med_care_id: {
-            startsWith: `MC-${currentYear}-`,
-          },
-        },
-        orderBy: {
-          med_care_id: 'desc',
-        },
-        select: {
-          med_care_id: true,
-        },
-      })
-      let nextSerial = 1
+const DateOfBirthPicker = React.lazy(() =>
+  import('#/components/datePicker').then((mod) => ({
+    default: mod.DateOfBirthPicker,
+  })),
+)
 
-      if (lastPatientInYear && lastPatientInYear.med_care_id) {
-        const parts = lastPatientInYear.med_care_id.split('-')
-        const lastSerial = parseInt(parts[2], 10)
-        if (!isNaN(lastSerial)) {
-          nextSerial = lastSerial + 1
-        }
-      }
-
-      const paddedSerial = String(nextSerial).padStart(5, '0')
-      const generatedMedCareId = `MC-${currentYear}-${paddedSerial}`
-
-      const newPatient = await tx.patientRecord.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          age: data.age,
-          med_care_id: generatedMedCareId,
-          gender: data.gender,
-          phone: data.phone,
-        },
-      })
-      return newPatient
-    })
-  })
 export const Route = createFileRoute('/dashboard/addPatient')({
   component: RouteComponent,
 })
@@ -85,7 +44,7 @@ function RouteComponent() {
     },
     validators: {
       onSubmit: addPatientSchema,
-      onChange: addPatientSchema,
+      onBlur: addPatientSchema,
     },
     onSubmit: async ({ value }) => {
       try {
