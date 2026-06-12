@@ -7,6 +7,7 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 import neon from './neon-vite-plugin.ts'
+import tsconfigPaths from 'vite-tsconfig-paths' // 1. Import it
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
@@ -17,6 +18,7 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
+    tsconfigPaths(), // 2. Add it to the plugins array
   ],
 })
 
