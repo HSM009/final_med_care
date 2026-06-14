@@ -1,10 +1,10 @@
-import { adminNotification, emailTemplate } from '@/components/email'
+import { adminNotification, emailTemplateOTP } from '@/components/email'
 import { prisma } from '@/db'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
-import { admin } from 'better-auth/plugins'
+import { admin, emailOTP } from 'better-auth/plugins'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -15,12 +15,10 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     autoSignIn: false,
   },
-  experimental: { joins: true },
-
   emailVerification: {
-    sendVerificationEmail: async ({ user, url }) => {
-      await emailTemplate(user.email, url)
+    sendVerificationEmail: async ({ user }) => {
       try {
+        // await emailTemplate(user.email, url)
         await adminNotification(user.name, user.email)
       } catch (error) {
         console.error(
@@ -29,8 +27,7 @@ export const auth = betterAuth({
         )
       }
     },
-  }, // 💡 Fixed the missing closing brace here
-
+  },
   user: {
     changeEmail: {
       enabled: true,
@@ -38,7 +35,11 @@ export const auth = betterAuth({
     additionalFields: {
       cellNo: { type: 'string', required: false, input: true },
       qualification: { type: 'string', required: false, input: true },
-      banned: { type: 'boolean', required: false, input: false },
+      banned: {
+        type: 'boolean',
+        required: false,
+        input: false,
+      },
       bannedReason: { type: 'string', required: false, input: false },
       role: {
         type: 'string',
@@ -50,7 +51,30 @@ export const auth = betterAuth({
     },
   },
 
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          return {
+            data: {
+              ...user,
+              banned: true,
+            },
+          }
+        },
+      },
+    },
+  },
+
   plugins: [
+    emailOTP({
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type === 'email-verification') {
+          await emailTemplateOTP(email, otp)
+        } else {
+        }
+      },
+    }),
     {
       id: 'rate-limiting-lockout',
       hooks: {
@@ -58,10 +82,10 @@ export const auth = betterAuth({
         before: [
           {
             matcher: (context) => !!context.path?.includes('/sign-in/email'),
+            // || !!context.path?.includes('/email-otp/send-verification-otp')
             handler: createAuthMiddleware(async (ctx) => {
               const body = ctx.body as Record<string, any> | undefined
               const email = body?.email
-
               if (!email) return
 
               // Look up user status and password expiration info
@@ -71,9 +95,21 @@ export const auth = betterAuth({
                   banned: true,
                   banExpires: true,
                   banReason: true,
+                  emailVerified: true,
                   // tempPasswordExpires: true,
                 },
               })
+
+              // check pending for registration approval
+              if (
+                user &&
+                user.banned &&
+                user.banReason === 'Pending for admin for access'
+              ) {
+                throw new APIError('UNAUTHORIZED', {
+                  message: `PENDING_REGISTRATION: Pending for admin for access`,
+                })
+              }
 
               // 🛡️ Check A: Temporary Admin Assigned Password Expiration Window
               // if (

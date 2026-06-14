@@ -75,3 +75,22 @@ export async function emailChangeNotification(
            <p>Your new login email is now: <code>${email}</code></p>`,
   })
 }
+
+export async function emailTemplateOTP(email: string, otp: string) {
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  })
+  return await transporter.sendMail({
+    from: `"Med Care" <${process.env.SMTP_FROM_EMAIL}>`,
+    to: email,
+    subject: 'Med Care- Verify your account',
+    text: `Welcome! Here is the OPT of your accound: ${otp}`,
+    html: `<p>Welcome! Here is the OPT of your accound: <code>${otp}</code></p>`,
+  })
+}

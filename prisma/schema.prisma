@@ -21,7 +21,7 @@ model User {
 
   banned        Boolean?  @default(true)
   bannedReason  String?   @default("Pending for admin for access")
-  banReason  String?      @default("Pending for admin for access")
+  banReason     String?      @default("Pending for admin for access")
 
   bannedUntil   DateTime? @db.Timestamptz(3)      
   banExpires   DateTime? @db.Timestamptz(3)      

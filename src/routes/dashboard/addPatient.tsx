@@ -182,7 +182,7 @@ function RouteComponent() {
                     field.state.meta.isTouched && !field.state.meta.isValid
 
                   return (
-                    <Field data-invalid={isInvalid}>
+                    <Field orientation="responsive" data-invalid={isInvalid}>
                       <FieldLabel htmlFor={field.name}>Gender:</FieldLabel>
                       <Select
                         name={field.name}

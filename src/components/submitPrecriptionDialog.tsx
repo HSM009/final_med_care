@@ -1,5 +1,5 @@
 import { useState, useTransition } from 'react'
-import { Button } from '@/components/ui/button'
+import { Button } from '#/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from '#/components/ui/dialog'
 import { createServerFn } from '@tanstack/react-start'
-import { authFnMiddleware } from '@/middlewares/auth'
-import { prisma } from '@/db'
+import { authFnMiddleware } from '#/middlewares/auth'
+import { prisma } from '#/db'
 import { toast } from 'sonner'
 import { useRouter } from '@tanstack/react-router'
 
@@ -88,6 +88,7 @@ export function SubmitPrescriptionDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
         <form
+          noValidate
           onSubmit={(e) => {
             e.preventDefault()
             e.stopPropagation()
