@@ -19,6 +19,7 @@ import { loginSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { Separator } from './ui/separator'
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -169,8 +170,15 @@ export function LoginForm() {
                   </Button>
 
                   <FieldDescription className="text-center">
-                    Don&apos;t have an account?{' '}
-                    <Link to="/signUp">Sign up</Link>
+                    <span>
+                      Forgot your password?{' '}
+                      <Link to="/forgotPassword">Forgot Password</Link>
+                    </span>
+                    <Separator orientation="horizontal" />
+                    <span>
+                      Don&apos;t have an account?{' '}
+                      <Link to="/signUp">Sign up</Link>
+                    </span>
                   </FieldDescription>
                 </Field>
               </FieldGroup>

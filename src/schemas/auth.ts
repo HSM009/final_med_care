@@ -130,6 +130,10 @@ export const passwordUpdateSchema = z
     path: ['newPassword'],
   })
 
+export const resetPasswordUpdateSchema = z.object({
+  password: z.string().min(8, 'Current password must be at least 8 characters'),
+})
+
 export const forceChangeEmailSchema = z.object({
   userId: z.string(),
   newEmail: z.string().email(),

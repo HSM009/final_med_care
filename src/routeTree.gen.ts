@@ -20,6 +20,7 @@ import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addP
 import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
+import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgotPassword/index'
 import { Route as DashboardPatientPrescriptionIdRouteImport } from './routes/dashboard/patientPrescription.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
@@ -79,6 +80,11 @@ const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
+  id: '/forgotPassword/',
+  path: '/forgotPassword/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const DashboardPatientPrescriptionIdRoute =
   DashboardPatientPrescriptionIdRouteImport.update({
     id: '/patientPrescription/$id',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
+  '/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/login/': typeof AuthLoginIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
 }
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
+  '/forgotPassword': typeof AuthForgotPasswordIndexRoute
   '/login': typeof AuthLoginIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
 }
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
+  '/_auth/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
 }
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/dashboard/patientPrescription/$id'
+    | '/forgotPassword/'
     | '/login/'
     | '/signUp/'
   fileRoutesByTo: FileRoutesByTo
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/dashboard/patientPrescription/$id'
+    | '/forgotPassword'
     | '/login'
     | '/signUp'
   id:
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/dashboard/patientPrescription/$id'
+    | '/_auth/forgotPassword/'
     | '/_auth/login/'
     | '/_auth/signUp/'
   fileRoutesById: FileRoutesById
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/forgotPassword/': {
+      id: '/_auth/forgotPassword/'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword/'
+      preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/dashboard/patientPrescription/$id': {
       id: '/dashboard/patientPrescription/$id'
       path: '/patientPrescription/$id'
@@ -302,11 +321,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
   AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   AuthSignUpIndexRoute: typeof AuthSignUpIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
   AuthLoginIndexRoute: AuthLoginIndexRoute,
   AuthSignUpIndexRoute: AuthSignUpIndexRoute,
 }

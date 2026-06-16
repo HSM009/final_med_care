@@ -73,6 +73,6 @@ export async function emailTemplateOTP(email: string, otp: string) {
     to: email,
     subject: 'Med Care- Verify your account',
     text: `Welcome! Here is the OPT of your accound: ${otp}`,
-    html: `<p>Welcome! Here is the OPT of your accound: <code>${otp}</code></p>`,
+    html: `<p>Welcome! Here is the OTP of your accound: <code>${otp}</code></p>`,
   })
 }

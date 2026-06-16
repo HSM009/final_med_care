@@ -71,6 +71,8 @@ export const auth = betterAuth({
       async sendVerificationOTP({ email, otp, type }) {
         if (type === 'email-verification') {
           await emailTemplateOTP(email, otp)
+        } else if (type === 'forget-password') {
+          await emailTemplateOTP(email, otp)
         } else {
         }
       },
