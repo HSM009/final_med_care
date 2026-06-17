@@ -30,7 +30,7 @@ export const uploadPrescriptionAttachmentAction = createServerFn({
         `prescriptions/attachments/${Date.now()}-${file.name}`,
         file,
         {
-          access: 'public', // Using public unless you have a premium signed-url setup
+          access: 'private', // Using public unless you have a premium signed-url setup
         },
       )
 
