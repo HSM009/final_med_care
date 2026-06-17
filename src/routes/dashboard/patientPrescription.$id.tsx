@@ -230,7 +230,7 @@ function RouteComponent() {
                           <td className="px-4 py-1 dark:text-primary text-secondary">
                             {medicine.Dosage}
                           </td>
-                          <td className="px-4 py-1 dark:text-primary text-secondary">
+                          <td className="px-4 py-1 dark:text-primary text-secondary ">
                             <DropdownMenuDosageSwitcher
                               value={medicine.idTime || '1'}
                               onChange={(newTime) =>
@@ -326,7 +326,7 @@ function RouteComponent() {
       {prescriptionState &&
         (selectedPrescriptionType === prescriptionButtons[0].type ? (
           <Card className="mt-6">
-            <CardContent className="pt-6">
+            <CardContent>
               {uploadedAttachments.length > 0 && (
                 <p className="text-sm text-green-400 mb-2 font-medium">
                   ✓ {uploadedAttachments.length} file(s) securely staging inside
@@ -334,22 +334,37 @@ function RouteComponent() {
                 </p>
               )}
               <p>
+                You have saved the prescription form{' '}
+                <span className=" font-bold ">({name.toUpperCase()})</span>.
+              </p>
+            </CardContent>
+          </Card>
+        ) : selectedPrescriptionType === prescriptionButtons[1].type ? (
+          <Card className="mt-6">
+            <CardContent>
+              {uploadedAttachments.length > 0 && (
+                <p className="text-xs text-green-400 mt-2 font-medium">
+                  ✓ {uploadedAttachments.length} file(s) securely staged in
+                  remote cloud storage.
+                </p>
+              )}
+              <p>
                 You have successfully submitted the presecription of patient{' '}
                 <span className=" font-bold ">({name.toUpperCase()})</span>
               </p>
             </CardContent>
-            {selectedPrescriptionType === prescriptionButtons[1].type && (
-              <CardFooter>
-                <Button
-                  className="font-medium cursor-pointer bg-blue-500 hover:bg-blue-600 text-white"
-                  onClick={() => handlePrint()}
-                >
-                  Print Prescription
-                </Button>
-              </CardFooter>
-            )}
+
+            <CardFooter>
+              <Button
+                className="font-medium cursor-pointer bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => handlePrint()}
+              >
+                Print Prescription
+              </Button>
+            </CardFooter>
           </Card>
         ) : null)}
+
       <div className="hidden">
         <PrescriptionPrintTemplate
           ref={componentRef}
