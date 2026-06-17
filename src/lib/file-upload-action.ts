@@ -19,8 +19,10 @@ export async function uploadPrescriptionAttachmentAction(formData: FormData) {
       `prescriptions/attachments/${Date.now()}-${file.name}`,
       file,
       {
-        access: 'public',
+        access: 'private',
         token: `VERCEL_OIDC_TOKEN`,
+        oidcToken: process.env.VERCEL_OIDC_TOKEN,
+        storeId: process.env.BLOB_STORE_ID,
       },
     )
 
