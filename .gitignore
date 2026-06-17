@@ -14,3 +14,5 @@ todos.json
 
 .vercel
 .env*
+
+.src/lib/file-upload-action.ts

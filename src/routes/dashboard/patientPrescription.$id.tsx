@@ -335,7 +335,10 @@ function RouteComponent() {
               )}
               <p>
                 You have saved the prescription form{' '}
-                <span className=" font-bold ">({name.toUpperCase()})</span>.
+                <span className=" font-bold text-blue-600">
+                  ({name.toUpperCase()})
+                </span>
+                .
               </p>
             </CardContent>
           </Card>
@@ -350,7 +353,9 @@ function RouteComponent() {
               )}
               <p>
                 You have successfully submitted the presecription of patient{' '}
-                <span className=" font-bold ">({name.toUpperCase()})</span>
+                <span className=" font-bold text-blue-600">
+                  ({name.toUpperCase()})
+                </span>
               </p>
             </CardContent>
 

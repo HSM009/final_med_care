@@ -22,7 +22,7 @@ export const uploadPrescriptionAttachmentAction = createServerFn({
         file,
         {
           access: 'private', // Using public unless you have a premium signed-url setup
-          // token: 'VERCEL_OIDC_TOKEN',
+          token: 'BLOB_READ_WRITE_TOKEN',
         },
       )
 
@@ -43,3 +43,5 @@ export const uploadPrescriptionAttachmentAction = createServerFn({
       }
     }
   })
+
+//---
