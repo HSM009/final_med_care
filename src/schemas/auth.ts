@@ -150,3 +150,12 @@ export const adminActionSchema = z.object({
   Title: z.string(),
   newValue: z.string().or(z.boolean()).or(z.number()),
 })
+
+export const submitPrescriptionSchema = z.object({
+  med_care_id: z.string(),
+  doctorId: z.string(),
+  note: z.string(),
+  prescriptionsContent: z.string(),
+  prescriptionSubmitted: z.union([z.string(), z.boolean()]), // Handles 'string | true'
+  relatedImages: z.string(),
+})

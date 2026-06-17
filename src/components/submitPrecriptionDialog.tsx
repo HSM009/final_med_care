@@ -10,39 +10,29 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import { createServerFn } from '@tanstack/react-start'
-import { authFnMiddleware } from '#/middlewares/auth'
-import { prisma } from '#/db'
 import { toast } from 'sonner'
 import { useRouter } from '@tanstack/react-router'
 
-export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }: { data: any }) => {
-    return await prisma.$transaction(async (tx) => {
-      const newPrescription = await tx.patientPrescription.create({
-        data: {
-          med_care_id: data.med_care_id,
-          prescriptionsContent: data.prescriptionsContent,
-          prescriptionSubmitted: data.prescriptionSubmitted,
-          doctorId: data.doctorId,
-          note: data.note,
-          relatedImages: data.relatedImages,
-        },
-      })
-      return newPrescription
-    })
-  })
+import {
+  uploadPrescriptionAttachmentAction,
+  type UploadedFileInfo,
+} from '#/lib/file-upload-action.ts'
+import { addPrescriptionSubmission } from '#/server/actions'
 
 interface SubmitPrescriptionDialogProps {
   prescriptionType: string
   med_care_id: string
   doctorId: string
   note: string
-  prescriptionVal: Boolean
+  prescriptionVal: boolean
   medicinesList: any[]
-  onSuccess?: (submitted: boolean, typeSubmitted: string) => void
-  relatedImages: string
+  existingUploadedImages: UploadedFileInfo[] // 🌐 Track already uploaded assets
+  onSuccess?: (
+    submitted: boolean,
+    typeSubmitted: string,
+    finalizedImages: UploadedFileInfo[],
+  ) => void
+  attachments: File[]
 }
 
 export function SubmitPrescriptionDialog({
@@ -53,24 +43,98 @@ export function SubmitPrescriptionDialog({
   medicinesList,
   onSuccess,
   prescriptionVal,
-  relatedImages,
+  existingUploadedImages,
+  attachments,
 }: SubmitPrescriptionDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const submitPrescriptionHandler = async (values: any) => {
+  // 🚀 Internalized file transmission helper returning results safely back to operational pipeline
+  const executeCloudUploads = async (
+    toastId: string | number,
+  ): Promise<UploadedFileInfo[]> => {
+    if (attachments.length === 0) return []
+    const trackingArray: UploadedFileInfo[] = []
+
+    for (let i = 0; i < attachments.length; i++) {
+      const fileToUpload = attachments[i]
+
+      toast.loading(
+        `Uploading asset (${i + 1}/${attachments.length}): ${fileToUpload.name}...`,
+        { id: toastId },
+      )
+
+      const formData = new FormData()
+      formData.append('file', fileToUpload)
+
+      const result = await uploadPrescriptionAttachmentAction({
+        data: formData,
+      })
+
+      if (!result.success || !result.fileInfo) {
+        throw new Error(
+          result.error || `Upload failed on item: ${fileToUpload.name}`,
+        )
+      }
+      trackingArray.push(result.fileInfo)
+    }
+    return trackingArray
+  }
+
+  const submitPrescriptionHandler = async () => {
+    const toastId = toast.loading('Initializing validation protocols...')
+
     startTransition(async () => {
       try {
-        await addPrescriptionSubmission({ data: values })
-        toast.success(
-          ` ${values.prescriptionSubmitted ? 'Prescription submitted successfully.' : 'Prescription saved successfully.'}.`,
+        // 1. Process local file uploads sequentially before database execution
+        let newCloudAssets: UploadedFileInfo[] = []
+        if (attachments.length > 0) {
+          toast.loading(
+            `Preparing transmission for ${attachments.length} files...`,
+            { id: toastId },
+          )
+          newCloudAssets = await executeCloudUploads(toastId)
+        }
+
+        // Combine freshly uploaded files with any pre-existing database listings
+        const finalImagesPayload = [
+          ...existingUploadedImages,
+          ...newCloudAssets,
+        ]
+
+        // 2. Clean and build data payloads
+        const cleanedMedicinesList = medicinesList.map(
+          ({ id, activeStatus, createdPrescription, ...rest }) => rest,
         )
+
+        const databasePayload = {
+          med_care_id,
+          doctorId,
+          note,
+          prescriptionsContent: JSON.stringify(cleanedMedicinesList) || 'N/A',
+          prescriptionSubmitted: prescriptionVal || 'N/A',
+          relatedImages: JSON.stringify(finalImagesPayload) || 'N/A',
+        }
+
+        // 3. Save directly to Prisma
+        await addPrescriptionSubmission({ data: databasePayload })
+
+        toast.success(
+          prescriptionVal
+            ? 'Prescription submitted successfully.'
+            : 'Prescription saved successfully.',
+          { id: toastId },
+        )
+
         setIsOpen(false)
-        onSuccess?.(true, prescriptionType)
+        onSuccess?.(true, prescriptionType, finalImagesPayload)
         await router.invalidate()
-      } catch (error) {
-        toast.error('Something went wrong finalizing the prescription.')
+      } catch (error: any) {
+        toast.error(
+          error.message || 'Something went wrong finalizing the prescription.',
+          { id: toastId },
+        )
         console.error(error)
       }
     })
@@ -82,7 +146,7 @@ export function SubmitPrescriptionDialog({
         <Button
           className={`w-40 font-medium cursor-pointer transition-colors ${
             prescriptionVal
-              ? 'bg-green-500 hover:bg-green-600 text-white'
+              ? 'bg-green-600 hover:bg-green-700 text-white'
               : 'bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-200'
           }`}
         >
@@ -90,65 +154,44 @@ export function SubmitPrescriptionDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
-        <form
-          noValidate
-          onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-        >
-          <DialogHeader>
-            <DialogTitle>Confirmation Alert</DialogTitle>
-            <DialogDescription>
-              {prescriptionVal
-                ? 'Are you sure you want to submit this prescription? This action cannot be undone.'
-                : 'Your precription will be saved. You can submit it later when you are ready.'}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Confirmation Alert</DialogTitle>
+          <DialogDescription>
+            {prescriptionVal
+              ? 'Are you sure you want to submit this prescription? This action cannot be undone.'
+              : 'Your prescription will be saved. You can submit it later when you are ready.'}
+          </DialogDescription>
+        </DialogHeader>
 
-          <DialogFooter className="mt-6 flex flex-row justify-end gap-2">
-            <DialogClose asChild>
-              <Button
-                type="button"
-                disabled={isPending}
-                className="cursor-pointer hover:bg-destructive/60 bg-destructive text-white"
-              >
-                Cancel
-              </Button>
-            </DialogClose>
+        <DialogFooter className="mt-6 flex flex-row justify-end gap-2">
+          <DialogClose asChild>
             <Button
               type="button"
               disabled={isPending}
-              onClick={() => {
-                const cleanedMedicinesList = medicinesList.map(
-                  ({ id, activeStatus, createdPrescription, ...rest }) => rest,
-                )
-
-                submitPrescriptionHandler({
-                  med_care_id: med_care_id,
-                  doctorId: doctorId,
-                  note: note,
-                  prescriptionsContent: JSON.stringify(cleanedMedicinesList),
-                  prescriptionSubmitted: prescriptionVal,
-                  relatedImages: relatedImages,
-                })
-              }}
-              className={` cursor-pointer min-w-30 ${
-                prescriptionVal
-                  ? 'bg-green-500 hover:bg-green-600 text-white'
-                  : 'bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-200'
-              }`}
+              className="cursor-pointer hover:bg-destructive/60 bg-destructive text-white"
             >
-              {prescriptionVal
-                ? isPending
-                  ? 'Submitting...'
-                  : 'Submit Prescription'
-                : isPending
-                  ? 'Saving...'
-                  : 'Save Prescription'}
+              Cancel
             </Button>
-          </DialogFooter>
-        </form>
+          </DialogClose>
+          <Button
+            type="button"
+            disabled={isPending}
+            onClick={submitPrescriptionHandler}
+            className={`cursor-pointer min-w-30 ${
+              prescriptionVal
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-200'
+            }`}
+          >
+            {prescriptionVal
+              ? isPending
+                ? 'Submitting...'
+                : 'Submit Prescription'
+              : isPending
+                ? 'Saving...'
+                : 'Save Prescription'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

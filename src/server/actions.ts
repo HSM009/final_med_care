@@ -6,6 +6,7 @@ import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
   addPatientSchema,
+  submitPrescriptionSchema,
   updateMedicineSchema,
   updatePatientSchema,
 } from '#/schemas/auth'
@@ -177,5 +178,24 @@ export const updatePatientAction = createServerFn({ method: 'POST' })
         },
       })
       return newPatient
+    })
+  })
+
+export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
+  .middleware([authFnMiddleware])
+  .validator(submitPrescriptionSchema)
+  .handler(async ({ data }: { data: any }) => {
+    return await prisma.$transaction(async (tx) => {
+      const newPrescription = await tx.patientPrescription.create({
+        data: {
+          med_care_id: data.med_care_id,
+          prescriptionsContent: data.prescriptionsContent,
+          prescriptionSubmitted: data.prescriptionSubmitted,
+          doctorId: data.doctorId,
+          note: data.note,
+          relatedImages: data.relatedImages,
+        },
+      })
+      return newPrescription
     })
   })

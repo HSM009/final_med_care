@@ -23,11 +23,7 @@ import { calculateAge } from '#/components/datePicker'
 import { SubmitPrescriptionDialog } from '#/components/submitPrecriptionDialog'
 import { FileUploader } from '#/components/ui/file-uploader'
 
-// 📥 Import our new custom Vercel Blob upload action
-import {
-  uploadPrescriptionAttachmentAction,
-  type UploadedFileInfo,
-} from '#/lib/file-upload-action.ts'
+import { type UploadedFileInfo } from '#/lib/file-upload-action.ts'
 
 export const Route = createFileRoute('/dashboard/patientPrescription/$id')({
   loader: async ({}) => {
@@ -42,81 +38,9 @@ export const Route = createFileRoute('/dashboard/patientPrescription/$id')({
 function RouteComponent() {
   const { user } = Route.useLoaderData()
   const [attachments, setAttachments] = useState<File[]>([])
-  const [uploadProgress, setUploadProgress] = useState<number | undefined>(
-    undefined,
-  )
-
-  // 💾 Holds permanent cloud CDN URLs for submission to your DB
   const [uploadedAttachments, setUploadedAttachments] = useState<
     UploadedFileInfo[]
   >([])
-
-  // 🚀 LIVE VERCEL BLOB UPLOAD IMPLEMENTATION
-  const handleUpload = async () => {
-    if (attachments.length === 0) return
-
-    setUploadProgress(5) // Show initial progress response kick-off
-    const toastId = toast.loading(
-      `Preparing transmission for ${attachments.length} file(s)...`,
-    )
-
-    const trackingArray: UploadedFileInfo[] = []
-
-    try {
-      // Loop through selected items sequentially to build an accurate progress tracking calculation
-      for (let i = 0; i < attachments.length; i++) {
-        const fileToUpload = attachments[i]
-
-        toast.loading(
-          `Uploading asset (${i + 1}/${attachments.length}): ${fileToUpload.name}...`,
-          { id: toastId },
-        )
-
-        const formData = new FormData()
-        formData.append('file', fileToUpload)
-
-        // Dispatch chunk directly over server actions channel
-        const result = await uploadPrescriptionAttachmentAction({
-          data: formData,
-        })
-
-        if (!result.success || !result.fileInfo) {
-          throw new Error(
-            result.error || `Upload failed on item: ${fileToUpload.name}`,
-          )
-        }
-
-        // Cache completed references
-        trackingArray.push(result.fileInfo)
-
-        // Increment progress indicator layout status bar smoothly
-        const currentPercentage = Math.round(
-          ((i + 1) / attachments.length) * 100,
-        )
-        setUploadProgress(currentPercentage)
-      }
-
-      // Append new files to state (preserves previously uploaded files if any)
-      setUploadedAttachments((prev) => [...prev, ...trackingArray])
-
-      setUploadProgress(100)
-      toast.success(
-        'All attachments successfully written to cloud storage networks!',
-        { id: toastId },
-      )
-      setAttachments([]) // Clear file-picker staging canvas slots
-    } catch (error: any) {
-      console.error('Upload process crashed:', error)
-      toast.error(
-        error.message ||
-          'An unexpected storage exception interrupted network traffic.',
-        { id: toastId },
-      )
-    } finally {
-      // Add a slight visual delay at 100% before hiding the bar
-      setTimeout(() => setUploadProgress(undefined), 800)
-    }
-  }
 
   const componentRef = useRef<HTMLDivElement>(null)
   const { name, med_care_id, age, phone, gender } =
@@ -294,19 +218,19 @@ function RouteComponent() {
                           key={medicine.id}
                           className="border-neutral-800 hover:bg-neutral-800/40 transition-colors"
                         >
-                          <td className="px-4 py-4 text-neutral-400">
+                          <td className="px-4 py-1 text-neutral-400">
                             {index + 1}
                           </td>
-                          <td className="px-4 py-4 dark:text-primary text-secondary">
+                          <td className="px-4 py-1 dark:text-primary text-secondary">
                             {medicine.medicineContentEnglish}
                           </td>
-                          <td className="px-4 py-4 dark:text-primary text-secondary">
+                          <td className="px-4 py-1 dark:text-primary text-secondary">
                             {medicine.medicineContentUrdu}
                           </td>
-                          <td className="px-4 py-4 dark:text-primary text-secondary">
+                          <td className="px-4 py-1 dark:text-primary text-secondary">
                             {medicine.Dosage}
                           </td>
-                          <td className="px-4 py-4 dark:text-primary text-secondary">
+                          <td className="px-4 py-1 dark:text-primary text-secondary">
                             <DropdownMenuDosageSwitcher
                               value={medicine.idTime || '1'}
                               onChange={(newTime) =>
@@ -314,7 +238,7 @@ function RouteComponent() {
                               }
                             />
                           </td>
-                          <td className="px-4 py-4 text-right">
+                          <td className="px-4 py-1 text-right">
                             <Button
                               variant="ghost"
                               onClick={() => handleRemoveMedicine(medicine.id)}
@@ -337,7 +261,6 @@ function RouteComponent() {
               </CardContent>
             </Card>
 
-            {/* 📸 PATIENT ATTACHMENT SECTIONS INTEGRATED WITH LIVE PROGRESS PROPS */}
             <Card className="  border-secondary/50 border-2 mt-6">
               <CardHeader>
                 <CardTitle className="text-xs flex w-full">
@@ -348,7 +271,12 @@ function RouteComponent() {
                 <FileUploader
                   value={attachments}
                   onValueChange={setAttachments}
-                  progress={uploadProgress}
+                  uploadedFiles={uploadedAttachments}
+                  onRemoveUploadedFile={(index) => {
+                    setUploadedAttachments((prev) =>
+                      prev.filter((_, i) => i !== index),
+                    )
+                  }}
                   dropzoneOptions={{
                     maxFiles: 5,
                     maxSize: 1024 * 1024 * 5, // 5MB limit
@@ -358,26 +286,6 @@ function RouteComponent() {
                     },
                   }}
                 />
-
-                {/* Visual indicator showing how many files have been uploaded to Vercel */}
-                {uploadedAttachments.length > 0 && (
-                  <p className="text-xs text-green-400 mt-2 font-medium">
-                    ✓ {uploadedAttachments.length} file(s) securely staged in
-                    remote cloud storage.
-                  </p>
-                )}
-
-                <Button
-                  onClick={handleUpload}
-                  disabled={
-                    attachments.length === 0 || uploadProgress !== undefined
-                  }
-                  className=" mt-4 w-full cursor-pointer"
-                >
-                  {uploadProgress !== undefined
-                    ? `Uploading Content (${uploadProgress}%)`
-                    : 'Upload Patient Assets'}
-                </Button>
               </CardContent>
             </Card>
 
@@ -393,13 +301,19 @@ function RouteComponent() {
                       note={doctorNote}
                       medicinesList={selectedMedicines}
                       prescriptionVal={btn.val}
-                      relatedImages={JSON.stringify(uploadedAttachments)}
-                      // if you update your dialog file structure to parse and save it to the db!
-                      onSuccess={(state, prescriptionTypeSelected) => {
+                      existingUploadedImages={uploadedAttachments}
+                      attachments={attachments}
+                      onSuccess={(
+                        state,
+                        prescriptionTypeSelected,
+                        finalizedImages,
+                      ) => {
                         if (state) {
                           setPrescriptionState(true)
                         }
                         setSelectedPrescriptionType(prescriptionTypeSelected)
+                        setUploadedAttachments(finalizedImages)
+                        setAttachments([]) // Flush local staged state cache post-upload
                       }}
                     />
                   ))}
@@ -412,19 +326,28 @@ function RouteComponent() {
       {prescriptionState &&
         (selectedPrescriptionType === prescriptionButtons[0].type ? (
           <Card className="mt-6">
-            <CardContent>You have saved the prescription form.</CardContent>
-          </Card>
-        ) : selectedPrescriptionType === prescriptionButtons[1].type ? (
-          <Card className="mt-6">
-            <CardContent>You have submitted the prescription form.</CardContent>
-            <CardFooter>
-              <Button
-                className="font-medium cursor-pointer bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => handlePrint()}
-              >
-                Print Prescription
-              </Button>
-            </CardFooter>
+            <CardContent className="pt-6">
+              {uploadedAttachments.length > 0 && (
+                <p className="text-sm text-green-400 mb-2 font-medium">
+                  ✓ {uploadedAttachments.length} file(s) securely staging inside
+                  cloud networks.
+                </p>
+              )}
+              <p>
+                You have successfully submitted the presecription of patient{' '}
+                <span className=" font-bold ">({name.toUpperCase()})</span>
+              </p>
+            </CardContent>
+            {selectedPrescriptionType === prescriptionButtons[1].type && (
+              <CardFooter>
+                <Button
+                  className="font-medium cursor-pointer bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={() => handlePrint()}
+                >
+                  Print Prescription
+                </Button>
+              </CardFooter>
+            )}
           </Card>
         ) : null)}
       <div className="hidden">

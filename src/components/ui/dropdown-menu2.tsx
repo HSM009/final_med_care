@@ -19,7 +19,7 @@ export default function DropdownMenuDosageSwitcher({
   const current = dosageTime.find((d) => d.time === value) || dosageTime[0]
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="bg-secondary flex items-center gap-2 rounded-lg px-6 py-2.5">
+      <DropdownMenuTrigger className="bg-secondary flex items-center gap-2 rounded-lg px-6 py-2.5 cursor-pointer">
         <div className="flex flex-col gap-1 text-start leading-none">
           <span className="max-w-[17ch] truncate text-sm leading-none font-semibold">
             {current.time}
@@ -29,10 +29,14 @@ export default function DropdownMenuDosageSwitcher({
           </span>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-66">
+      <DropdownMenuContent className="w-66 ">
         {dosageTime.map((dt) => (
-          <DropdownMenuItem key={dt.id} onClick={() => onChange(dt.time)}>
-            <div className="flex items-center gap-2">
+          <DropdownMenuItem
+            key={dt.id}
+            onClick={() => onChange(dt.time)}
+            className=" cursor-pointer"
+          >
+            <div className="flex items-center gap-2 ">
               <div className="flex flex-col gap-1 text-start leading-none">
                 <span className="max-w-[17ch] truncate text-sm leading-none font-semibold">
                   {dt.time}
