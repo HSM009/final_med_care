@@ -27,6 +27,7 @@ export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
           prescriptionSubmitted: data.prescriptionSubmitted,
           doctorId: data.doctorId,
           note: data.note,
+          relatedImages: data.relatedImages,
         },
       })
       return newPrescription
@@ -41,6 +42,7 @@ interface SubmitPrescriptionDialogProps {
   prescriptionVal: Boolean
   medicinesList: any[]
   onSuccess?: (submitted: boolean, typeSubmitted: string) => void
+  relatedImages: string
 }
 
 export function SubmitPrescriptionDialog({
@@ -51,6 +53,7 @@ export function SubmitPrescriptionDialog({
   medicinesList,
   onSuccess,
   prescriptionVal,
+  relatedImages,
 }: SubmitPrescriptionDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -127,6 +130,7 @@ export function SubmitPrescriptionDialog({
                   note: note,
                   prescriptionsContent: JSON.stringify(cleanedMedicinesList),
                   prescriptionSubmitted: prescriptionVal,
+                  relatedImages: relatedImages,
                 })
               }}
               className={` cursor-pointer min-w-30 ${
