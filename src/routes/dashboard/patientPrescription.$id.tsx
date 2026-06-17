@@ -407,7 +407,6 @@ function RouteComponent() {
           </div>
         </>
       )}
-
       {prescriptionState &&
         (selectedPrescriptionType === prescriptionButtons[0].type ? (
           <Card className="mt-6">
@@ -426,7 +425,6 @@ function RouteComponent() {
             </CardFooter>
           </Card>
         ) : null)}
-
       <div className="hidden">
         <PrescriptionPrintTemplate
           ref={componentRef}

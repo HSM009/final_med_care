@@ -10,19 +10,20 @@ export interface UploadedFileInfo {
 }
 
 export async function uploadPrescriptionAttachmentAction(formData: FormData) {
+  const getEnvKey = import.meta.env.BLOB_READ_WRITE_TOKEN
   try {
     const file = formData.get('file') as File
     if (!file) throw new Error('File missing from form payload data.')
 
     // Store within an isolated folder partition inside your Vercel cloud storage bucket
     const blob = await put(
-      `prescriptions/attachments/${Date.now()}-${file.name}`,
+      `store-attachments-med-care/prescriptions/attachments/${Date.now()}-${file.name},file`,
       file,
       {
         access: 'private',
-        token: `VERCEL_OIDC_TOKEN`,
-        oidcToken: process.env.VERCEL_OIDC_TOKEN,
-        storeId: process.env.BLOB_STORE_ID,
+        token: `BLOB_READ_WRITE_TOKEN`,
+        oidcToken: getEnvKey,
+        // storeId: process.env.BLOB_STORE_ID,
       },
     )
 
