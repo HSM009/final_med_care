@@ -1,5 +1,3 @@
-'use server' // Informs Vite to treat this file strictly as server territory
-
 import { createServerFn } from '@tanstack/react-start'
 import { prisma } from '@/db'
 import { authFnMiddleware } from '@/middlewares/auth'

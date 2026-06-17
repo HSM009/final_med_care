@@ -76,7 +76,9 @@ function RouteComponent() {
         formData.append('file', fileToUpload)
 
         // Dispatch chunk directly over server actions channel
-        const result = await uploadPrescriptionAttachmentAction(formData)
+        const result = await uploadPrescriptionAttachmentAction({
+          data: formData,
+        })
 
         if (!result.success || !result.fileInfo) {
           throw new Error(
