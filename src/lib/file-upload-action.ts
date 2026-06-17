@@ -1,4 +1,3 @@
-// src/actions/upload.ts
 import { createServerFn } from '@tanstack/react-start'
 import { put } from '@vercel/blob'
 
@@ -9,7 +8,6 @@ export interface UploadedFileInfo {
   contentType: string
 }
 
-// 🌐 Convert to an explicit TanStack Server Function
 export const uploadPrescriptionAttachmentAction = createServerFn({
   method: 'POST',
 })
@@ -18,13 +16,6 @@ export const uploadPrescriptionAttachmentAction = createServerFn({
     try {
       const file = data.get('file') as File
       if (!file) throw new Error('File missing from form payload data.')
-
-      // 🔍 Since this now executes safely on the backend server,
-      // this line will print your actual environment variable token!
-      console.log(
-        'TOKEN CHECK:',
-        process.env.BLOB_READ_WRITE_TOKEN?.substring(0, 10) + '...',
-      )
 
       const blob = await put(
         `prescriptions/attachments/${Date.now()}-${file.name}`,
