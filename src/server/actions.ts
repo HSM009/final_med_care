@@ -75,6 +75,7 @@ export const getPatientPrescriptions = createServerFn({ method: 'GET' })
         prescriptionsContent: true,
         createdPrescription: true,
         prescriptionSubmitted: true,
+        relatedImages: true,
         note: true,
         user: {
           select: {
@@ -108,6 +109,7 @@ export const getPatientPrescriptions = createServerFn({ method: 'GET' })
       patientAge: p.patientRecord?.age || new Date(),
       patientPhone: p.patientRecord?.phone || 'Unknown Phone',
       patientGender: p.patientRecord?.gender || 'Unknown Gender',
+      patientImages: p.relatedImages,
     }))
   })
 

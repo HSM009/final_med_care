@@ -23,7 +23,7 @@ import { calculateAge } from '#/components/datePicker'
 import { SubmitPrescriptionDialog } from '#/components/submitPrecriptionDialog'
 import { FileUploader } from '#/components/ui/file-uploader'
 
-import { type UploadedFileInfo } from '#/lib/file-upload-action.ts'
+import { type UploadedFileInfo } from '#/lib/vercel-action'
 
 export const Route = createFileRoute('/dashboard/patientPrescription/$id')({
   loader: async ({}) => {
@@ -334,7 +334,7 @@ function RouteComponent() {
                 </p>
               )}
               <p>
-                You have saved the prescription form{' '}
+                You have saved the prescription of patient{' '}
                 <span className=" font-bold text-blue-600">
                   ({name.toUpperCase()})
                 </span>

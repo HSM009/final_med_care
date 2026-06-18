@@ -17,6 +17,9 @@ import { PrescriptionPrintTemplate } from '@/components/prescriptionPrintTemplat
 import { useReactToPrint } from 'react-to-print'
 import { useRef } from 'react'
 import { Gender } from '@/generated/prisma/browser'
+import { getDownloadUrl, type UploadedFileInfo } from '#/lib/vercel-action'
+import { DownloadCloudIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface MedicineItem {
   medicineContentEnglish: string
@@ -36,6 +39,7 @@ interface PescriptionDrawerProps {
   patientAge: Date
   patientPhone: string
   patientGender: Gender
+  patientImages: string | UploadedFileInfo[]
   children: React.ReactNode
 }
 
@@ -51,6 +55,7 @@ export function PescriptionDrawer({
   patientAge,
   patientPhone,
   patientGender,
+  patientImages,
   children,
 }: PescriptionDrawerProps) {
   const medicines: MedicineItem[] = (() => {
@@ -65,6 +70,20 @@ export function PescriptionDrawer({
     }
     return prescriptionsContent
   })()
+
+  const imagesAttached: UploadedFileInfo[] = (() => {
+    if (!patientImages) return []
+    if (typeof patientImages === 'string') {
+      try {
+        return JSON.parse(patientImages)
+      } catch (e) {
+        console.error('Failed parsing prescription text content:', e)
+        return []
+      }
+    }
+    return patientImages
+  })()
+
   const atAge = () => {
     const birthDayAge = calculateAge(patientAge) || 0
     const prescriptionAge = calculateAge(createdPrescription) || 0
@@ -77,6 +96,45 @@ export function PescriptionDrawer({
     documentTitle: `Prescription-${patientName?.replace(/\s+/g, '-')}`,
   })
 
+  const handleDownloadUrl = async (fileUrl: string) => {
+    try {
+      toast.loading('Preparing download...', { id: 'download-status' })
+
+      // 1. Await streaming data from Tanstack server function
+      const result = await getDownloadUrl({ data: { fileUrl } })
+
+      if (!result.ok) {
+        toast.error('Download Failed: File inaccessible.', {
+          id: 'download-status',
+        })
+        return
+      }
+
+      // 2. Unpack binary payload stream into memory
+      const blob = await result.blob()
+      const downloadUrl = URL.createObjectURL(blob)
+      const filename = fileUrl.split('/').pop() || 'prescription-attachment'
+
+      // 3. Mount temporary download node and execute
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.setAttribute('download', filename)
+
+      document.body.appendChild(link)
+      link.click()
+
+      // 4. Garbage collection execution
+      document.body.removeChild(link)
+      URL.revokeObjectURL(downloadUrl)
+
+      toast.success('Download complete!', { id: 'download-status' })
+    } catch (error) {
+      console.error('Client download error:', error)
+      toast.error('An unexpected download error occurred.', {
+        id: 'download-status',
+      })
+    }
+  }
   return (
     <>
       <Drawer direction="right">
@@ -95,54 +153,55 @@ export function PescriptionDrawer({
               <CardContent>
                 <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default">
                   <table className="w-full text-sm text-left text-body">
-                    <tr className="  border-2 text-center">
-                      <td
-                        scope="col"
-                        className=" bg-gray-600 font-bold px-4 py-4"
-                      >
-                        Med Care Id
-                      </td>
-                      <td> {med_care_id} </td>
-                    </tr>
-                    <tr className="  border-2 text-center">
-                      <td
-                        scope="col"
-                        className="  bg-gray-600 font-bold px-4 py-4"
-                      >
-                        Patient Name
-                      </td>
-                      <td> {patientName}</td>
-                    </tr>
-                    <tr className="  border-2 text-center">
-                      <td
-                        scope="col"
-                        className="  bg-gray-600 font-bold px-4 py-4"
-                      >
-                        Patient Age / Gender
-                      </td>
-                      <td>
-                        {' '}
-                        {atAge()} yrs {patientGender.charAt(0)}
-                      </td>
-                    </tr>
-                    <tr className="  border-2 text-center">
-                      <td
-                        scope="col"
-                        className="  bg-gray-600 font-bold  px-4 py-4"
-                      >
-                        Doctor Name
-                      </td>
-                      <td> {doctorName} </td>
-                    </tr>
-                    <tr className="  border-2 text-center">
-                      <td
-                        scope="col"
-                        className="  bg-gray-600 font-bold  px-4 py-4"
-                      >
-                        Prescription Date
-                      </td>
-                      <td> {formatDateToDMY(createdPrescription)} </td>
-                    </tr>
+                    <tbody>
+                      <tr className="  border-2 text-center">
+                        <td
+                          scope="col"
+                          className=" bg-gray-600 font-bold px-4 py-4"
+                        >
+                          Med Care Id
+                        </td>
+                        <td> {med_care_id} </td>
+                      </tr>
+                      <tr className="  border-2 text-center">
+                        <td
+                          scope="col"
+                          className="  bg-gray-600 font-bold px-4 py-4"
+                        >
+                          Patient Name
+                        </td>
+                        <td> {patientName}</td>
+                      </tr>
+                      <tr className="  border-2 text-center">
+                        <td
+                          scope="col"
+                          className="  bg-gray-600 font-bold px-4 py-4"
+                        >
+                          Patient Age / Gender
+                        </td>
+                        <td>
+                          {atAge()} yrs {patientGender.charAt(0)}
+                        </td>
+                      </tr>
+                      <tr className="  border-2 text-center">
+                        <td
+                          scope="col"
+                          className="  bg-gray-600 font-bold  px-4 py-4"
+                        >
+                          Doctor Name
+                        </td>
+                        <td> {doctorName} </td>
+                      </tr>
+                      <tr className="  border-2 text-center">
+                        <td
+                          scope="col"
+                          className="  bg-gray-600 font-bold  px-4 py-4"
+                        >
+                          Prescription Date
+                        </td>
+                        <td> {formatDateToDMY(createdPrescription)} </td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               </CardContent>
@@ -204,6 +263,53 @@ export function PescriptionDrawer({
                                   dosageTime[0]?.uTime ||
                                   'ایک صبح، ایک دوپہر، ایک رات'}
                               </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card className=" mt-3">
+              <CardTitle className="px-3 pt-3 text-sm font-semibold">
+                Attached Files
+              </CardTitle>
+              <CardContent className="p-3">
+                {imagesAttached.length === 0 ? (
+                  <div className="text-center py-4 text-sm text-muted-foreground">
+                    No images attached in this file log record.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-base border">
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-muted text-xs uppercase tracking-wider border-b text-center">
+                        <tr>
+                          <th className="px-4 py-2">Attachments</th>
+                          <th className="sr-only">Download</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {imagesAttached.map((img, index) => (
+                          <tr
+                            key={index}
+                            className="flex justify-between items-center border-b last:border-0 hover:bg-muted/30 transition-colors w-full"
+                          >
+                            <td className="px-4 py-2.5 min-w-0 flex-1 text-left">
+                              <span className="font-medium text-foreground block truncate">
+                                {img.name}
+                              </span>
+                            </td>
+
+                            <td className="px-4 py-2.5 cursor-pointer text-blue-600 flex shrink-0 items-center">
+                              <DownloadCloudIcon
+                                className="h-5 w-5"
+                                onClick={() =>
+                                  // toast.info(`${img.url}`)
+                                  handleDownloadUrl(img.url)
+                                }
+                              />
                             </td>
                           </tr>
                         ))}

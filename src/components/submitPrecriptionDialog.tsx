@@ -16,7 +16,7 @@ import { useRouter } from '@tanstack/react-router'
 import {
   uploadPrescriptionAttachmentAction,
   type UploadedFileInfo,
-} from '#/lib/file-upload-action.ts'
+} from '#/lib/vercel-action'
 import { addPrescriptionSubmission } from '#/server/actions'
 
 interface SubmitPrescriptionDialogProps {
@@ -112,9 +112,9 @@ export function SubmitPrescriptionDialog({
           med_care_id,
           doctorId,
           note,
-          prescriptionsContent: JSON.stringify(cleanedMedicinesList) || 'N/A',
-          prescriptionSubmitted: prescriptionVal || 'N/A',
-          relatedImages: JSON.stringify(finalImagesPayload) || 'N/A',
+          prescriptionsContent: JSON.stringify(cleanedMedicinesList),
+          prescriptionSubmitted: prescriptionVal,
+          relatedImages: JSON.stringify(finalImagesPayload),
         }
 
         // 3. Save directly to Prisma

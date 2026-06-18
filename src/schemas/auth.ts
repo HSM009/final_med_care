@@ -159,3 +159,7 @@ export const submitPrescriptionSchema = z.object({
   prescriptionSubmitted: z.union([z.string(), z.boolean()]), // Handles 'string | true'
   relatedImages: z.string(),
 })
+
+export const downloadSchema = z.object({
+  fileUrl: z.string().url(),
+})

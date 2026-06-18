@@ -16,7 +16,7 @@ import imageCompression from 'browser-image-compression'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { type UploadedFileInfo } from '#/lib/file-upload-action.ts' // Ensure correct import path
+import { type UploadedFileInfo } from '#/lib/vercel-action' // Ensure correct import path
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: File[]

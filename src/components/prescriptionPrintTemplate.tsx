@@ -116,7 +116,7 @@ export const PrescriptionPrintTemplate = React.forwardRef<
             </thead>
             <tbody className="divide-y divide-gray-200 text-base">
               {medicines.map((med, index) => (
-                <tr key={med.id} className="align-middle">
+                <tr key={med.id || `med-row-${index}`} className="align-middle">
                   <td className="text-gray-500 font-medium">{index + 1}</td>
                   <td className="">
                     <div className="font-bold text-sm text-gray-900">
@@ -132,19 +132,19 @@ export const PrescriptionPrintTemplate = React.forwardRef<
                   <td className=" text-gray-700 text-sm font-medium pr-6">
                     {med.Dosage || '—'}
                   </td>
-                  <td className=" w-full bg-blue-50 text-right inline-block rounded border border-blue-200">
-                    <span className=" text-black font-bold px-2.5  text-xs">
-                      {med.idTime || '1+1+1'}
-                    </span>
-                    <br />
-                    <span
-                      className="  text-black font-bold px-2.5  text-xs"
-                      dir="rtl" // Added RTL support so Urdu text reads naturally left-to-right/right-to-left where appropriate
-                    >
-                      {dosageTime.find(
-                        (u) => u.time === medicines[index]?.idTime,
-                      )?.uTime || 'ایک صبح، ایک دوپہر، ایک رات'}
-                    </span>
+                  <td className="py-3 text-right">
+                    <div className="inline-block bg-blue-50/70 p-2 rounded border border-blue-100 min-w-35 text-right">
+                      <span className="block text-blue-900 font-bold text-xs">
+                        {med.idTime || '1+1+1'}
+                      </span>
+                      <span
+                        className="block text-gray-500 text-[11px] font-medium mt-0.5"
+                        dir="rtl"
+                      >
+                        {dosageTime.find((u) => u.time === med.idTime)?.uTime ||
+                          'ایک صبح، ایک دوپہر، ایک رات'}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               ))}

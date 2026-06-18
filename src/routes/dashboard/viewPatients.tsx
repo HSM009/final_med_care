@@ -176,29 +176,29 @@ function RouteComponent() {
         </CardContent>
       </Card>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className=" w-full mt-6"
-      >
-        <TabsList>
-          <TabsTrigger value="Overview">Overview</TabsTrigger>
-          <TabsTrigger
-            value="Precsription"
-            className={`${activeTab === 'Overview' ? 'hidden' : ''}`}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex w-full">
+            <span> Patient Record:</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className=" w-full"
           >
-            Precsription
-          </TabsTrigger>
-        </TabsList>
+            <TabsList>
+              <TabsTrigger value="Overview">Overview</TabsTrigger>
+              <TabsTrigger
+                value="Precsription"
+                className={`${activeTab === 'Overview' ? 'hidden' : ''}`}
+              >
+                Precsription
+              </TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="Overview">
-          <Card className="">
-            <CardHeader>
-              <CardTitle className="text-sm flex w-full">
-                <span> Patient Record:</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+            <TabsContent value="Overview">
               <div className="relative overflow-x-auto shadow-xs rounded-t-2xl border">
                 <table className="w-full text-sm text-left text-body">
                   <thead className="text-sm text-body bg-neutral-600 border-b">
@@ -278,7 +278,9 @@ function RouteComponent() {
                             className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-blue-500 hover:underline"
                             onClick={() => {
                               setActiveTab('Precsription')
-                              handleMedId(patient.med_care_id || ' ')
+                              setTimeout(() => {
+                                handleMedId(patient.med_care_id || ' ')
+                              }, 0)
                             }}
                           >
                             View
@@ -318,9 +320,9 @@ function RouteComponent() {
                   </tbody>
                 </table>
                 {items.length === 0 && (
-                  <li className="text-center py-8 text-indigo-300/70 italic">
+                  <div className="text-center py-8 text-indigo-300/70 italic">
                     No patients match your search criteria.
-                  </li>
+                  </div>
                 )}
               </div>
               <AppPagination
@@ -330,14 +332,14 @@ function RouteComponent() {
                 isPending={isPending}
                 onPageChange={handlePageChange}
               />
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="Precsription">
-          <GetPrescriptions medCareId={medId} />
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="Precsription" tabIndex={-1}>
+              <GetPrescriptions medCareId={medId} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   )
 }

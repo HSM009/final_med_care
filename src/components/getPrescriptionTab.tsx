@@ -154,6 +154,7 @@ export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
                               patientAge={prescription.patientAge}
                               patientPhone={prescription.patientPhone}
                               patientGender={prescription.patientGender}
+                              patientImages={prescription.patientImages}
                             >
                               <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
                                 View Details
@@ -182,6 +183,7 @@ export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
                                 patientAge={prescription.patientAge}
                                 patientPhone={prescription.patientPhone}
                                 patientGender={prescription.patientGender}
+                                patientImages={prescription.patientImages}
                               >
                                 <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
                                   View Details
