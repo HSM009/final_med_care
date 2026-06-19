@@ -9,6 +9,7 @@ import {
   submitPrescriptionSchema,
   updateMedicineSchema,
   updatePatientSchema,
+  updatePrescriptionSchema,
 } from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
 
@@ -200,6 +201,26 @@ export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
   .handler(async ({ data }: { data: any }) => {
     return await prisma.$transaction(async (tx) => {
       const newPrescription = await tx.patientPrescription.create({
+        data: {
+          med_care_id: data.med_care_id,
+          prescriptionsContent: data.prescriptionsContent,
+          prescriptionSubmitted: data.prescriptionSubmitted,
+          doctorId: data.doctorId,
+          note: data.note,
+          relatedImages: data.relatedImages,
+        },
+      })
+      return newPrescription
+    })
+  })
+
+export const updatePrescriptionSubmission = createServerFn({ method: 'POST' })
+  .middleware([authFnMiddleware])
+  .validator(updatePrescriptionSchema)
+  .handler(async ({ data }: { data: any }) => {
+    return await prisma.$transaction(async (tx) => {
+      const newPrescription = await tx.patientPrescription.update({
+        where: { id: Number(data.prescriptionId) },
         data: {
           med_care_id: data.med_care_id,
           prescriptionsContent: data.prescriptionsContent,

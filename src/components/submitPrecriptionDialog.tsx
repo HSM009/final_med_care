@@ -12,14 +12,19 @@ import {
 } from '#/components/ui/dialog'
 import { toast } from 'sonner'
 import { useRouter } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 
 import {
   uploadPrescriptionAttachmentAction,
   type UploadedFileInfo,
 } from '#/lib/vercel-action'
-import { addPrescriptionSubmission } from '#/server/actions'
+import {
+  addPrescriptionSubmission,
+  updatePrescriptionSubmission,
+} from '#/server/actions'
 
 interface SubmitPrescriptionDialogProps {
+  prescriptionId: string
   prescriptionType: string
   med_care_id: string
   doctorId: string
@@ -36,6 +41,7 @@ interface SubmitPrescriptionDialogProps {
 }
 
 export function SubmitPrescriptionDialog({
+  prescriptionId,
   prescriptionType,
   med_care_id,
   doctorId,
@@ -48,9 +54,9 @@ export function SubmitPrescriptionDialog({
 }: SubmitPrescriptionDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const queryClient = useQueryClient()
   const router = useRouter()
 
-  // 🚀 Internalized file transmission helper returning results safely back to operational pipeline
   const executeCloudUploads = async (
     toastId: string | number,
   ): Promise<UploadedFileInfo[]> => {
@@ -87,7 +93,6 @@ export function SubmitPrescriptionDialog({
 
     startTransition(async () => {
       try {
-        // 1. Process local file uploads sequentially before database execution
         let newCloudAssets: UploadedFileInfo[] = []
         if (attachments.length > 0) {
           toast.loading(
@@ -97,18 +102,16 @@ export function SubmitPrescriptionDialog({
           newCloudAssets = await executeCloudUploads(toastId)
         }
 
-        // Combine freshly uploaded files with any pre-existing database listings
         const finalImagesPayload = [
           ...existingUploadedImages,
           ...newCloudAssets,
         ]
 
-        // 2. Clean and build data payloads
         const cleanedMedicinesList = medicinesList.map(
           ({ id, activeStatus, createdPrescription, ...rest }) => rest,
         )
-
         const databasePayload = {
+          prescriptionId,
           med_care_id,
           doctorId,
           note,
@@ -116,9 +119,11 @@ export function SubmitPrescriptionDialog({
           prescriptionSubmitted: prescriptionVal,
           relatedImages: JSON.stringify(finalImagesPayload),
         }
-
-        // 3. Save directly to Prisma
-        await addPrescriptionSubmission({ data: databasePayload })
+        if (databasePayload.prescriptionId === '1') {
+          await addPrescriptionSubmission({ data: databasePayload })
+        } else {
+          await updatePrescriptionSubmission({ data: databasePayload })
+        }
 
         toast.success(
           prescriptionVal
@@ -129,6 +134,9 @@ export function SubmitPrescriptionDialog({
 
         setIsOpen(false)
         onSuccess?.(true, prescriptionType, finalImagesPayload)
+        await queryClient.invalidateQueries({
+          queryKey: ['prescriptions', databasePayload.med_care_id],
+        })
         await router.invalidate()
       } catch (error: any) {
         toast.error(

@@ -79,6 +79,8 @@ export const Route = createFileRoute('/dashboard/viewPatients')({
 })
 
 function RouteComponent() {
+  const { session } = Route.useRouteContext()
+
   const { items, totalCount } = Route.useLoaderData()
   const { search, page = 1 } = Route.useSearch()
   const [activeTab, setActiveTab] = useState<string>('Overview')
@@ -300,8 +302,7 @@ function RouteComponent() {
                           </EditPatientDialog>
 
                           <Link
-                            to="/dashboard/patientPrescription/$id"
-                            params={{ id: String(patient.id) }}
+                            to="/dashboard/patientPrescription"
                             search={{
                               name: patient.name || '',
                               med_care_id: patient.med_care_id || '',
@@ -309,6 +310,15 @@ function RouteComponent() {
                               phone: patient.phone || '',
                               email: patient.email,
                               gender: patient.gender,
+                              note: '',
+                              prescriptionsContent: [],
+                              relatedImages: [],
+                              doctorName: session.user.name,
+                              doctorQualification:
+                                session.user?.qualification || ' ',
+                              doctorPhone: session.user?.cellNo || ' ',
+                              id: patient.id,
+                              doctorId: session.user.id,
                             }}
                             className="font-medium text-green-500 hover:underline"
                           >
@@ -335,7 +345,13 @@ function RouteComponent() {
             </TabsContent>
 
             <TabsContent value="Precsription" tabIndex={-1}>
-              <GetPrescriptions medCareId={medId} />
+              <GetPrescriptions
+                medCareId={medId}
+                userId={session.user.id}
+                doctorName={session.user.name}
+                doctorQualification={session.user.qualification || ' '}
+                doctorCellNo={session.user.cellNo || ' '}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

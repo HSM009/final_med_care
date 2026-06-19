@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card'
-import { type NavPatientProps, prescriptionButtons } from '#/lib/types'
+import { prescriptionButtons } from '#/lib/types'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   MedicineDialog,
@@ -18,40 +18,33 @@ import { useRef, useState } from 'react'
 import DropdownMenuDosageSwitcher from '#/components/ui/dropdown-menu2'
 import { useReactToPrint } from 'react-to-print'
 import { PrescriptionPrintTemplate } from '#/components/prescriptionPrintTemplate'
-import { getSessionFn } from '#/data/session'
 import { calculateAge } from '#/components/datePicker'
 import { SubmitPrescriptionDialog } from '#/components/submitPrecriptionDialog'
 import { FileUploader } from '#/components/ui/file-uploader'
 
-import { type UploadedFileInfo } from '#/lib/vercel-action'
+import { patientPrescriptionSearchSchema } from '#/schemas/auth'
 
-export const Route = createFileRoute('/dashboard/patientPrescription/$id')({
-  loader: async ({}) => {
-    const session = await getSessionFn()
-    return {
-      user: session.user,
-    }
-  },
+export const Route = createFileRoute('/dashboard/patientPrescription')({
+  validateSearch: (search) => patientPrescriptionSearchSchema.parse(search),
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { user } = Route.useLoaderData()
+  const prescription = Route.useSearch()
   const [attachments, setAttachments] = useState<File[]>([])
-  const [uploadedAttachments, setUploadedAttachments] = useState<
-    UploadedFileInfo[]
-  >([])
-
   const componentRef = useRef<HTMLDivElement>(null)
-  const { name, med_care_id, age, phone, gender } =
-    Route.useSearch() as NavPatientProps
 
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
-    documentTitle: `Prescription-${name?.replace(/\s+/g, '-')}`,
+    documentTitle: `Prescription-${prescription.name?.replace(/\s+/g, '-') || 'Unknown'}`,
   })
 
-  const [selectedMedicines, setSelectedMedicines] = useState<MedicineItem[]>([])
+  const [selectedMedicines, setSelectedMedicines] = useState(
+    () => prescription?.prescriptionsContent || [],
+  )
+  const [uploadedAttachments, setUploadedAttachments] = useState(
+    () => prescription?.relatedImages || [],
+  )
 
   const handleAddMedicine = (newMed: MedicineItem) => {
     setSelectedMedicines((prev: any) => {
@@ -66,15 +59,17 @@ function RouteComponent() {
     })
   }
 
-  const updateMedicineDosage = (id: number, newDosage: string) => {
+  const updateMedicineDosage = (indexToUpdate: number, newDosage: string) => {
     setSelectedMedicines((prev) =>
-      prev.map((med) => (med.id === id ? { ...med, idTime: newDosage } : med)),
+      prev.map((med, index) =>
+        index === indexToUpdate ? { ...med, idTime: newDosage } : med,
+      ),
     )
   }
 
-  const handleRemoveMedicine = (id: number) => {
+  const handleRemoveMedicine = (indexToRemove: number) => {
     setSelectedMedicines((prev: any) =>
-      prev.filter((med: any) => med.id !== id),
+      prev.filter((_: any, index: number) => index !== indexToRemove),
     )
   }
 
@@ -84,15 +79,14 @@ function RouteComponent() {
   const atAge = (val: Date) => {
     return calculateAge(val)
   }
-
-  const [doctorNote, setDoctorNote] = useState<string>('')
+  const [doctorNote, setDoctorNote] = useState(() => prescription?.note || '')
 
   return (
     <div className="">
       <div className=" py-2 absolute top-12 left-4">
         <Link
           to="/dashboard/viewPatients"
-          search={{ search: name || '' }}
+          search={{ search: prescription.name || '' }}
           className={buttonVariants({ variant: 'secondary' })}
         >
           <ArrowLeft className=" size-4" /> Back to Patient List
@@ -113,7 +107,7 @@ function RouteComponent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className=" text-3xl text-center text-blue-500">
-                    {med_care_id}
+                    {prescription.med_care_id}
                   </CardContent>
                 </Card>
                 <Card className=" w-1/4 bg-secondary/50 border-secondary/50 border-2">
@@ -123,7 +117,7 @@ function RouteComponent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className=" text-3xl text-center text-blue-500">
-                    {name}
+                    {prescription.name}
                   </CardContent>
                 </Card>
                 <Card className=" w-1/4 bg-secondary/50 border-secondary/50 border-2">
@@ -134,14 +128,16 @@ function RouteComponent() {
                   </CardHeader>
                   <CardContent className=" text-3xl text-center text-blue-500">
                     {(() => {
-                      const numericAge = atAge(age)
+                      const numericAge = atAge(prescription.age)
                       if (numericAge === null) return 'N/A'
                       return numericAge > 1
                         ? `${numericAge} Yrs`
                         : `${numericAge} Yr`
                     })()}{' '}
-                    {gender.toUpperCase().charAt(0) +
-                      gender.slice(1).toLowerCase()}
+                    {prescription.gender
+                      ? prescription.gender.toUpperCase().charAt(0) +
+                        prescription.gender.slice(1).toLowerCase()
+                      : ''}
                   </CardContent>
                 </Card>
                 <Card className=" w-1/4 bg-secondary/50 border-secondary/50 border-2">
@@ -151,7 +147,7 @@ function RouteComponent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className=" text-3xl text-center text-blue-500">
-                    {phone}
+                    {prescription.phone}
                   </CardContent>
                 </Card>
               </div>
@@ -169,7 +165,7 @@ function RouteComponent() {
                     value={doctorNote}
                     onChange={(e) => setDoctorNote(e.target.value)}
                     placeholder="Type patient clinical observations, recommendations, or case notes here..."
-                    className="w-full min-h-25 p-3 text-sm bg-background border rounded-md focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 resize-y"
+                    className="w-full min-h-25 p-3 text-sm bg-background border rounded-md focus:outline-amber-950"
                   />
                 </CardContent>
               </CardHeader>
@@ -215,7 +211,7 @@ function RouteComponent() {
                     <tbody>
                       {selectedMedicines.map((medicine: any, index: any) => (
                         <tr
-                          key={medicine.id}
+                          key={`med-${index}`}
                           className="border-neutral-800 hover:bg-neutral-800/40 transition-colors"
                         >
                           <td className="px-4 py-1 text-neutral-400">
@@ -234,14 +230,14 @@ function RouteComponent() {
                             <DropdownMenuDosageSwitcher
                               value={medicine.idTime || '1'}
                               onChange={(newTime) =>
-                                updateMedicineDosage(medicine.id, newTime)
+                                updateMedicineDosage(index, newTime)
                               }
                             />
                           </td>
                           <td className="px-4 py-1 text-right">
                             <Button
                               variant="ghost"
-                              onClick={() => handleRemoveMedicine(medicine.id)}
+                              onClick={() => handleRemoveMedicine(index)}
                               className="text-red-400 hover:text-red-300 hover:bg-red-500/10 h-8 w-8 p-0 inline-flex items-center justify-center cursor-pointer"
                               title="Remove item"
                             >
@@ -295,9 +291,10 @@ function RouteComponent() {
                   {prescriptionButtons.map((btn) => (
                     <SubmitPrescriptionDialog
                       key={btn.type}
+                      prescriptionId={prescription.id.toString()}
                       prescriptionType={btn.type}
-                      med_care_id={med_care_id!}
-                      doctorId={user?.id || ''}
+                      med_care_id={prescription.med_care_id!}
+                      doctorId={prescription.doctorId}
                       note={doctorNote}
                       medicinesList={selectedMedicines}
                       prescriptionVal={btn.val}
@@ -324,7 +321,7 @@ function RouteComponent() {
         </>
       )}
       {prescriptionState &&
-        (selectedPrescriptionType === prescriptionButtons[0].type ? (
+        (selectedPrescriptionType === prescriptionButtons[0]?.type ? (
           <Card className="mt-6">
             <CardContent>
               {uploadedAttachments.length > 0 && (
@@ -336,13 +333,13 @@ function RouteComponent() {
               <p>
                 You have saved the prescription of patient{' '}
                 <span className=" font-bold text-blue-600">
-                  ({name.toUpperCase()})
+                  ({prescription.name?.toUpperCase() || ''})
                 </span>
                 .
               </p>
             </CardContent>
           </Card>
-        ) : selectedPrescriptionType === prescriptionButtons[1].type ? (
+        ) : selectedPrescriptionType === prescriptionButtons[1]?.type ? (
           <Card className="mt-6">
             <CardContent>
               {uploadedAttachments.length > 0 && (
@@ -354,7 +351,7 @@ function RouteComponent() {
               <p>
                 You have successfully submitted the presecription of patient{' '}
                 <span className=" font-bold text-blue-600">
-                  ({name.toUpperCase()})
+                  ({prescription.name?.toUpperCase() || ''})
                 </span>
               </p>
             </CardContent>
@@ -374,21 +371,22 @@ function RouteComponent() {
         <PrescriptionPrintTemplate
           ref={componentRef}
           patientData={{
-            name,
-            med_care_id,
-            age: atAge(age) || 0,
-            gender,
-            phone,
+            name: prescription.name || '',
+            med_care_id: prescription.med_care_id || '',
+            age: atAge(prescription.age) || 0,
+            gender: prescription.gender || '',
+            phone: prescription.phone || '',
           }}
           doctorNote={doctorNote}
           createdPrescription={new Date()}
           medicines={selectedMedicines}
           doctorData={{
             qualification:
-              user?.qualification || 'Doctor Qualification Not Provided',
-            cellNo: user?.cellNo || 'Doctor Cell No. Not Provided',
+              prescription?.doctorQualification ||
+              'Doctor Qualification Not Provided',
+            cellNo: prescription?.doctorPhone || 'Doctor Cell No. Not Provided',
             user: {
-              name: user?.name || 'Doctor Name',
+              name: prescription?.doctorName || 'Unknown Doctor',
             },
           }}
           printType="Original"

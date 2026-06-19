@@ -15,13 +15,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardViewPatientsRouteImport } from './routes/dashboard/viewPatients'
 import { Route as DashboardViewMedicineListRouteImport } from './routes/dashboard/viewMedicineList'
+import { Route as DashboardPatientPrescriptionRouteImport } from './routes/dashboard/patientPrescription'
 import { Route as DashboardAdministerUserRouteImport } from './routes/dashboard/administerUser'
 import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addPatient'
 import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgotPassword/index'
-import { Route as DashboardPatientPrescriptionIdRouteImport } from './routes/dashboard/patientPrescription.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
 
@@ -55,6 +55,12 @@ const DashboardViewMedicineListRoute =
     path: '/viewMedicineList',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardPatientPrescriptionRoute =
+  DashboardPatientPrescriptionRouteImport.update({
+    id: '/patientPrescription',
+    path: '/patientPrescription',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
 const DashboardAdministerUserRoute = DashboardAdministerUserRouteImport.update({
   id: '/administerUser',
   path: '/administerUser',
@@ -85,12 +91,6 @@ const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   path: '/forgotPassword/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const DashboardPatientPrescriptionIdRoute =
-  DashboardPatientPrescriptionIdRouteImport.update({
-    id: '/patientPrescription/$id',
-    path: '/patientPrescription/$id',
-    getParentRoute: () => DashboardRouteRoute,
-  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -108,12 +108,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/login/': typeof AuthLoginIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
@@ -123,12 +123,12 @@ export interface FileRoutesByTo {
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/forgotPassword': typeof AuthForgotPasswordIndexRoute
   '/login': typeof AuthLoginIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
@@ -141,12 +141,12 @@ export interface FileRoutesById {
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/dashboard/patientPrescription/$id': typeof DashboardPatientPrescriptionIdRoute
   '/_auth/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
@@ -159,12 +159,12 @@ export interface FileRouteTypes {
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
-    | '/dashboard/patientPrescription/$id'
     | '/forgotPassword/'
     | '/login/'
     | '/signUp/'
@@ -174,12 +174,12 @@ export interface FileRouteTypes {
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard'
     | '/api/admin/approve-user'
     | '/api/auth/$'
-    | '/dashboard/patientPrescription/$id'
     | '/forgotPassword'
     | '/login'
     | '/signUp'
@@ -191,12 +191,12 @@ export interface FileRouteTypes {
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
-    | '/dashboard/patientPrescription/$id'
     | '/_auth/forgotPassword/'
     | '/_auth/login/'
     | '/_auth/signUp/'
@@ -254,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardViewMedicineListRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/patientPrescription': {
+      id: '/dashboard/patientPrescription'
+      path: '/patientPrescription'
+      fullPath: '/dashboard/patientPrescription'
+      preLoaderRoute: typeof DashboardPatientPrescriptionRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/administerUser': {
       id: '/dashboard/administerUser'
       path: '/administerUser'
@@ -296,13 +303,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/dashboard/patientPrescription/$id': {
-      id: '/dashboard/patientPrescription/$id'
-      path: '/patientPrescription/$id'
-      fullPath: '/dashboard/patientPrescription/$id'
-      preLoaderRoute: typeof DashboardPatientPrescriptionIdRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -340,20 +340,20 @@ interface DashboardRouteRouteChildren {
   DashboardAccountSettingRoute: typeof DashboardAccountSettingRoute
   DashboardAddPatientRoute: typeof DashboardAddPatientRoute
   DashboardAdministerUserRoute: typeof DashboardAdministerUserRoute
+  DashboardPatientPrescriptionRoute: typeof DashboardPatientPrescriptionRoute
   DashboardViewMedicineListRoute: typeof DashboardViewMedicineListRoute
   DashboardViewPatientsRoute: typeof DashboardViewPatientsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
-  DashboardPatientPrescriptionIdRoute: typeof DashboardPatientPrescriptionIdRoute
 }
 
 const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAccountSettingRoute: DashboardAccountSettingRoute,
   DashboardAddPatientRoute: DashboardAddPatientRoute,
   DashboardAdministerUserRoute: DashboardAdministerUserRoute,
+  DashboardPatientPrescriptionRoute: DashboardPatientPrescriptionRoute,
   DashboardViewMedicineListRoute: DashboardViewMedicineListRoute,
   DashboardViewPatientsRoute: DashboardViewPatientsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-  DashboardPatientPrescriptionIdRoute: DashboardPatientPrescriptionIdRoute,
 }
 
 const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(

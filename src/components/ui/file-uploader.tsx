@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Plus,
   Loader2,
+  ImageIcon,
 } from 'lucide-react'
 import imageCompression from 'browser-image-compression'
 import { cn } from '@/lib/utils'
@@ -155,9 +156,9 @@ export function FileUploader({
               <div className="flex items-center gap-3 min-w-0">
                 {file.contentType?.startsWith('image/') ||
                 file.name.match(/\.(jpg|jpeg|png|webp)$/i) ? (
-                  <img
-                    src={file.url}
-                    alt={file.name}
+                  <ImageIcon
+                    // src={file.url}
+                    // alt={file.name}
                     className="h-9 w-9 rounded object-cover shrink-0 border"
                   />
                 ) : (

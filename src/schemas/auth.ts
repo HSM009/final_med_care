@@ -159,12 +159,16 @@ export const submitPrescriptionSchema = z.object({
   prescriptionSubmitted: z.union([z.string(), z.boolean()]), // Handles 'string | true'
   relatedImages: z.string(),
 })
+export const updatePrescriptionSchema = submitPrescriptionSchema.extend({
+  prescriptionId: z.string(),
+})
 
 export const downloadSchema = z.object({
   fileUrl: z.string().url(),
 })
 
 export const patientPrescriptionSearchSchema = z.object({
+  id: z.number(),
   name: z.string(),
   med_care_id: z.string(),
   age: z.any(), // Keeps the incoming date or string safe
@@ -174,4 +178,22 @@ export const patientPrescriptionSearchSchema = z.object({
   note: z.string().optional().nullable().catch(''),
   prescriptionsContent: z.array(z.any()).catch([]).optional(),
   relatedImages: z.array(z.any()).catch([]).optional(),
+  doctorName: z.string(),
+  doctorId: z.string(),
+  doctorQualification: z.string(),
+  doctorPhone: z.string(),
 })
+
+export const patientPrescriptionSearchSchema1 = z
+  .object({
+    name: z.string(),
+    med_care_id: z.string(),
+    age: z.any(), // Keeps the incoming date or string safe
+    phone: z.string(),
+    email: z.string().optional().nullable(),
+    gender: z.string(),
+    note: z.string().optional().nullable().catch(''),
+    prescriptionsContent: z.array(z.any()).catch([]).optional(),
+    relatedImages: z.array(z.any()).catch([]).optional(),
+  })
+  .passthrough()

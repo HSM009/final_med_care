@@ -39,7 +39,6 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
     },
     validators: {
       onSubmit: addOrUpdateMedicineSchema,
-      onBlur: addOrUpdateMedicineSchema,
     },
     onSubmit: async ({ value }) => {
       try {

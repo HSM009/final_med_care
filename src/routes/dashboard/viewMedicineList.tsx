@@ -54,12 +54,11 @@ export const getMedicineList = createServerFn({ method: 'GET' })
         : {}),
     }
 
-    // Run parallel queries for maximum speed efficiency
     const [items, totalCount] = await Promise.all([
       prisma.medicineList.findMany({
         where: whereClause,
-        skip: (currentPage - 1) * PAGE_SIZE, // Skips records based on active index page
-        take: PAGE_SIZE, // Locks exactly 10 items
+        skip: (currentPage - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
         orderBy: { id: 'asc' },
       }),
       prisma.medicineList.count({ where: whereClause }),

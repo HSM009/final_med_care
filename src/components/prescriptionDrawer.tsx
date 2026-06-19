@@ -1,4 +1,4 @@
-import { formatDateToDMY } from '#/lib/types' // Adjusted to match your absolute path mapping
+import { formatDateToDMY, type SinglePrescription } from '#/lib/types' // Adjusted to match your absolute path mapping
 import { Button } from './ui/button'
 import {
   Drawer,
@@ -16,7 +16,6 @@ import { calculateAge } from './datePicker'
 import { PrescriptionPrintTemplate } from '@/components/prescriptionPrintTemplate'
 import { useReactToPrint } from 'react-to-print'
 import { useRef } from 'react'
-import type { Gender } from '#/generated/prisma/enums'
 import { getDownloadUrl, type UploadedFileInfo } from '#/lib/vercel-action'
 import { DownloadCloudIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,23 +25,6 @@ interface MedicineItem {
   medicineContentUrdu: string
   Dosage: string
   idTime: string
-}
-
-interface SinglePrescription {
-  id: number
-  med_care_id: string | null
-  createdPrescription: Date
-  prescriptionSubmitted: boolean
-  prescriptionsContent: string | MedicineItem[] | null
-  doctorName: string | null
-  doctorQualification: string | null
-  doctorCellNo: string | null
-  doctorNote: string | null
-  patientName: string | null
-  patientAge: Date
-  patientPhone: string | null
-  patientGender: Gender | string | null
-  patientImages: string | UploadedFileInfo[] | null
 }
 
 interface PescriptionDrawerProps {

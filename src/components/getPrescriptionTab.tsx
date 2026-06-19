@@ -9,7 +9,21 @@ import { patientPrescriptionsQueryOptions } from '#/server/actions'
 
 const o_PAGE_SIZE = 8
 
-export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
+interface getPrescriptionProp {
+  medCareId: string
+  userId: string
+  doctorName: string
+  doctorQualification: string
+  doctorCellNo: string
+}
+
+export default function GetPrescriptions({
+  medCareId,
+  userId,
+  doctorName,
+  doctorQualification,
+  doctorCellNo,
+}: getPrescriptionProp) {
   const [page, setPage] = useState(1)
   const [isPending, startTransition] = useTransition()
 
@@ -27,6 +41,7 @@ export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
     (page - 1) * o_PAGE_SIZE,
     page * o_PAGE_SIZE,
   )
+
   return (
     <>
       <div>
@@ -118,8 +133,30 @@ export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
                             <>
                               <div className="  text-yellow-400 hover:underline cursor-pointer font-medium">
                                 <Link
-                                  to="/dashboard/patientPrescription/$id"
-                                  params={{ id: String(prescription.id) }}
+                                  to="/dashboard/patientPrescription"
+                                  search={{
+                                    id: prescription.id,
+                                    name: prescription.patientName,
+                                    med_care_id: prescription.med_care_id || '',
+                                    age: prescription.patientAge,
+                                    phone: prescription.patientPhone,
+                                    gender: prescription.patientGender,
+                                    email: prescription.patientEmail,
+                                    note: prescription.doctorNote,
+                                    prescriptionsContent:
+                                      prescription.prescriptionsContent
+                                        ? JSON.parse(
+                                            prescription.prescriptionsContent,
+                                          )
+                                        : [],
+                                    relatedImages: prescription.patientImages
+                                      ? JSON.parse(prescription.patientImages)
+                                      : [],
+                                    doctorName: doctorName,
+                                    doctorQualification: doctorQualification,
+                                    doctorPhone: doctorCellNo,
+                                    doctorId: userId.toString(),
+                                  }}
                                 >
                                   Open
                                 </Link>

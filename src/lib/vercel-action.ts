@@ -23,6 +23,7 @@ export const uploadPrescriptionAttachmentAction = createServerFn({
         file,
         {
           access: 'private', // Using public unless you have a premium signed-url setup
+          token: process.env.BLOB_READ_WRITE_TOKEN,
         },
       )
 

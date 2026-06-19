@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import { type User } from 'better-auth'
 import { Gender } from '@/generated/prisma/browser'
+import type { UploadedFileInfo } from './vercel-action'
+import type { MedicineItem } from '#/components/addPatientMedicineDialog'
 
 export interface navUserProps {
   user: User
@@ -126,4 +128,21 @@ export interface AdminFieldCardProps {
   currentData: string | Boolean | Number
   sessionName?: string
   validatorHandler: any
+}
+
+export interface SinglePrescription {
+  id: number
+  med_care_id: string | null
+  createdPrescription: Date
+  prescriptionSubmitted: boolean
+  prescriptionsContent: string | MedicineItem[] | null
+  doctorName: string | null
+  doctorQualification: string | null
+  doctorCellNo: string | null
+  doctorNote: string | null
+  patientName: string | null
+  patientAge: Date
+  patientPhone: string | null
+  patientGender: Gender | string | null
+  patientImages: string | UploadedFileInfo[] | null
 }
