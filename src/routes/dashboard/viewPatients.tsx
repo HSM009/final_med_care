@@ -303,10 +303,10 @@ function RouteComponent() {
                             to="/dashboard/patientPrescription/$id"
                             params={{ id: String(patient.id) }}
                             search={{
-                              name: patient.name,
-                              med_care_id: patient.med_care_id,
+                              name: patient.name || '',
+                              med_care_id: patient.med_care_id || '',
                               age: patient.age,
-                              phone: patient.phone,
+                              phone: patient.phone || '',
                               email: patient.email,
                               gender: patient.gender,
                             }}

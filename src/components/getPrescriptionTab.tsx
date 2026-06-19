@@ -1,53 +1,32 @@
+import { useState, useTransition } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { formatDateToDMY } from '#/lib/types'
 import { AppPagination } from './appPagination'
-import { useEffect, useState, useTransition } from 'react'
 import { PescriptionDrawer } from './prescriptionDrawer'
-import { getPatientPrescriptions } from '#/server/actions'
+import { formatDateToDMY } from '#/lib/types'
+import { patientPrescriptionsQueryOptions } from '#/server/actions'
 
-var o_PAGE_SIZE = 8
+const o_PAGE_SIZE = 8
 
 export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
-  const [prescriptions, setPrescriptions] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [page, setPage] = useState(1)
   const [isPending, startTransition] = useTransition()
 
-  const [page, setPage] = useState(1)
-
-  useEffect(() => {
-    if (!medCareId || medCareId.trim() === '') {
-      setPrescriptions([])
-      return
-    }
-
-    async function loadPrescriptions() {
-      try {
-        setIsLoading(true)
-        const data = await getPatientPrescriptions({ data: medCareId })
-        setPrescriptions(data)
-        setPage(1)
-      } catch (error) {
-        console.error('Failed to load patient prescriptions:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadPrescriptions()
-  }, [medCareId])
+  const { data: prescriptions = [], isLoading } = useQuery(
+    patientPrescriptionsQueryOptions(medCareId),
+  )
 
   const handlePageChange = (newPage: number) => {
     startTransition(() => {
       setPage(newPage)
     })
   }
-
   const totalCount = prescriptions.length
   const paginatedPrescriptions = prescriptions.slice(
     (page - 1) * o_PAGE_SIZE,
     page * o_PAGE_SIZE,
   )
-
   return (
     <>
       <div>
@@ -135,62 +114,23 @@ export default function GetPrescriptions({ medCareId }: { medCareId: string }) {
                         </td>
 
                         <td className="px-6 py-3 flex items-center justify-end gap-3 whitespace-nowrap">
-                          {prescription.prescriptionSubmitted ? (
-                            <PescriptionDrawer
-                              createdPrescription={
-                                prescription.createdPrescription
-                              }
-                              prescriptionsContent={
-                                prescription.prescriptionsContent
-                              }
-                              med_care_id={prescription.med_care_id}
-                              doctorName={prescription.doctorName}
-                              doctorQualification={
-                                prescription.doctorQualification
-                              }
-                              doctorCellNo={prescription.doctorCellNo}
-                              doctorNote={prescription.doctorNote}
-                              patientName={prescription.patientName}
-                              patientAge={prescription.patientAge}
-                              patientPhone={prescription.patientPhone}
-                              patientGender={prescription.patientGender}
-                              patientImages={prescription.patientImages}
-                            >
-                              <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
-                                View Details
-                              </span>
-                            </PescriptionDrawer>
-                          ) : (
+                          {!prescription.prescriptionSubmitted && (
                             <>
-                              <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-yellow-400 mr-4 hover:underline">
-                                Open
-                              </span>
-                              <PescriptionDrawer
-                                createdPrescription={
-                                  prescription.createdPrescription
-                                }
-                                prescriptionsContent={
-                                  prescription.prescriptionsContent
-                                }
-                                med_care_id={prescription.med_care_id}
-                                doctorName={prescription.doctorName}
-                                doctorQualification={
-                                  prescription.doctorQualification
-                                }
-                                doctorCellNo={prescription.doctorCellNo}
-                                doctorNote={prescription.doctorNote}
-                                patientName={prescription.patientName}
-                                patientAge={prescription.patientAge}
-                                patientPhone={prescription.patientPhone}
-                                patientGender={prescription.patientGender}
-                                patientImages={prescription.patientImages}
-                              >
-                                <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
-                                  View Details
-                                </span>
-                              </PescriptionDrawer>
+                              <div className="  text-yellow-400 hover:underline cursor-pointer font-medium">
+                                <Link
+                                  to="/dashboard/patientPrescription/$id"
+                                  params={{ id: String(prescription.id) }}
+                                >
+                                  Open
+                                </Link>
+                              </div>
                             </>
                           )}
+                          <PescriptionDrawer prescription={prescription}>
+                            <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
+                              View Details
+                            </span>
+                          </PescriptionDrawer>
                         </td>
                       </tr>
                     ))

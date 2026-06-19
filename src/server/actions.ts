@@ -1,5 +1,5 @@
 'use server'
-
+import { queryOptions } from '@tanstack/react-query'
 import { prisma } from '#/db'
 import { authFnMiddleware } from '#/middlewares/auth'
 import {
@@ -62,7 +62,7 @@ export const getPatientPrescriptions = createServerFn({ method: 'GET' })
   .validator((medCareId: string) => medCareId)
   .middleware([authFnMiddleware])
   .handler(async ({ data: medCareId }) => {
-    const prescriptions = await prisma.patientPrescription.findMany({
+    const prescription = await prisma.patientPrescription.findMany({
       where: {
         med_care_id: medCareId,
       },
@@ -90,12 +90,15 @@ export const getPatientPrescriptions = createServerFn({ method: 'GET' })
             age: true,
             phone: true,
             gender: true,
+            email: true,
           },
         },
       },
     })
-
-    return prescriptions.map((p) => ({
+    if (!prescription) {
+      throw new Error('Prescription record not found')
+    }
+    return prescription.map((p) => ({
       id: p.id,
       med_care_id: p.med_care_id,
       prescriptionsContent: p.prescriptionsContent,
@@ -107,10 +110,18 @@ export const getPatientPrescriptions = createServerFn({ method: 'GET' })
       doctorNote: p.note || 'No note available',
       patientName: p.patientRecord?.name || ' Unknown Patient',
       patientAge: p.patientRecord?.age || new Date(),
+      patientEmail: p.patientRecord?.email,
       patientPhone: p.patientRecord?.phone || 'Unknown Phone',
       patientGender: p.patientRecord?.gender || 'Unknown Gender',
       patientImages: p.relatedImages,
     }))
+  })
+
+export const patientPrescriptionsQueryOptions = (medCareId: string) =>
+  queryOptions({
+    queryKey: ['prescriptions', medCareId],
+    queryFn: () => getPatientPrescriptions({ data: medCareId }),
+    staleTime: 1000 * 60 * 5, // Data is considered fresh for 5 minutes
   })
 
 export const addMedicineAction = createServerFn({ method: 'POST' })

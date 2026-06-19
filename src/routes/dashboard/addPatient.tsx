@@ -44,7 +44,7 @@ function RouteComponent() {
     },
     validators: {
       onSubmit: addPatientSchema,
-      onBlur: addPatientSchema,
+      onChange: addPatientSchema,
     },
     onSubmit: async ({ value }) => {
       try {

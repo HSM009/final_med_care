@@ -163,3 +163,15 @@ export const submitPrescriptionSchema = z.object({
 export const downloadSchema = z.object({
   fileUrl: z.string().url(),
 })
+
+export const patientPrescriptionSearchSchema = z.object({
+  name: z.string(),
+  med_care_id: z.string(),
+  age: z.any(), // Keeps the incoming date or string safe
+  phone: z.string(),
+  email: z.string().optional().nullable(),
+  gender: z.string(),
+  note: z.string().optional().nullable().catch(''),
+  prescriptionsContent: z.array(z.any()).catch([]).optional(),
+  relatedImages: z.array(z.any()).catch([]).optional(),
+})

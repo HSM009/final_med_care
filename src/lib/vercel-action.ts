@@ -49,13 +49,10 @@ export const getDownloadUrl = createServerFn({ method: 'GET' })
   .middleware([])
   .handler(async ({ data }) => {
     try {
-      // 1. Defensively fix double-encoding safely
       let cleanUrl = data.fileUrl
       if (cleanUrl.includes('%25')) {
         cleanUrl = decodeURIComponent(cleanUrl)
       }
-
-      // 2. Feed token explicitly to guarantee it reaches Vercel's API gateway
       const blobResult = await get(cleanUrl, {
         access: 'private',
         token: process.env.BLOB_READ_WRITE_TOKEN,
@@ -64,10 +61,7 @@ export const getDownloadUrl = createServerFn({ method: 'GET' })
       if (!blobResult) {
         return new Response('File not found', { status: 404 })
       }
-
       const filename = blobResult.blob.pathname.split('/').pop() || 'download'
-
-      // 3. Return the raw native web stream response
       return new Response(blobResult.stream as unknown as BodyInit, {
         status: 200,
         headers: {

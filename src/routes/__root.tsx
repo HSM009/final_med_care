@@ -4,8 +4,7 @@ import {
   Scripts,
   createRootRoute,
 } from '@tanstack/react-router'
-// import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-// import { TanStackDevtools } from '@tanstack/react-devtools'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '#/components/ui/sonner'
 import { ThemeProvider } from '#/lib/theme-provider'
 
@@ -13,7 +12,14 @@ import appCss from '../styles.css?url'
 import { buttonVariants } from '#/components/ui/button'
 import { cn } from '#/lib/utils'
 
-export const Route = createRootRoute({
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes standard caching default
+    },
+  },
+})
+export const Route = createRootRoute<{ queryClient: QueryClient }>({
   head: () => ({
     meta: [
       {
@@ -34,6 +40,7 @@ export const Route = createRootRoute({
       },
     ],
   }),
+
   shellComponent: RootDocument,
   notFoundComponent: () => {
     return (
@@ -56,16 +63,18 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <ThemeProvider>
-          {children}
-          <Toaster closeButton position="top-center" />
-        </ThemeProvider>
-        <Scripts />
-      </body>
+      <QueryClientProvider client={queryClient}>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <ThemeProvider>
+            {children}
+            <Toaster closeButton position="top-center" />
+          </ThemeProvider>
+          <Scripts />
+        </body>
+      </QueryClientProvider>
     </html>
   )
 }
