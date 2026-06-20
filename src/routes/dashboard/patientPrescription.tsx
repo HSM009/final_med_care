@@ -86,7 +86,7 @@ function RouteComponent() {
       <div className=" py-2 absolute top-12 left-4">
         <Link
           to="/dashboard/viewPatients"
-          search={{ search: prescription.name || '' }}
+          search={{ search: prescription.name, page: 1, pagePerRows: 8 }}
           className={buttonVariants({ variant: 'secondary' })}
         >
           <ArrowLeft className=" size-4" /> Back to Patient List

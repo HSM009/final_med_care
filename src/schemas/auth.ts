@@ -192,3 +192,8 @@ export const patientPrescriptionSearchSchema1 = z
     relatedImages: z.array(z.any()).catch([]).optional(),
   })
   .passthrough()
+
+export const loginErrorRedirect = z.object({
+  redirect: z.string().optional(),
+  reason: z.string().optional(),
+})

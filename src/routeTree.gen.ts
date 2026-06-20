@@ -19,8 +19,8 @@ import { Route as DashboardPatientPrescriptionRouteImport } from './routes/dashb
 import { Route as DashboardAdministerUserRouteImport } from './routes/dashboard/administerUser'
 import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addPatient'
 import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
-import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgotPassword/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
@@ -76,14 +76,14 @@ const DashboardAccountSettingRoute = DashboardAccountSettingRouteImport.update({
   path: '/accountSetting',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthSignUpIndexRoute = AuthSignUpIndexRouteImport.update({
   id: '/signUp/',
   path: '/signUp/',
-  getParentRoute: () => AuthRouteRoute,
-} as any)
-const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
@@ -105,6 +105,7 @@ const ApiAdminApproveUserRoute = ApiAdminApproveUserRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/login': typeof AuthLoginRoute
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
@@ -115,11 +116,11 @@ export interface FileRoutesByFullPath {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgotPassword/': typeof AuthForgotPasswordIndexRoute
-  '/login/': typeof AuthLoginIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof AuthLoginRoute
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
@@ -130,7 +131,6 @@ export interface FileRoutesByTo {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgotPassword': typeof AuthForgotPasswordIndexRoute
-  '/login': typeof AuthLoginIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesById {
@@ -138,6 +138,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/_auth/login': typeof AuthLoginRoute
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
@@ -148,7 +149,6 @@ export interface FileRoutesById {
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_auth/forgotPassword/': typeof AuthForgotPasswordIndexRoute
-  '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRouteTypes {
@@ -156,6 +156,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/login'
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
@@ -166,11 +167,11 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/forgotPassword/'
-    | '/login/'
     | '/signUp/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
@@ -181,13 +182,13 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/forgotPassword'
-    | '/login'
     | '/signUp'
   id:
     | '__root__'
     | '/'
     | '/_auth'
     | '/dashboard'
+    | '/_auth/login'
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
@@ -198,7 +199,6 @@ export interface FileRouteTypes {
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/_auth/forgotPassword/'
-    | '/_auth/login/'
     | '/_auth/signUp/'
   fileRoutesById: FileRoutesById
 }
@@ -282,18 +282,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAccountSettingRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/signUp/': {
       id: '/_auth/signUp/'
       path: '/signUp'
       fullPath: '/signUp/'
       preLoaderRoute: typeof AuthSignUpIndexRouteImport
-      parentRoute: typeof AuthRouteRoute
-    }
-    '/_auth/login/': {
-      id: '/_auth/login/'
-      path: '/login'
-      fullPath: '/login/'
-      preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
     '/_auth/forgotPassword/': {
@@ -321,14 +321,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
   AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
-  AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   AuthSignUpIndexRoute: typeof AuthSignUpIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
   AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
-  AuthLoginIndexRoute: AuthLoginIndexRoute,
   AuthSignUpIndexRoute: AuthSignUpIndexRoute,
 }
 

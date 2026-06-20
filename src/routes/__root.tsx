@@ -66,7 +66,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <body>
           <ThemeProvider>
             {children}
-            <Toaster closeButton position="top-center" />
+            <Toaster
+              closeButton
+              position="top-center"
+              toastOptions={{
+                classNames: {
+                  closeButton: '!right-0 !left-auto !translate-x-1/2',
+                },
+              }}
+            />
           </ThemeProvider>
           <Scripts />
         </body>

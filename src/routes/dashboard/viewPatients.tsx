@@ -26,6 +26,9 @@ export const Route = createFileRoute('/dashboard/viewPatients')({
 
 function RouteComponent() {
   const { session } = Route.useRouteContext()
+  if (!session || !session.user) {
+    return null // or <Loader2 className="animate-spin" />
+  }
 
   const { items, totalCount } = Route.useLoaderData()
   const { search, page = 1 } = Route.useSearch()
@@ -264,7 +267,7 @@ function RouteComponent() {
                                 note: '',
                                 prescriptionsContent: [],
                                 relatedImages: [],
-                                doctorName: session.user.name,
+                                doctorName: session.user?.name,
                                 doctorQualification:
                                   session.user?.qualification || ' ',
                                 doctorPhone: session.user?.cellNo || ' ',

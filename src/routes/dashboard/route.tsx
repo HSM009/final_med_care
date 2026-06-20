@@ -8,42 +8,30 @@ import {
 } from '#/components/ui/sidebar'
 import { getSessionFn } from '#/data/session'
 import { cn } from '#/lib/utils'
-import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  redirect,
+  useRouter,
+} from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
   beforeLoad: async ({ location }) => {
-    let session
-    try {
-      session = await getSessionFn()
-    } catch (error) {
-      if (
-        error instanceof TypeError ||
-        (error as any).message?.includes('fetch')
-      ) {
-        throw error
-      }
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.href,
-          reason: 'expired',
-        },
-      })
-    }
+    const session = await getSessionFn()
+
     if (!session || !session.user) {
       throw redirect({
         to: '/login',
-        search: {
-          redirect: location.href,
-          reason: 'expired',
-        },
+        search: { redirect: location.href, reason: 'expired' },
       })
     }
+
     return { session }
   },
-
   loader: ({ context }) => {
     return {
       user: context.session.user,
@@ -53,7 +41,7 @@ export const Route = createFileRoute('/dashboard')({
     return (
       <div>
         <div className=" p-4 text-amber-700 ">
-          <p>Page Not found :(</p> <p>Most probably under Development.</p>
+          <p>Page Not found :| </p> <p>Most probably under Development.</p>
           <p>Comeback Soon</p>
         </div>
         <Link
@@ -63,7 +51,7 @@ export const Route = createFileRoute('/dashboard')({
           )}
           to="/dashboard"
         >
-          Go Dasboard Home Page
+          Go Dashboard Home Page
         </Link>
       </div>
     )
@@ -78,12 +66,19 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function RouteComponent() {
-  const { user } = Route.useLoaderData()
+  const { session } = Route.useRouteContext()
+  const router = useRouter()
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await router.invalidate()
+    }, 60_000)
+    return () => clearInterval(interval)
+  }, [router])
 
   return (
     <div>
       <SidebarProvider>
-        <AppSidebar user={user} role={user.role} />
+        <AppSidebar user={session.user} role={session.user.role} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">
