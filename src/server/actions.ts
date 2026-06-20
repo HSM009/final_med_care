@@ -6,6 +6,8 @@ import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
   addPatientSchema,
+  medicineSearchSchema,
+  patientSearchSchema,
   submitPrescriptionSchema,
   updateMedicineSchema,
   updatePatientSchema,
@@ -122,7 +124,7 @@ export const patientPrescriptionsQueryOptions = (medCareId: string) =>
   queryOptions({
     queryKey: ['prescriptions', medCareId],
     queryFn: () => getPatientPrescriptions({ data: medCareId }),
-    staleTime: 1000 * 60 * 5, // Data is considered fresh for 5 minutes
+    staleTime: 1000 * 60 * 5,
   })
 
 export const addMedicineAction = createServerFn({ method: 'POST' })
@@ -232,4 +234,117 @@ export const updatePrescriptionSubmission = createServerFn({ method: 'POST' })
       })
       return newPrescription
     })
+  })
+
+export const getMedicineList = createServerFn({ method: 'GET' })
+  .validator(medicineSearchSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const searchString = data?.search
+    const currentPage = data?.page || 1
+    const PAGE_SIZE = data.rowsPerPage
+    if (searchString === undefined) {
+      return { items: [], totalCount: 0 }
+    }
+    const whereClause = {
+      activeStatus: true,
+      ...(searchString
+        ? {
+            AND: [
+              {
+                OR: [
+                  {
+                    medicineContentEnglish: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  {
+                    medicineContentUrdu: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  {
+                    Dosage: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                ],
+              },
+            ],
+          }
+        : {}),
+    }
+
+    const [items, totalCount] = await Promise.all([
+      prisma.medicineList.findMany({
+        where: whereClause,
+        skip: (currentPage - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+        orderBy: { id: 'asc' },
+      }),
+      prisma.medicineList.count({ where: whereClause }),
+    ])
+
+    return { items, totalCount }
+  })
+
+export const getPatients = createServerFn({ method: 'GET' })
+  .validator(patientSearchSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const searchString = data?.search
+    const currentPage = data?.page || 1
+    const PAGE_SIZE = data.pagePerRows
+
+    if (searchString === undefined) {
+      return { items: [], totalCount: 0 }
+    }
+
+    const whereClause = {
+      activeStatus: true,
+
+      ...(searchString
+        ? {
+            AND: [
+              {
+                OR: [
+                  {
+                    med_care_id: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  {
+                    name: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                  {
+                    phone: {
+                      contains: searchString,
+                      mode: 'insensitive' as const,
+                    },
+                  },
+                ],
+              },
+            ],
+          }
+        : {}),
+    }
+
+    const [items, totalCount] = await Promise.all([
+      prisma.patientRecord.findMany({
+        where: whereClause,
+        skip: (currentPage - 1) * PAGE_SIZE, // Skips records based on active index page
+        take: PAGE_SIZE, //
+        orderBy: { id: 'asc' },
+      }),
+      prisma.patientRecord.count({ where: whereClause }),
+    ])
+
+    return { items, totalCount }
   })

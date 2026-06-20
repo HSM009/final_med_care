@@ -164,7 +164,7 @@ export default function GetPrescriptions({
                             </>
                           )}
                           <PescriptionDrawer prescription={prescription}>
-                            <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-green-500 hover:underline">
+                            <span className=" bg-transparent hover:bg-transparent cursor-pointer font-medium text-blue-500 hover:underline">
                               View Details
                             </span>
                           </PescriptionDrawer>

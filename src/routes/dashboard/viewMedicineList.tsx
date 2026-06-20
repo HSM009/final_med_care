@@ -1,9 +1,6 @@
-import { prisma } from '#/db'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
 import { useTransition } from 'react'
-import { authFnMiddleware } from '#/middlewares/auth'
-import { medicineSearchSchema, routeMedicineSearchSchema } from '#/schemas/auth'
+import { medicineSearchSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Field, FieldError, FieldGroup } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
@@ -13,64 +10,18 @@ import { AppPagination } from '#/components/appPagination'
 import { EditMedicineDialog } from '#/components/editMedicineDialog'
 import { Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
+import { getMedicineList } from '#/server/actions'
 var o_PAGE_SIZE = 8
-
-export const getMedicineList = createServerFn({ method: 'GET' })
-  .validator(medicineSearchSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    const searchString = data?.search?.trim()
-    const currentPage = data?.page || 1
-    const PAGE_SIZE = o_PAGE_SIZE
-    const whereClause = {
-      activeStatus: true,
-      ...(searchString
-        ? {
-            AND: [
-              {
-                OR: [
-                  {
-                    medicineContentEnglish: {
-                      contains: searchString,
-                      mode: 'insensitive' as const,
-                    },
-                  },
-                  {
-                    medicineContentUrdu: {
-                      contains: searchString,
-                      mode: 'insensitive' as const,
-                    },
-                  },
-                  {
-                    Dosage: {
-                      contains: searchString,
-                      mode: 'insensitive' as const,
-                    },
-                  },
-                ],
-              },
-            ],
-          }
-        : {}),
-    }
-
-    const [items, totalCount] = await Promise.all([
-      prisma.medicineList.findMany({
-        where: whereClause,
-        skip: (currentPage - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
-        orderBy: { id: 'asc' },
-      }),
-      prisma.medicineList.count({ where: whereClause }),
-    ])
-
-    return { items, totalCount }
-  })
 
 export const Route = createFileRoute('/dashboard/viewMedicineList')({
   component: RouteComponent,
 
-  validateSearch: (search) => routeMedicineSearchSchema.parse(search),
+  validateSearch: (search) =>
+    medicineSearchSchema.parse({
+      page: 1,
+      rowsPerPage: o_PAGE_SIZE,
+      ...search,
+    }),
   loaderDeps: ({ search }) => ({ search }),
   loader: async ({ deps: { search } }) =>
     await getMedicineList({ data: search }),
@@ -97,8 +48,9 @@ function RouteComponent() {
         await navigate({
           search: (prev) => ({
             ...prev,
-            search: value.search.trim() || undefined,
+            search: value.search.trim(),
             page: 1,
+            rowsPerPage: o_PAGE_SIZE,
           }),
         })
       })
@@ -181,90 +133,95 @@ function RouteComponent() {
           <CardTitle className=" text-xs">Medicine List:</CardTitle>
         </CardHeader>
         <CardContent>
-          <FieldGroup>
-            <div className="relative overflow-x-auto shadow-xs rounded-t-2xl border">
-              <table className="w-full text-sm text-left text-body">
-                <thead className="text-sm text-body bg-neutral-600 border-b">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 font-medium dark:text-primary text-secondary"
-                    >
-                      Medicine Content English
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 font-medium dark:text-primary text-secondary"
-                    >
-                      Medicine Content Urdu
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 font-medium dark:text-primary text-secondary"
-                    >
-                      Dosage
-                    </th>
-                    <th
-                      scope="col"
-                      className="  px-6 py-3 font-medium right-0 text-right "
-                    >
-                      <MedicineDialog>
-                        <Button className=" cursor-pointer bg-primary hover:bg-primary/60">
-                          Add New Medicine
-                        </Button>
-                      </MedicineDialog>
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {items.map((medicine) => (
-                    <tr
-                      key={medicine.id}
-                      className="border-b hover:bg-neutral-600/50 transition-colors "
-                    >
-                      <td className="px-6 py-3 text-primary">
-                        {medicine.medicineContentEnglish}
-                      </td>
-                      <td className="px-6 py-3 text-primary">
-                        {medicine.medicineContentUrdu}
-                      </td>
-                      <td className="px-6 py-3 text-primary">
-                        {medicine.Dosage}
-                      </td>
-                      <td className="px-6 py-3 text-primary text-right">
-                        <EditMedicineDialog
-                          Id={medicine.id}
-                          medicineContentEnglish={
-                            medicine.medicineContentEnglish
-                          }
-                          medicineContentUrdu={medicine.medicineContentUrdu}
-                          Dosage={medicine.Dosage}
-                        >
-                          <span className=" hover:underline cursor-pointer bg-transparent hover:bg-transparent text-red-500 ">
-                            Edit
-                          </span>
-                        </EditMedicineDialog>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {getMedicineList.length === 0 && (
-                <li className="text-center py-8 text-indigo-300/70 italic">
-                  No medicines added or matched your search criteria.
-                </li>
-              )}
+          {search === undefined ? (
+            <div className="text-center py-8 text-indigo-300/70 italic border-b bg-neutral-900/10">
+              <span>Please type a search term above to view medicines.</span>
             </div>
+          ) : (
+            <FieldGroup>
+              <div className="relative overflow-x-auto shadow-xs rounded-t-2xl border">
+                <table className="w-full text-sm text-left text-body">
+                  <thead className="text-sm text-body bg-neutral-600 border-b">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 font-medium dark:text-primary text-secondary"
+                      >
+                        Medicine Content English
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 font-medium dark:text-primary text-secondary"
+                      >
+                        Medicine Content Urdu
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 font-medium dark:text-primary text-secondary"
+                      >
+                        Dosage
+                      </th>
+                      <th
+                        scope="col"
+                        className="  px-6 py-3 font-medium right-0 text-right "
+                      >
+                        <MedicineDialog>
+                          <Button className=" cursor-pointer bg-primary hover:bg-primary/60">
+                            Add New Medicine
+                          </Button>
+                        </MedicineDialog>
+                      </th>
+                    </tr>
+                  </thead>
 
-            <AppPagination
-              page={page}
-              totalCount={totalCount}
-              pageSize={o_PAGE_SIZE}
-              isPending={isPending}
-              onPageChange={handlePageChange}
-            />
-          </FieldGroup>
+                  <tbody>
+                    {items.map((medicine) => (
+                      <tr
+                        key={medicine.id}
+                        className="border-b hover:bg-neutral-600/50 transition-colors "
+                      >
+                        <td className="px-6 py-3 text-primary">
+                          {medicine.medicineContentEnglish}
+                        </td>
+                        <td className="px-6 py-3 text-primary">
+                          {medicine.medicineContentUrdu}
+                        </td>
+                        <td className="px-6 py-3 text-primary">
+                          {medicine.Dosage}
+                        </td>
+                        <td className="px-6 py-3 text-primary text-right">
+                          <EditMedicineDialog
+                            Id={medicine.id}
+                            medicineContentEnglish={
+                              medicine.medicineContentEnglish
+                            }
+                            medicineContentUrdu={medicine.medicineContentUrdu}
+                            Dosage={medicine.Dosage}
+                          >
+                            <span className=" hover:underline cursor-pointer bg-transparent hover:bg-transparent text-red-500 ">
+                              Edit
+                            </span>
+                          </EditMedicineDialog>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {items.length === 0 && (
+                  <div className="text-center py-8 text-indigo-300/70 italic border-b bg-neutral-900/10">
+                    <span>No medicines matched your search criteria.</span>
+                  </div>
+                )}
+              </div>
+              <AppPagination
+                page={page}
+                totalCount={totalCount}
+                pageSize={o_PAGE_SIZE}
+                isPending={isPending}
+                onPageChange={handlePageChange}
+              />
+            </FieldGroup>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -12,13 +12,11 @@ export const signupSchema = z.object({
   password: z.string().min(8),
 })
 export const patientSearchSchema = z.object({
-  search: z.string().default(''),
+  search: z.string().optional(),
   page: z.number().catch(1).optional(),
+  pagePerRows: z.number(),
 })
-export const routeSearchSchema = z.object({
-  search: z.string().optional().catch(''),
-  page: z.number().catch(1).optional(),
-})
+
 export const adminSearchSchema = z.object({
   search: z.string().default(''),
   page: z.number().catch(1).optional(),
@@ -56,12 +54,9 @@ export const addPatientSchema = z.object({
 })
 
 export const medicineSearchSchema = z.object({
-  search: z.string().default(''),
-  page: z.number().catch(1).optional(),
-})
-export const routeMedicineSearchSchema = z.object({
-  search: z.string().optional().catch(''),
-  page: z.number().catch(1).optional(),
+  search: z.string().optional(),
+  page: z.number().optional(),
+  rowsPerPage: z.number(),
 })
 
 export const addOrUpdateMedicineSchema = z.object({
