@@ -124,7 +124,7 @@ function RouteComponent() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className=" mt-6">
         <CardHeader>
           <CardTitle className="text-xs flex w-full">
             <span> Patient Record:</span>

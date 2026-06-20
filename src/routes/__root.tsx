@@ -11,14 +11,9 @@ import { ThemeProvider } from '#/lib/theme-provider'
 import appCss from '../styles.css?url'
 import { buttonVariants } from '#/components/ui/button'
 import { cn } from '#/lib/utils'
+import { GlobalErrorComponent } from '#/components/globalErrorComponent'
+import { queryClient } from '#/lib/query-client'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes standard caching default
-    },
-  },
-})
 export const Route = createRootRoute<{ queryClient: QueryClient }>({
   head: () => ({
     meta: [
@@ -42,6 +37,7 @@ export const Route = createRootRoute<{ queryClient: QueryClient }>({
   }),
 
   shellComponent: RootDocument,
+  errorComponent: GlobalErrorComponent,
   notFoundComponent: () => {
     return (
       <div>

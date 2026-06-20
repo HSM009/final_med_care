@@ -13,13 +13,37 @@ import { Loader2 } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
-  beforeLoad: async () => {
-    const session = await getSessionFn()
+  beforeLoad: async ({ location }) => {
+    let session
+    try {
+      session = await getSessionFn()
+    } catch (error) {
+      if (
+        error instanceof TypeError ||
+        (error as any).message?.includes('fetch')
+      ) {
+        throw error
+      }
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.href,
+          reason: 'expired',
+        },
+      })
+    }
     if (!session || !session.user) {
-      throw redirect({ to: '/login' })
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.href,
+          reason: 'expired',
+        },
+      })
     }
     return { session }
   },
+
   loader: ({ context }) => {
     return {
       user: context.session.user,
