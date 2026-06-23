@@ -17,7 +17,8 @@ model User {
   cellNo              String?
 
   emailVerified Boolean   @default(false)
-  role          String?      @default("user") 
+  role          String?      @default("patient") 
+  isApproved    Boolean?    @default(false)
 
   banned        Boolean?  @default(true)
   bannedReason  String?   @default("Pending for admin for access")

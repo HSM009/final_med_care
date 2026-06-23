@@ -26,8 +26,14 @@ import {
   type CarouselApi,
 } from './ui/carousel'
 import { useState } from 'react'
+import { LoginType } from '#/lib/types'
 
-export function SignupForm({}: React.ComponentProps<typeof Card>) {
+interface prop {
+  type: string | undefined
+}
+
+export function SignupForm({ type }: prop) {
+  console.log(type)
   const navigate = useNavigate()
 
   const [api, setApi] = useState<CarouselApi>()
@@ -39,15 +45,21 @@ export function SignupForm({}: React.ComponentProps<typeof Card>) {
       fullName: '',
       email: '',
       password: '',
+      role: type,
+      isApproved: false,
     },
     validators: {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
+      const isApprovedStatus = type !== LoginType.Doctor
+
       await authClient.signUp.email({
         name: value.fullName,
         email: value.email,
         password: value.password,
+        role: type || 'patient',
+        isApproved: isApprovedStatus,
         fetchOptions: {
           onSuccess: async () => {
             toast.loading('Sending the verification code ...', {
@@ -115,6 +127,7 @@ export function SignupForm({}: React.ComponentProps<typeof Card>) {
     toast.success('Account Creates Successfully.')
     navigate({
       to: '/login',
+      search: { type: type },
     })
   }
 
@@ -288,7 +301,9 @@ export function SignupForm({}: React.ComponentProps<typeof Card>) {
                             </Button>
                             <FieldDescription className="px-6 text-center">
                               Already have an account?{' '}
-                              <Link to="/login">Login</Link>
+                              <Link to="/login" search={{ type: type }}>
+                                Login
+                              </Link>
                             </FieldDescription>
                           </Field>
                         </FieldGroup>

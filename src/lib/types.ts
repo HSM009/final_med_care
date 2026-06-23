@@ -1,7 +1,11 @@
 import { type LucideIcon } from 'lucide-react'
 import { authClient } from './auth-client'
 import { toast } from 'sonner'
-import { useNavigate } from '@tanstack/react-router'
+import {
+  useNavigate,
+  type RegisteredRouter,
+  type RouteIds,
+} from '@tanstack/react-router'
 import { type User } from 'better-auth'
 import { Gender } from '@/generated/prisma/browser'
 import type { UploadedFileInfo } from './vercel-action'
@@ -18,7 +22,7 @@ export interface extendedUser extends navUserProps {
 export interface NavPrimaryProps {
   items: {
     title: string
-    to: string
+    to: RouteIds<RegisteredRouter['routeTree']>
     icon: LucideIcon
     activeOptions: { exact: boolean }
   }[]
@@ -145,4 +149,9 @@ export interface SinglePrescription {
   patientPhone: string | null
   patientGender: Gender | string | null
   patientImages: string | UploadedFileInfo[] | null
+}
+
+export enum LoginType {
+  Patient = 'Patient',
+  Doctor = 'Doctor',
 }

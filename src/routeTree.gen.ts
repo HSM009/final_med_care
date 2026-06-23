@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PatientDashboardIndexRouteImport } from './routes/patientDashboard/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardViewPatientsRouteImport } from './routes/dashboard/viewPatients'
 import { Route as DashboardViewMedicineListRouteImport } from './routes/dashboard/viewMedicineList'
@@ -21,6 +22,7 @@ import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addP
 import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
+import { Route as AuthRoleSelectIndexRouteImport } from './routes/_auth/roleSelect/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgotPassword/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
@@ -37,6 +39,11 @@ const AuthRouteRoute = AuthRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PatientDashboardIndexRoute = PatientDashboardIndexRouteImport.update({
+  id: '/patientDashboard/',
+  path: '/patientDashboard/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -86,6 +93,11 @@ const AuthSignUpIndexRoute = AuthSignUpIndexRouteImport.update({
   path: '/signUp/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthRoleSelectIndexRoute = AuthRoleSelectIndexRouteImport.update({
+  id: '/roleSelect/',
+  path: '/roleSelect/',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   id: '/forgotPassword/',
   path: '/forgotPassword/',
@@ -113,9 +125,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgotPassword/': typeof AuthForgotPasswordIndexRoute
+  '/roleSelect/': typeof AuthRoleSelectIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesByTo {
@@ -128,9 +142,11 @@ export interface FileRoutesByTo {
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/patientDashboard': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/forgotPassword': typeof AuthForgotPasswordIndexRoute
+  '/roleSelect': typeof AuthRoleSelectIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
 }
 export interface FileRoutesById {
@@ -146,9 +162,11 @@ export interface FileRoutesById {
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_auth/forgotPassword/': typeof AuthForgotPasswordIndexRoute
+  '/_auth/roleSelect/': typeof AuthRoleSelectIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
 }
 export interface FileRouteTypes {
@@ -164,9 +182,11 @@ export interface FileRouteTypes {
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard/'
+    | '/patientDashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/forgotPassword/'
+    | '/roleSelect/'
     | '/signUp/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -179,9 +199,11 @@ export interface FileRouteTypes {
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard'
+    | '/patientDashboard'
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/forgotPassword'
+    | '/roleSelect'
     | '/signUp'
   id:
     | '__root__'
@@ -196,9 +218,11 @@ export interface FileRouteTypes {
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
     | '/dashboard/'
+    | '/patientDashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
     | '/_auth/forgotPassword/'
+    | '/_auth/roleSelect/'
     | '/_auth/signUp/'
   fileRoutesById: FileRoutesById
 }
@@ -206,6 +230,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  PatientDashboardIndexRoute: typeof PatientDashboardIndexRoute
   ApiAdminApproveUserRoute: typeof ApiAdminApproveUserRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -231,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/patientDashboard/': {
+      id: '/patientDashboard/'
+      path: '/patientDashboard'
+      fullPath: '/patientDashboard/'
+      preLoaderRoute: typeof PatientDashboardIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -296,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignUpIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/roleSelect/': {
+      id: '/_auth/roleSelect/'
+      path: '/roleSelect'
+      fullPath: '/roleSelect/'
+      preLoaderRoute: typeof AuthRoleSelectIndexRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/forgotPassword/': {
       id: '/_auth/forgotPassword/'
       path: '/forgotPassword'
@@ -323,12 +362,14 @@ declare module '@tanstack/react-router' {
 interface AuthRouteRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthForgotPasswordIndexRoute: typeof AuthForgotPasswordIndexRoute
+  AuthRoleSelectIndexRoute: typeof AuthRoleSelectIndexRoute
   AuthSignUpIndexRoute: typeof AuthSignUpIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthForgotPasswordIndexRoute: AuthForgotPasswordIndexRoute,
+  AuthRoleSelectIndexRoute: AuthRoleSelectIndexRoute,
   AuthSignUpIndexRoute: AuthSignUpIndexRoute,
 }
 
@@ -364,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  PatientDashboardIndexRoute: PatientDashboardIndexRoute,
   ApiAdminApproveUserRoute: ApiAdminApproveUserRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

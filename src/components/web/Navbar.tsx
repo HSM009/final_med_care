@@ -40,7 +40,7 @@ export function Navbar() {
           ) : (
             <>
               <Link
-                to="/login"
+                to="/roleSelect"
                 className={buttonVariants({ variant: 'secondary' })}
               >
                 Login

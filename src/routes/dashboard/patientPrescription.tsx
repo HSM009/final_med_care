@@ -23,9 +23,10 @@ import { SubmitPrescriptionDialog } from '#/components/submitPrecriptionDialog'
 import { FileUploader } from '#/components/ui/file-uploader'
 
 import { patientPrescriptionSearchSchema } from '#/schemas/auth'
+import { Textarea } from '#/components/ui/textarea'
 
 export const Route = createFileRoute('/dashboard/patientPrescription')({
-  validateSearch: (search) => patientPrescriptionSearchSchema.parse(search),
+  validateSearch: patientPrescriptionSearchSchema,
   component: RouteComponent,
 })
 
@@ -160,15 +161,14 @@ function RouteComponent() {
                 <CardTitle className="text-xs flex w-full">
                   <span>Doctor Note:</span>
                 </CardTitle>
-                <CardContent className=" py-3">
-                  <textarea
-                    value={doctorNote}
-                    onChange={(e) => setDoctorNote(e.target.value)}
-                    placeholder="Type patient clinical observations, recommendations, or case notes here..."
-                    className="w-full min-h-25 p-3 text-sm bg-background border rounded-md focus:outline-amber-950"
-                  />
-                </CardContent>
               </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={doctorNote}
+                  onChange={(e) => setDoctorNote(e.target.value)}
+                  placeholder="Type patient clinical observations, recommendations, or case notes here..."
+                />
+              </CardContent>
             </Card>
           </div>
 
@@ -291,10 +291,10 @@ function RouteComponent() {
                   {prescriptionButtons.map((btn) => (
                     <SubmitPrescriptionDialog
                       key={btn.type}
-                      prescriptionId={prescription.id.toString()}
+                      prescriptionId={prescription?.id!.toString()}
                       prescriptionType={btn.type}
                       med_care_id={prescription.med_care_id!}
-                      doctorId={prescription.doctorId}
+                      doctorId={prescription?.doctorId!}
                       note={doctorNote}
                       medicinesList={selectedMedicines}
                       prescriptionVal={btn.val}

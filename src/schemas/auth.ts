@@ -10,6 +10,8 @@ export const signupSchema = z.object({
   fullName: z.string().min(5),
   email: z.string().email({ message: 'Invalid email address' }),
   password: z.string().min(8),
+  role: z.string(),
+  isApproved: z.boolean(),
 })
 export const patientSearchSchema = z.object({
   search: z.string().optional(),
@@ -163,20 +165,20 @@ export const downloadSchema = z.object({
 })
 
 export const patientPrescriptionSearchSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  med_care_id: z.string(),
-  age: z.any(), // Keeps the incoming date or string safe
-  phone: z.string(),
+  id: z.number().optional(),
+  name: z.string().optional(),
+  med_care_id: z.string().optional(),
+  age: z.any().optional(), // Keeps the incoming date or string safe
+  phone: z.string().optional(),
   email: z.string().optional().nullable(),
-  gender: z.string(),
-  note: z.string().optional().nullable().catch(''),
+  gender: z.string().optional(),
+  note: z.string().optional().nullable(),
   prescriptionsContent: z.array(z.any()).catch([]).optional(),
   relatedImages: z.array(z.any()).catch([]).optional(),
-  doctorName: z.string(),
-  doctorId: z.string(),
-  doctorQualification: z.string(),
-  doctorPhone: z.string(),
+  doctorName: z.string().optional(),
+  doctorId: z.string().optional(),
+  doctorQualification: z.string().optional(),
+  doctorPhone: z.string().optional(),
 })
 
 export const patientPrescriptionSearchSchema1 = z
@@ -194,6 +196,11 @@ export const patientPrescriptionSearchSchema1 = z
   .passthrough()
 
 export const loginErrorRedirect = z.object({
+  type: z.string().optional(),
   redirect: z.string().optional(),
   reason: z.string().optional(),
+})
+
+export const signInType = z.object({
+  type: z.string().optional(),
 })

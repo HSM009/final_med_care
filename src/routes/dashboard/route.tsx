@@ -7,6 +7,7 @@ import {
   SidebarTrigger,
 } from '#/components/ui/sidebar'
 import { getSessionFn } from '#/data/session'
+import { LoginType } from '#/lib/types'
 import { cn } from '#/lib/utils'
 import {
   createFileRoute,
@@ -22,11 +23,17 @@ export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
   beforeLoad: async ({ location }) => {
     const session = await getSessionFn()
-
     if (!session || !session.user) {
       throw redirect({
         to: '/login',
         search: { redirect: location.href, reason: 'expired' },
+      })
+    }
+    const recievedRole = session.user?.role?.toLowerCase().trim()
+    const userRole = LoginType.Patient.toLowerCase()
+    if (recievedRole === userRole) {
+      throw redirect({
+        to: '/patientDashboard',
       })
     }
 
@@ -78,7 +85,7 @@ function RouteComponent() {
   return (
     <div>
       <SidebarProvider>
-        <AppSidebar user={session.user} role={session.user.role} />
+        <AppSidebar user={session.user} role={session.user.role!} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">

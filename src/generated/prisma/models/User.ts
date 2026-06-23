@@ -43,6 +43,7 @@ export type UserMinAggregateOutputType = {
   cellNo: string | null
   emailVerified: boolean | null
   role: string | null
+  isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
   banReason: string | null
@@ -65,6 +66,7 @@ export type UserMaxAggregateOutputType = {
   cellNo: string | null
   emailVerified: boolean | null
   role: string | null
+  isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
   banReason: string | null
@@ -87,6 +89,7 @@ export type UserCountAggregateOutputType = {
   cellNo: number
   emailVerified: number
   role: number
+  isApproved: number
   banned: number
   bannedReason: number
   banReason: number
@@ -119,6 +122,7 @@ export type UserMinAggregateInputType = {
   cellNo?: true
   emailVerified?: true
   role?: true
+  isApproved?: true
   banned?: true
   bannedReason?: true
   banReason?: true
@@ -141,6 +145,7 @@ export type UserMaxAggregateInputType = {
   cellNo?: true
   emailVerified?: true
   role?: true
+  isApproved?: true
   banned?: true
   bannedReason?: true
   banReason?: true
@@ -163,6 +168,7 @@ export type UserCountAggregateInputType = {
   cellNo?: true
   emailVerified?: true
   role?: true
+  isApproved?: true
   banned?: true
   bannedReason?: true
   banReason?: true
@@ -272,6 +278,7 @@ export type UserGroupByOutputType = {
   cellNo: string | null
   emailVerified: boolean
   role: string | null
+  isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
   banReason: string | null
@@ -317,6 +324,7 @@ export type UserWhereInput = {
   cellNo?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  isApproved?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -342,6 +350,7 @@ export type UserOrderByWithRelationInput = {
   cellNo?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  isApproved?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -370,6 +379,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   cellNo?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.StringNullableFilter<"User"> | string | null
+  isApproved?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -395,6 +405,7 @@ export type UserOrderByWithAggregationInput = {
   cellNo?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrderInput | Prisma.SortOrder
+  isApproved?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -425,6 +436,7 @@ export type UserScalarWhereWithAggregatesInput = {
   cellNo?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   role?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  isApproved?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -447,6 +459,7 @@ export type UserCreateInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -472,6 +485,7 @@ export type UserUncheckedCreateInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -497,6 +511,7 @@ export type UserUpdateInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -522,6 +537,7 @@ export type UserUncheckedUpdateInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -547,6 +563,7 @@ export type UserCreateManyInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -569,6 +586,7 @@ export type UserUpdateManyMutationInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -591,6 +609,7 @@ export type UserUncheckedUpdateManyInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -613,6 +632,7 @@ export type UserCountOrderByAggregateInput = {
   cellNo?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   bannedReason?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
@@ -639,6 +659,7 @@ export type UserMaxOrderByAggregateInput = {
   cellNo?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   bannedReason?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
@@ -661,6 +682,7 @@ export type UserMinOrderByAggregateInput = {
   cellNo?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  isApproved?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   bannedReason?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
@@ -773,6 +795,7 @@ export type UserCreateWithoutSessionsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -797,6 +820,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -837,6 +861,7 @@ export type UserUpdateWithoutSessionsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +886,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,6 +911,7 @@ export type UserCreateWithoutAccountsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -909,6 +936,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -949,6 +977,7 @@ export type UserUpdateWithoutAccountsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -973,6 +1002,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -997,6 +1027,7 @@ export type UserCreateWithoutDoctorDetailsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1021,6 +1052,7 @@ export type UserUncheckedCreateWithoutDoctorDetailsInput = {
   cellNo?: string | null
   emailVerified?: boolean
   role?: string | null
+  isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1061,6 +1093,7 @@ export type UserUpdateWithoutDoctorDetailsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1085,6 +1118,7 @@ export type UserUncheckedUpdateWithoutDoctorDetailsInput = {
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1158,6 +1192,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   cellNo?: boolean
   emailVerified?: boolean
   role?: boolean
+  isApproved?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -1184,6 +1219,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   cellNo?: boolean
   emailVerified?: boolean
   role?: boolean
+  isApproved?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -1206,6 +1242,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   cellNo?: boolean
   emailVerified?: boolean
   role?: boolean
+  isApproved?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -1228,6 +1265,7 @@ export type UserSelectScalar = {
   cellNo?: boolean
   emailVerified?: boolean
   role?: boolean
+  isApproved?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -1241,7 +1279,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "name" | "email" | "qualification" | "cellNo" | "emailVerified" | "role" | "banned" | "bannedReason" | "banReason" | "bannedUntil" | "banExpires" | "impersonatedBy" | "impersonatorId" | "failedAttempts" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "name" | "email" | "qualification" | "cellNo" | "emailVerified" | "role" | "isApproved" | "banned" | "bannedReason" | "banReason" | "bannedUntil" | "banExpires" | "impersonatedBy" | "impersonatorId" | "failedAttempts" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -1267,6 +1305,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     cellNo: string | null
     emailVerified: boolean
     role: string | null
+    isApproved: boolean | null
     banned: boolean | null
     bannedReason: string | null
     banReason: string | null
@@ -1712,6 +1751,7 @@ export interface UserFieldRefs {
   readonly cellNo: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly isApproved: Prisma.FieldRef<"User", 'Boolean'>
   readonly banned: Prisma.FieldRef<"User", 'Boolean'>
   readonly bannedReason: Prisma.FieldRef<"User", 'String'>
   readonly banReason: Prisma.FieldRef<"User", 'String'>

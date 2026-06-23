@@ -274,6 +274,9 @@ function RouteComponent() {
                                 id: patient.id,
                                 doctorId: session.user.id,
                               }}
+                              mask={{
+                                to: '/dashboard/patientPrescription',
+                              }}
                               className="font-medium text-green-500 hover:underline"
                             >
                               New

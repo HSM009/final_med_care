@@ -85,6 +85,7 @@ export const UserScalarFieldEnum = {
   cellNo: 'cellNo',
   emailVerified: 'emailVerified',
   role: 'role',
+  isApproved: 'isApproved',
   banned: 'banned',
   bannedReason: 'bannedReason',
   banReason: 'banReason',

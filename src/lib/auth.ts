@@ -4,7 +4,7 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
-import { admin, emailOTP } from 'better-auth/plugins'
+import { emailOTP } from 'better-auth/plugins'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -22,8 +22,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user }) => {
       try {
-        // await emailTemplate(user.email, url)
-        await adminNotification(user.name, user.email)
+        const userRole = (user as any).role.toLowerCase()
+        if (userRole === 'doctor')
+          await adminNotification(user.name, user.email)
       } catch (error) {
         console.error(
           'Failed to notify admin regarding registration instance:',
@@ -39,30 +40,41 @@ export const auth = betterAuth({
     additionalFields: {
       cellNo: { type: 'string', required: false, input: true },
       qualification: { type: 'string', required: false, input: true },
-      banned: {
-        type: 'boolean',
-        required: false,
-        input: false,
-      },
+      banned: { type: 'boolean', required: false, input: false },
+      banReason: { type: 'string', required: false, input: false },
       bannedReason: { type: 'string', required: false, input: false },
+
       role: {
         type: 'string',
-        required: true,
-        input: false,
+        required: false,
+        input: true,
+        defaultValue: 'Patient',
       },
-      // 💡 Added to support temporary credential windows
-      // tempPasswordExpires: { type: 'date', required: false, input: false },
+      isApproved: {
+        type: 'boolean',
+        required: true,
+        input: true,
+        defaultValue: true,
+      },
     },
   },
 
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => {
+        before: async (user, ctx) => {
+          const body = (ctx as any)?.body || {}
+
+          const submittedRole = body.role || 'Patient'
+          const isDoctor = submittedRole.toLowerCase() === 'doctor'
+
           return {
             data: {
               ...user,
-              banned: true,
+              role: isDoctor ? 'Doctor' : 'Patient',
+              banned: isDoctor ? true : false,
+              banReason: isDoctor ? 'Pending for admin for access' : null,
+              bannedReason: isDoctor ? 'Pending for admin for access' : null,
             },
           }
         },
@@ -88,10 +100,10 @@ export const auth = betterAuth({
         before: [
           {
             matcher: (context) => !!context.path?.includes('/sign-in/email'),
-            // || !!context.path?.includes('/email-otp/send-verification-otp')
             handler: createAuthMiddleware(async (ctx) => {
               const body = ctx.body as Record<string, any> | undefined
               const email = body?.email
+
               if (!email) return
 
               // Look up user status and password expiration info
@@ -102,10 +114,10 @@ export const auth = betterAuth({
                   banExpires: true,
                   banReason: true,
                   emailVerified: true,
+                  role: true,
                   // tempPasswordExpires: true,
                 },
               })
-
               // check pending for registration approval
               if (
                 user &&
@@ -257,7 +269,6 @@ export const auth = betterAuth({
         ],
       },
     },
-    admin(),
     tanstackStartCookies(),
   ],
 })

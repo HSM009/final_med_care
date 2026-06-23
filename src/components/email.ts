@@ -21,7 +21,7 @@ export async function adminNotification(name: string, email: string) {
   return await transporter.sendMail({
     from: `"Med Care" <${process.env.SMTP_FROM_EMAIL}>`,
     to: ADMIN_EMAIL,
-    subject: `Med-Care Verify new account of ${name}`,
+    subject: `Med-Care Verify new Doctor Account ${name}`,
     text: `Welcome! Click this link to verify the account: `,
     html: `<h3>New Account Registration</h3>
         <p><strong>Name:</strong> ${name}</p>

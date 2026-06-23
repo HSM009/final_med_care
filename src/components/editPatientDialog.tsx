@@ -68,6 +68,8 @@ export function EditPatientDialog({
           to: '/dashboard/viewPatients',
           search: {
             search: value.name.trim(),
+            page: 1,
+            pagePerRows: 8,
           },
         })
 

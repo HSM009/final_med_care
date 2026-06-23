@@ -157,6 +157,9 @@ export default function GetPrescriptions({
                                     doctorPhone: doctorCellNo,
                                     doctorId: userId.toString(),
                                   }}
+                                  mask={{
+                                    to: '/dashboard/patientPrescription',
+                                  }}
                                 >
                                   Open
                                 </Link>

@@ -20,7 +20,11 @@ import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
-export function LoginForm() {
+interface prop {
+  type: string | undefined
+}
+
+export function LoginForm({ type }: prop) {
   const navigate = useNavigate()
   const form = useForm({
     defaultValues: {
@@ -35,9 +39,25 @@ export function LoginForm() {
         email: value.email,
         password: value.password,
         fetchOptions: {
-          onSuccess: () => {
-            navigate({ to: '/dashboard' })
-            toast.success('Logged in successfully')
+          onSuccess: async () => {
+            const session = await authClient.getSession()
+            const receivedRole =
+              (session?.data?.user as any)?.role?.toLowerCase() || ''
+            const currentFormType = type!.toLowerCase()
+            if (receivedRole !== 'admin') {
+              if (currentFormType !== receivedRole) {
+                toast.error('You are not authorized to access this portal.')
+                await authClient.signOut()
+                return
+              }
+            }
+            if (receivedRole === 'admin' || receivedRole === 'doctor') {
+              navigate({ to: '/dashboard' })
+              toast.success('Logged in successfully')
+            } else if (receivedRole === 'patient') {
+              navigate({ to: '/patientDashboard' })
+              toast.success('Logged in successfully')
+            }
           },
           onError: ({ error }) => {
             if (error.message?.startsWith('PENDING_REGISTRATION:')) {
@@ -181,12 +201,13 @@ export function LoginForm() {
                   </FieldDescription>
                   <FieldDescription className=" text-center">
                     <span>
-                      Don&apos;t have an account?{' '}
+                      Don&apos;t have an account?
                       <Link
                         to="/signUp"
+                        search={{ type: type }}
                         className=" underline hover:text-primary"
                       >
-                        Sign up
+                        Sign Up
                       </Link>
                     </span>
                   </FieldDescription>
