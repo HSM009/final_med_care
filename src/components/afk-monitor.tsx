@@ -4,7 +4,7 @@ import { handleAfkSignOut } from '#/server/afk-killSession'
 import type { Roles } from '#/generated/prisma/enums'
 import type { AuthUser } from '#/lib/types'
 
-const AFK_TIMEOUT_MS = 1000 * 60 * 1 // 1 Minutes
+const AFK_TIMEOUT_MS = 1000 * 60 * 15 // 15 Minutes
 
 interface AfkInterface {
   type: Roles

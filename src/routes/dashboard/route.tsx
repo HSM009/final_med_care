@@ -74,9 +74,10 @@ function RouteComponent() {
   const router = useRouter()
 
   useEffect(() => {
+    const ONE_HOUR_MS = 60 * 60 * 1000
     const interval = setInterval(async () => {
       await router.invalidate()
-    }, 60_000)
+    }, ONE_HOUR_MS)
     return () => clearInterval(interval)
   }, [router])
 
