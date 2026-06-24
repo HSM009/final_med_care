@@ -33,7 +33,6 @@ interface prop {
 }
 
 export function SignupForm({ type }: prop) {
-  console.log(type)
   const navigate = useNavigate()
 
   const [api, setApi] = useState<CarouselApi>()
@@ -58,7 +57,7 @@ export function SignupForm({ type }: prop) {
         name: value.fullName,
         email: value.email,
         password: value.password,
-        role: type || 'patient',
+        role: type || Roles.Patient,
         isApproved: isApprovedStatus,
         fetchOptions: {
           onSuccess: async () => {
