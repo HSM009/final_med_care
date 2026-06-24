@@ -9,6 +9,7 @@ import {
 } from '#/components/ui/sidebar'
 import { Roles } from '#/generated/prisma/enums'
 import { hasPermission } from '#/lib/roleBaseActions'
+import type { AuthUser } from '#/lib/types'
 import { cn } from '#/lib/utils'
 import {
   createFileRoute,
@@ -67,6 +68,8 @@ export const Route = createFileRoute('/dashboard')({
 
 function RouteComponent() {
   const { auth } = Route.useRouteContext()
+  const authUser = auth.user as AuthUser
+
   const userRole = auth.user?.role as Roles
   const router = useRouter()
 
@@ -79,7 +82,7 @@ function RouteComponent() {
 
   return (
     <div>
-      <AfkMonitor type={userRole}>
+      <AfkMonitor type={userRole} user={authUser}>
         <SidebarProvider>
           <AppSidebar auth={auth} />
           <SidebarInset>

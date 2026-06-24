@@ -2,19 +2,21 @@ import { useEffect } from 'react'
 import { useRouter } from '@tanstack/react-router'
 import { handleAfkSignOut } from '#/server/afk-killSession'
 import type { Roles } from '#/generated/prisma/enums'
+import type { AuthUser } from '#/lib/types'
 
 const AFK_TIMEOUT_MS = 1000 * 60 * 1 // 1 Minutes
 
 interface AfkInterface {
   type: Roles
+  user: AuthUser | null | undefined
   children: React.ReactNode
 }
 
-export function AfkMonitor({ type, children }: AfkInterface) {
+export function AfkMonitor({ type, user, children }: AfkInterface) {
   const router = useRouter()
   const { navigate } = useRouter()
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (!user || typeof window === 'undefined') return
 
     let afkTimer: NodeJS.Timeout
 

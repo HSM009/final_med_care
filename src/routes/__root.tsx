@@ -15,7 +15,7 @@ import { GlobalErrorComponent } from '#/components/globalErrorComponent'
 import { queryClient } from '#/lib/query-client'
 import { getSessionFn } from '#/data/session'
 import { createAuthContext } from '#/lib/auth-injectors'
-import type { AuthContextResult } from '#/lib/types'
+import type { AuthContextResult, AuthUser } from '#/lib/types'
 import { AfkMonitor } from '#/components/afk-monitor'
 import type { Roles } from '#/generated/prisma/enums'
 
@@ -73,6 +73,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { auth } = Route.useRouteContext()
+  const authUser = auth.user as AuthUser
   const userRole = auth.user?.role as Roles
   return (
     <QueryClientProvider client={queryClient}>
@@ -81,7 +82,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <HeadContent />
         </head>
         <body>
-          <AfkMonitor type={userRole}>
+          <AfkMonitor type={userRole} user={authUser}>
             <ThemeProvider>
               {children}
               <Toaster
