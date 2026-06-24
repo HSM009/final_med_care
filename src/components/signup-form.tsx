@@ -26,7 +26,7 @@ import {
   type CarouselApi,
 } from './ui/carousel'
 import { useState } from 'react'
-import { LoginType } from '#/lib/types'
+import { Roles } from '#/generated/prisma/enums'
 
 interface prop {
   type: string | undefined
@@ -52,7 +52,7 @@ export function SignupForm({ type }: prop) {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      const isApprovedStatus = type !== LoginType.Doctor
+      const isApprovedStatus = type !== Roles.Doctor
 
       await authClient.signUp.email({
         name: value.fullName,

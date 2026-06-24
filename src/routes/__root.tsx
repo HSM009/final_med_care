@@ -2,7 +2,7 @@ import {
   HeadContent,
   Link,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '#/components/ui/sonner'
@@ -13,8 +13,23 @@ import { buttonVariants } from '#/components/ui/button'
 import { cn } from '#/lib/utils'
 import { GlobalErrorComponent } from '#/components/globalErrorComponent'
 import { queryClient } from '#/lib/query-client'
+import { getSessionFn } from '#/data/session'
+import { createAuthContext } from '#/lib/auth-injectors'
+import type { AuthContextResult } from '#/lib/types'
+import { AfkMonitor } from '#/components/afk-monitor'
+import type { Roles } from '#/generated/prisma/enums'
 
-export const Route = createRootRoute<{ queryClient: QueryClient }>({
+interface MyRouterContext {
+  queryClient: QueryClient
+  auth: AuthContextResult
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async () => {
+    const session = await getSessionFn()
+    return createAuthContext(session)
+  },
+
   head: () => ({
     meta: [
       {
@@ -57,28 +72,32 @@ export const Route = createRootRoute<{ queryClient: QueryClient }>({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { auth } = Route.useRouteContext()
+  const userRole = auth.user?.role as Roles
   return (
-    <html lang="en" suppressHydrationWarning>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <html lang="en" suppressHydrationWarning>
         <head>
           <HeadContent />
         </head>
         <body>
-          <ThemeProvider>
-            {children}
-            <Toaster
-              closeButton
-              position="top-center"
-              toastOptions={{
-                classNames: {
-                  closeButton: '!right-0 !left-auto !translate-x-1/2',
-                },
-              }}
-            />
-          </ThemeProvider>
+          <AfkMonitor type={userRole}>
+            <ThemeProvider>
+              {children}
+              <Toaster
+                closeButton
+                position="top-center"
+                toastOptions={{
+                  classNames: {
+                    closeButton: '!right-0 !left-auto !translate-x-1/2',
+                  },
+                }}
+              />
+            </ThemeProvider>
+          </AfkMonitor>
           <Scripts />
         </body>
-      </QueryClientProvider>
-    </html>
+      </html>
+    </QueryClientProvider>
   )
 }

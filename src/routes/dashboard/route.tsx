@@ -1,3 +1,4 @@
+import { AfkMonitor } from '#/components/afk-monitor'
 import { AppSidebar } from '#/components/app-sidebar'
 import { buttonVariants } from '#/components/ui/button'
 import { Separator } from '#/components/ui/separator'
@@ -6,8 +7,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '#/components/ui/sidebar'
-import { getSessionFn } from '#/data/session'
-import { LoginType } from '#/lib/types'
+import { Roles } from '#/generated/prisma/enums'
+import { hasPermission } from '#/lib/roleBaseActions'
 import { cn } from '#/lib/utils'
 import {
   createFileRoute,
@@ -21,27 +22,19 @@ import { useEffect } from 'react'
 
 export const Route = createFileRoute('/dashboard')({
   component: RouteComponent,
-  beforeLoad: async ({ location }) => {
-    const session = await getSessionFn()
-    if (!session || !session.user) {
+  beforeLoad: async ({ location, context }) => {
+    const user = context.auth.user
+    if (!user) {
       throw redirect({
         to: '/login',
         search: { redirect: location.href, reason: 'expired' },
       })
     }
-    const recievedRole = session.user?.role?.toLowerCase().trim()
-    const userRole = LoginType.Patient.toLowerCase()
-    if (recievedRole === userRole) {
+    const userRole = user.role as Roles
+    if (!hasPermission(userRole, Roles.Doctor)) {
       throw redirect({
         to: '/patientDashboard',
       })
-    }
-
-    return { session }
-  },
-  loader: ({ context }) => {
-    return {
-      user: context.session.user,
     }
   },
   notFoundComponent: () => {
@@ -73,8 +66,10 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function RouteComponent() {
-  const { session } = Route.useRouteContext()
+  const { auth } = Route.useRouteContext()
+  const userRole = auth.user?.role as Roles
   const router = useRouter()
+
   useEffect(() => {
     const interval = setInterval(async () => {
       await router.invalidate()
@@ -84,23 +79,25 @@ function RouteComponent() {
 
   return (
     <div>
-      <SidebarProvider>
-        <AppSidebar user={session.user} role={session.user.role!} />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-            <div className="flex items-center gap-2 px-4">
-              <SidebarTrigger className="-ml-1 animate-bounce-x" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
+      <AfkMonitor type={userRole}>
+        <SidebarProvider>
+          <AppSidebar auth={auth} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1 animate-bounce-x" />
+                <Separator
+                  orientation="vertical"
+                  className="mr-2 data-[orientation=vertical]:h-4"
+                />
+              </div>
+            </header>
+            <div className=" flex flex-1 flex-col gap-4 p-4 pt-4">
+              <Outlet />
             </div>
-          </header>
-          <div className=" flex flex-1 flex-col gap-4 p-4 pt-4">
-            <Outlet />
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+          </SidebarInset>
+        </SidebarProvider>
+      </AfkMonitor>
     </div>
   )
 }

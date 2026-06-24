@@ -20,16 +20,19 @@ export const patientSearchSchema = z.object({
 })
 
 export const adminSearchSchema = z.object({
-  search: z.string().default(''),
-  page: z.number().catch(1).optional(),
-  userId: z.string(),
-})
-
-export const routeAdminSearchSchema = z.object({
+  // Catch any bad value or undefined and fall back to an empty string
   search: z.string().optional().catch(''),
-  page: z.number().catch(1).optional(),
+
+  // Coerce incoming URL string params like '?page=2' into numbers, fall back to 1
+  page: z.coerce.number().optional().catch(1),
+
+  // pagePerRows will default to 8 if not present
+  pagePerRows: z.number().optional().default(8),
+
   userId: z.string().optional().catch(''),
 })
+
+export type AdminSearchParamType = z.infer<typeof adminSearchSchema>
 
 export const addPatientSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),

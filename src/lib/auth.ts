@@ -11,8 +11,9 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
   session: {
-    expiresIn: 60 * 10,
-    updateAge: 30,
+    expiresIn: 60 * 60 * 24,
+    updateAge: 60 * 60,
+    deferSessionRefresh: false,
   },
   emailAndPassword: {
     enabled: true,

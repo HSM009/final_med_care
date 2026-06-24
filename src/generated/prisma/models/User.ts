@@ -42,7 +42,7 @@ export type UserMinAggregateOutputType = {
   qualification: string | null
   cellNo: string | null
   emailVerified: boolean | null
-  role: string | null
+  role: $Enums.Roles | null
   isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
@@ -65,7 +65,7 @@ export type UserMaxAggregateOutputType = {
   qualification: string | null
   cellNo: string | null
   emailVerified: boolean | null
-  role: string | null
+  role: $Enums.Roles | null
   isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
@@ -277,7 +277,7 @@ export type UserGroupByOutputType = {
   qualification: string | null
   cellNo: string | null
   emailVerified: boolean
-  role: string | null
+  role: $Enums.Roles
   isApproved: boolean | null
   banned: boolean | null
   bannedReason: string | null
@@ -323,7 +323,7 @@ export type UserWhereInput = {
   qualification?: Prisma.StringNullableFilter<"User"> | string | null
   cellNo?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
-  role?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumRolesFilter<"User"> | $Enums.Roles
   isApproved?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -349,7 +349,7 @@ export type UserOrderByWithRelationInput = {
   qualification?: Prisma.SortOrderInput | Prisma.SortOrder
   cellNo?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
-  role?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   isApproved?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -378,7 +378,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   qualification?: Prisma.StringNullableFilter<"User"> | string | null
   cellNo?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
-  role?: Prisma.StringNullableFilter<"User"> | string | null
+  role?: Prisma.EnumRolesFilter<"User"> | $Enums.Roles
   isApproved?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -404,7 +404,7 @@ export type UserOrderByWithAggregationInput = {
   qualification?: Prisma.SortOrderInput | Prisma.SortOrder
   cellNo?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
-  role?: Prisma.SortOrderInput | Prisma.SortOrder
+  role?: Prisma.SortOrder
   isApproved?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -435,7 +435,7 @@ export type UserScalarWhereWithAggregatesInput = {
   qualification?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   cellNo?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  role?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  role?: Prisma.EnumRolesWithAggregatesFilter<"User"> | $Enums.Roles
   isApproved?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   banned?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -458,7 +458,7 @@ export type UserCreateInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -484,7 +484,7 @@ export type UserUncheckedCreateInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -510,7 +510,7 @@ export type UserUpdateInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -536,7 +536,7 @@ export type UserUncheckedUpdateInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -562,7 +562,7 @@ export type UserCreateManyInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -585,7 +585,7 @@ export type UserUpdateManyMutationInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -608,7 +608,7 @@ export type UserUncheckedUpdateManyInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -722,6 +722,10 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type EnumRolesFieldUpdateOperationsInput = {
+  set?: $Enums.Roles
+}
+
 export type NullableBoolFieldUpdateOperationsInput = {
   set?: boolean | null
 }
@@ -794,7 +798,7 @@ export type UserCreateWithoutSessionsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -819,7 +823,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -860,7 +864,7 @@ export type UserUpdateWithoutSessionsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -885,7 +889,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -910,7 +914,7 @@ export type UserCreateWithoutAccountsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -935,7 +939,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -976,7 +980,7 @@ export type UserUpdateWithoutAccountsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1001,7 +1005,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1026,7 +1030,7 @@ export type UserCreateWithoutDoctorDetailsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -1051,7 +1055,7 @@ export type UserUncheckedCreateWithoutDoctorDetailsInput = {
   qualification?: string | null
   cellNo?: string | null
   emailVerified?: boolean
-  role?: string | null
+  role?: $Enums.Roles
   isApproved?: boolean | null
   banned?: boolean | null
   bannedReason?: string | null
@@ -1092,7 +1096,7 @@ export type UserUpdateWithoutDoctorDetailsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1117,7 +1121,7 @@ export type UserUncheckedUpdateWithoutDoctorDetailsInput = {
   qualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cellNo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
   isApproved?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1304,7 +1308,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     qualification: string | null
     cellNo: string | null
     emailVerified: boolean
-    role: string | null
+    role: $Enums.Roles
     isApproved: boolean | null
     banned: boolean | null
     bannedReason: string | null
@@ -1750,7 +1754,7 @@ export interface UserFieldRefs {
   readonly qualification: Prisma.FieldRef<"User", 'String'>
   readonly cellNo: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
-  readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly role: Prisma.FieldRef<"User", 'Roles'>
   readonly isApproved: Prisma.FieldRef<"User", 'Boolean'>
   readonly banned: Prisma.FieldRef<"User", 'Boolean'>
   readonly bannedReason: Prisma.FieldRef<"User", 'String'>

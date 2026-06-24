@@ -8,13 +8,15 @@ import {
 } from '@/schemas/auth'
 import { emailChangeNotification } from '@/components/email'
 
-const PAGE_SIZE = 8
 export const getPatientsFn = createServerFn({ method: 'GET' })
   .validator(adminSearchSchema)
   .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
     const searchString = data?.search?.trim()
     const currentPage = data?.page || 1
+    if (searchString === undefined) {
+      return { items: [], totalCount: 0 }
+    }
     const whereClause = {
       NOT: [
         {
@@ -41,8 +43,8 @@ export const getPatientsFn = createServerFn({ method: 'GET' })
     const [items, totalCount] = await Promise.all([
       prisma.user.findMany({
         where: whereClause,
-        skip: (currentPage - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
+        skip: (currentPage - 1) * data.pagePerRows,
+        take: data.pagePerRows,
         orderBy: { id: 'asc' },
       }),
       prisma.user.count({ where: whereClause }),

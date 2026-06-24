@@ -1,28 +1,32 @@
 import { type LucideIcon } from 'lucide-react'
 import { authClient } from './auth-client'
 import { toast } from 'sonner'
-import {
-  useNavigate,
-  type RegisteredRouter,
-  type RouteIds,
-} from '@tanstack/react-router'
-import { type User } from 'better-auth'
-import { Gender } from '@/generated/prisma/browser'
+import { useNavigate } from '@tanstack/react-router'
+import { Gender, Roles } from '@/generated/prisma/browser'
 import type { UploadedFileInfo } from './vercel-action'
 import type { MedicineItem } from '#/components/addPatientMedicineDialog'
 
-export interface navUserProps {
-  user: User
+export interface AuthUser {
+  id?: string
+  name: string | undefined
+  email: string | undefined
+  qualification?: string
+  cellNo?: string
+  role?: Roles
 }
 
-export interface extendedUser extends navUserProps {
-  role: string
+export interface AuthContextResult {
+  auth: {
+    user: AuthUser | null | undefined
+  }
 }
+
+export interface NavUserProps {}
 
 export interface NavPrimaryProps {
   items: {
     title: string
-    to: RouteIds<RegisteredRouter['routeTree']>
+    to: string
     icon: LucideIcon
     activeOptions: { exact: boolean }
   }[]
@@ -149,9 +153,4 @@ export interface SinglePrescription {
   patientPhone: string | null
   patientGender: Gender | string | null
   patientImages: string | UploadedFileInfo[] | null
-}
-
-export enum LoginType {
-  Patient = 'Patient',
-  Doctor = 'Doctor',
 }

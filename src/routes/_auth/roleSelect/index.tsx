@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
-import { LoginType } from '#/lib/types'
+import { Roles } from '#/generated/prisma/enums'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth/roleSelect/')({
@@ -21,7 +21,7 @@ function RouteComponent() {
               <div className=" min-h-40">
                 <Link
                   to="/login"
-                  search={{ type: LoginType.Patient }}
+                  search={{ type: Roles.Patient }}
                   className=" flex h-full w-full justify-center text-center items-center bg-blue-500/50 hover:bg-blue-500 cursor-pointer"
                 >
                   Patient Login
@@ -30,7 +30,7 @@ function RouteComponent() {
               <div className=" min-h-40">
                 <Link
                   to="/login"
-                  search={{ type: LoginType.Doctor }}
+                  search={{ type: Roles.Doctor }}
                   className="flex h-full w-full justify-center text-center items-center bg-red-500/50 hover:bg-red-500 cursor-pointer"
                 >
                   Doctor Login

@@ -14,18 +14,23 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
+import { getSessionFn } from '#/data/session'
+import { Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
+import { createAuthContext } from '#/lib/auth-injectors'
+import { hasPermission } from '#/lib/roleBaseActions'
 import { loginSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
+
 import { toast } from 'sonner'
 
 interface prop {
   type: string | undefined
 }
-
 export function LoginForm({ type }: prop) {
   const navigate = useNavigate()
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -40,23 +45,28 @@ export function LoginForm({ type }: prop) {
         password: value.password,
         fetchOptions: {
           onSuccess: async () => {
-            const session = await authClient.getSession()
-            const receivedRole =
-              (session?.data?.user as any)?.role?.toLowerCase() || ''
-            const currentFormType = type!.toLowerCase()
-            if (receivedRole !== 'admin') {
+            const session = await getSessionFn()
+            const { auth } = createAuthContext(session)
+            const receivedRole = auth.user?.role as Roles
+            const currentFormType = type as Roles
+            console.log(
+              currentFormType + ' <> ' + receivedRole + ' <> ' + Roles.Admin,
+            )
+            if (receivedRole !== Roles.Admin) {
               if (currentFormType !== receivedRole) {
                 toast.error('You are not authorized to access this portal.')
                 await authClient.signOut()
                 return
               }
             }
-            if (receivedRole === 'admin' || receivedRole === 'doctor') {
+            if (hasPermission(receivedRole, Roles.Doctor)) {
               navigate({ to: '/dashboard' })
               toast.success('Logged in successfully')
-            } else if (receivedRole === 'patient') {
+            } else if (hasPermission(receivedRole, Roles.Patient)) {
               navigate({ to: '/patientDashboard' })
               toast.success('Logged in successfully')
+            } else {
+              console.log(3)
             }
           },
           onError: ({ error }) => {

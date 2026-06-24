@@ -17,7 +17,7 @@ model User {
   cellNo              String?
 
   emailVerified Boolean   @default(false)
-  role          String?      @default("patient") 
+  role          Roles      @default(Patient) 
   isApproved    Boolean?    @default(false)
 
   banned        Boolean?  @default(true)
@@ -135,4 +135,10 @@ enum Gender {
   MALE
   FEMALE
   OTHER
+}
+
+enum Roles {
+  Patient
+  Doctor
+  Admin
 }

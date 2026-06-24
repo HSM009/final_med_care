@@ -11,11 +11,12 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '#/components/ui/sidebar'
-import { Link, linkOptions } from '@tanstack/react-router'
-import { type extendedUser, type NavPrimaryProps } from '#/lib/types'
+import { Link } from '@tanstack/react-router'
+import { type NavPrimaryProps, type AuthContextResult } from '#/lib/types'
+import { hasPermission } from '#/lib/roleBaseActions'
+import { Roles } from '#/generated/prisma/enums'
 
-// This is sample data.
-const navItems: NavPrimaryProps['items'] = linkOptions([
+const navItems: NavPrimaryProps['items'] = [
   {
     title: 'View Patients',
     icon: ViewIcon,
@@ -40,9 +41,10 @@ const navItems: NavPrimaryProps['items'] = linkOptions([
     to: '/dashboard/administerUser',
     activeOptions: { exact: false },
   },
-])
+]
 
-export function AppSidebar({ user, role }: extendedUser) {
+export function AppSidebar({ auth }: AuthContextResult) {
+  console.log(auth.user?.role as Roles)
   return (
     <Sidebar collapsible="icon" className=" ">
       <SidebarHeader>
@@ -68,7 +70,7 @@ export function AppSidebar({ user, role }: extendedUser) {
         {/* <NavMain items={data.navMain} /> */}
         <NavPrimary
           items={(() => {
-            if (role.toUpperCase() !== 'ADMIN') {
+            if (!hasPermission(auth.user?.role as Roles, Roles.Admin)) {
               return navItems.filter((item) => item.title !== 'Administer User')
             }
             return navItems
@@ -76,7 +78,7 @@ export function AppSidebar({ user, role }: extendedUser) {
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser name={auth.user?.name} email={auth.user?.email} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -25,10 +25,7 @@ export const Route = createFileRoute('/dashboard/viewPatients')({
 })
 
 function RouteComponent() {
-  const { session } = Route.useRouteContext()
-  if (!session || !session.user) {
-    return null // or <Loader2 className="animate-spin" />
-  }
+  const { auth } = Route.useRouteContext()
 
   const { items, totalCount } = Route.useLoaderData()
   const { search, page = 1 } = Route.useSearch()
@@ -267,12 +264,12 @@ function RouteComponent() {
                                 note: '',
                                 prescriptionsContent: [],
                                 relatedImages: [],
-                                doctorName: session.user?.name,
+                                doctorName: auth.user?.name,
                                 doctorQualification:
-                                  session.user?.qualification || ' ',
-                                doctorPhone: session.user?.cellNo || ' ',
+                                  auth.user?.qualification || ' ',
+                                doctorPhone: auth.user?.cellNo || ' ',
                                 id: patient.id,
-                                doctorId: session.user.id,
+                                doctorId: auth.user?.id,
                               }}
                               mask={{
                                 to: '/dashboard/patientPrescription',
@@ -304,10 +301,10 @@ function RouteComponent() {
               <TabsContent value="Precsription" tabIndex={-1}>
                 <GetPrescriptions
                   medCareId={medId}
-                  userId={session.user.id}
-                  doctorName={session.user.name}
-                  doctorQualification={session.user.qualification || ' '}
-                  doctorCellNo={session.user.cellNo || ' '}
+                  userId={auth.user?.id || ' '}
+                  doctorName={auth.user?.name || ' '}
+                  doctorQualification={auth.user?.qualification || ' '}
+                  doctorCellNo={auth.user?.cellNo || ' '}
                 />
               </TabsContent>
             </Tabs>
