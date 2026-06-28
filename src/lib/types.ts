@@ -1,18 +1,17 @@
 import { type LucideIcon } from 'lucide-react'
-import { authClient } from './auth-client'
-import { toast } from 'sonner'
-import { useNavigate } from '@tanstack/react-router'
 import { Gender, Roles } from '@/generated/prisma/browser'
 import type { UploadedFileInfo } from './vercel-action'
 import type { MedicineItem } from '#/components/addPatientMedicineDialog'
 
 export interface AuthUser {
-  id?: string
+  id: string
   name: string | undefined
   email: string | undefined
-  qualification?: string
-  cellNo?: string
-  role?: Roles
+  qualification: string
+  gender: Gender
+  dateOfBirth: Date
+  cellNo: string
+  role: Roles
 }
 
 export interface AuthContextResult {
@@ -34,14 +33,14 @@ export interface NavPrimaryProps {
 
 export interface NavPatientProps {
   name: string
-  med_care_id: string
+  medCareId: string
   age: Date
   phone: string
   email: string
   gender: Gender
 }
 
-export interface NavAdminProps {
+export interface NavUserProps {
   editDialog: Number
   userId: string
   usertitle: string
@@ -55,32 +54,19 @@ export interface NavAdminProps {
   sessionName: string
 }
 
-//------------Handle Signout------------------
-export const useHandleSignOut = () => {
-  const navigate = useNavigate()
-  return async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          navigate({
-            to: '/',
-          })
-          toast.success('Signed out Successfully')
-        },
-        onError: ({ error }) => {
-          toast.error(error.message)
-        },
-      },
-    })
-  }
+export interface EditUserProps {
+  userId: string
+  userName: string
+  userEmail: string
+  userDateOfBirth: Date
+  userCellNo: string
+  gender: Gender
+  sessionName: string
 }
 
 export function formatDateToDMY(dateString: Date | string | number) {
   if (!dateString) return ''
-
   const dateObj = new Date(dateString)
-
-  // 1. Format the date section: "28-MAY-2026"
   const datePart = new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',
     month: 'short',
@@ -90,8 +76,7 @@ export function formatDateToDMY(dateString: Date | string | number) {
     .replace(/ /g, '-')
     .toUpperCase()
 
-  // 2. Format the time section: "09:15 PM"
-  const timePart = new Intl.DateTimeFormat('en-US', {
+  const timePart = new Intl.DateTimeFormat('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,
@@ -116,31 +101,22 @@ export interface EditMedicineDialogNavProps {
   Dosage?: string | undefined | null
 }
 
-export interface EditPatientDialogNavProps {
-  Id: number
-  name?: string | undefined | null
-  email?: string | undefined | null
-  age?: Date | null
-  phone?: string | undefined | null
-  gender?: string | undefined | null
-}
-
 export const prescriptionButtons = [
   { type: 'Save Prescription', val: false },
   { type: 'Finalize Prescription', val: true },
 ]
 
-export interface AdminFieldCardProps {
+export interface UserFieldCardProps {
   userId: string
   Title: string
-  currentData: string | Boolean | Number
+  currentData?: string | Boolean | Number | Date
   sessionName?: string
   validatorHandler: any
 }
 
 export interface SinglePrescription {
   id: number
-  med_care_id: string | null
+  medCareId: string | null
   createdPrescription: Date
   prescriptionSubmitted: boolean
   prescriptionsContent: string | MedicineItem[] | null

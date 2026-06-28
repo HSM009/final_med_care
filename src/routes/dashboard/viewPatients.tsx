@@ -6,7 +6,7 @@ import { patientSearchSchema } from '#/schemas/auth'
 import { Button } from '#/components/ui/button'
 import { useState, useTransition } from 'react'
 import { formatDateToDMY } from '#/lib/types'
-import { EditPatientDialog } from '#/components/editPatientDialog'
+import { EditPatientDialog } from '#/components/user/editPatientDialog'
 import { AppPagination } from '#/components/appPagination'
 import { calculateAge } from '#/components/datePicker'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
@@ -42,7 +42,7 @@ function RouteComponent() {
         await navigate({
           search: (prev) => ({
             ...prev,
-            search: value.search.trim(),
+            search: value.search,
             page: 1,
           }),
         })
@@ -55,6 +55,7 @@ function RouteComponent() {
       await navigate({
         search: (prev) => ({
           ...prev,
+          search: prev.search,
           page: newPage,
         }),
       })
@@ -178,6 +179,12 @@ function RouteComponent() {
                           scope="col"
                           className="px-6 py-3 font-medium dark:text-primary text-secondary"
                         >
+                          Gender
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 font-medium dark:text-primary text-secondary"
+                        >
                           Phone
                         </th>
                         <th
@@ -208,22 +215,25 @@ function RouteComponent() {
                           className="border-b hover:bg-neutral-600/50 transition-colors "
                         >
                           <td className="px-6 py-3 text-primary">
-                            {patient.med_care_id}
+                            {patient.medCareId}
                           </td>
                           <td className="px-6 py-3 dark:text-primary text-secondary">
                             {patient.name}
                           </td>
                           <td className="px-6 py-3 dark:text-primary text-secondary">
-                            {calculateAge(patient.age)}
+                            {calculateAge(patient.dateOfBirth)}
                           </td>
                           <td className="px-6 py-3 dark:text-primary text-secondary">
-                            {patient.phone}
+                            {patient.gender}
+                          </td>
+                          <td className="px-6 py-3 dark:text-primary text-secondary">
+                            {patient.cellNo}
                           </td>
                           <td className="px-6 py-3 dark:text-primary text-secondary">
                             {patient.email}
                           </td>
                           <td className="px-6 py-3 dark:text-primary text-secondary">
-                            {formatDateToDMY(patient.createdProfile)}
+                            {formatDateToDMY(patient.createdAt)}
                           </td>
 
                           <td className="px-6 py-3 flex items-center justify-end gap-3 whitespace-nowrap">
@@ -232,7 +242,7 @@ function RouteComponent() {
                               onClick={() => {
                                 setActiveTab('Precsription')
                                 setTimeout(() => {
-                                  handleMedId(patient.med_care_id || ' ')
+                                  handleMedId(patient.medCareId || ' ')
                                 }, 0)
                               }}
                             >
@@ -240,12 +250,15 @@ function RouteComponent() {
                             </span>
 
                             <EditPatientDialog
-                              Id={patient.id}
-                              name={patient.name}
-                              email={patient.email}
-                              age={patient.age}
-                              phone={patient.phone}
-                              gender={patient.gender}
+                              data={{
+                                userId: patient.id,
+                                userName: patient.name,
+                                userEmail: patient.email,
+                                userDateOfBirth: patient.dateOfBirth,
+                                userCellNo: patient.cellNo || '',
+                                gender: patient.gender,
+                                sessionName: auth.user?.name || 'N/A',
+                              }}
                             >
                               <span className="font-medium text-red-500 hover:underline cursor-pointer select-none">
                                 Edit
@@ -256,9 +269,9 @@ function RouteComponent() {
                               to="/dashboard/patientPrescription"
                               search={{
                                 name: patient.name || '',
-                                med_care_id: patient.med_care_id || '',
-                                age: patient.age,
-                                phone: patient.phone || '',
+                                medCareId: patient.medCareId || '',
+                                age: patient.dateOfBirth,
+                                phone: patient.cellNo || '',
                                 email: patient.email,
                                 gender: patient.gender,
                                 note: '',
@@ -268,7 +281,7 @@ function RouteComponent() {
                                 doctorQualification:
                                   auth.user?.qualification || ' ',
                                 doctorPhone: auth.user?.cellNo || ' ',
-                                id: patient.id,
+                                id: '1',
                                 doctorId: auth.user?.id,
                               }}
                               mask={{

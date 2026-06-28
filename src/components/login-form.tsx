@@ -49,9 +49,7 @@ export function LoginForm({ type }: prop) {
             const { auth } = createAuthContext(session)
             const receivedRole = auth.user?.role as Roles
             const currentFormType = type as Roles
-            console.log(
-              currentFormType + ' <> ' + receivedRole + ' <> ' + Roles.Admin,
-            )
+
             if (receivedRole !== Roles.Admin) {
               if (currentFormType !== receivedRole) {
                 toast.error('You are not authorized to access this portal.')

@@ -1,4 +1,4 @@
-import { Gender } from '@/generated/prisma/enums'
+import { Gender, Roles } from '@/generated/prisma/enums'
 import z from 'zod'
 
 export const loginSchema = z.object({
@@ -10,13 +10,35 @@ export const signupSchema = z.object({
   fullName: z.string().min(5),
   email: z.string().email({ message: 'Invalid email address' }),
   password: z.string().min(8),
-  role: z.string(),
-  isApproved: z.boolean(),
+  role: z.enum(Object.values(Roles) as [Roles, ...Roles[]]),
+  gender: z.enum(Object.values(Gender) as [Gender, ...Gender[]]),
+  dateOfBirth: z.date({ message: 'A valid date of birth is required' }).refine(
+    (birthDate) => {
+      const today = new Date()
+      let calculatedAge = today.getFullYear() - birthDate.getFullYear()
+      const monthDiff = today.getMonth() - birthDate.getMonth()
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        calculatedAge--
+      }
+      return calculatedAge >= 1 && calculatedAge <= 120
+    },
+    {
+      message: 'Patient must be between 1 and 120 years old',
+    },
+  ),
+  cellNo: z
+    .string()
+    .min(11, 'Cell number must be at least 11 characters')
+    .max(11, 'Cell number must be at most 11 characters'),
 })
+
 export const patientSearchSchema = z.object({
   search: z.string().optional(),
   page: z.number().catch(1).optional(),
-  pagePerRows: z.number(),
+  pagePerRows: z.number().optional(),
 })
 
 export const adminSearchSchema = z.object({
@@ -56,6 +78,7 @@ export const addPatientSchema = z.object({
     },
   ),
   phone: z.string().length(11, 'Phone number must be exactly 11 characters'),
+  role: z.enum(Roles).default(Roles.Patient),
 })
 
 export const medicineSearchSchema = z.object({
@@ -79,7 +102,7 @@ export const updateMedicineSchema = addOrUpdateMedicineSchema.extend({
 })
 
 export const updatePatientSchema = addPatientSchema.extend({
-  id: z.number(),
+  id: z.string(),
 })
 
 export const addPatientMedicineSearch = z.object({
@@ -90,8 +113,11 @@ export const emailUpdateSchema = z.object({
   email: z.string().email('Invalid email address'),
 })
 
+export const genderUpdateSchema = z.object({
+  gender: z.enum(Gender),
+})
 export const roleUpdateSchema = z.object({
-  role: z.string(),
+  role: z.enum(Roles),
 })
 export const emailVerifiedUpdateSchema = z.object({
   emailVerified: z.boolean(),
@@ -106,6 +132,25 @@ export const nameUpdateSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
 })
 
+export const dobUpdateSchema = z.object({
+  dateOfBirth: z.date({ message: 'A valid date of birth is required' }).refine(
+    (birthDate) => {
+      const today = new Date()
+      let calculatedAge = today.getFullYear() - birthDate.getFullYear()
+      const monthDiff = today.getMonth() - birthDate.getMonth()
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        calculatedAge--
+      }
+      return calculatedAge >= 1 && calculatedAge <= 120
+    },
+    {
+      message: 'Patient must be between 1 and 120 years old',
+    },
+  ),
+})
 export const cellNoUpdateSchema = z.object({
   cellNo: z
     .string()
@@ -148,11 +193,11 @@ export const forceChangeEmailSchemaExtended = forceChangeEmailSchema.extend({
 export const adminActionSchema = z.object({
   fId: z.string(),
   Title: z.string(),
-  newValue: z.string().or(z.boolean()).or(z.number()),
+  newValue: z.string().or(z.boolean()).or(z.number()).or(z.date()),
 })
 
 export const submitPrescriptionSchema = z.object({
-  med_care_id: z.string(),
+  medCareId: z.string(),
   doctorId: z.string(),
   note: z.string(),
   prescriptionsContent: z.string(),
@@ -168,9 +213,9 @@ export const downloadSchema = z.object({
 })
 
 export const patientPrescriptionSearchSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   name: z.string().optional(),
-  med_care_id: z.string().optional(),
+  medCareId: z.string().optional(),
   age: z.any().optional(), // Keeps the incoming date or string safe
   phone: z.string().optional(),
   email: z.string().optional().nullable(),
@@ -183,20 +228,6 @@ export const patientPrescriptionSearchSchema = z.object({
   doctorQualification: z.string().optional(),
   doctorPhone: z.string().optional(),
 })
-
-export const patientPrescriptionSearchSchema1 = z
-  .object({
-    name: z.string(),
-    med_care_id: z.string(),
-    age: z.any(), // Keeps the incoming date or string safe
-    phone: z.string(),
-    email: z.string().optional().nullable(),
-    gender: z.string(),
-    note: z.string().optional().nullable().catch(''),
-    prescriptionsContent: z.array(z.any()).catch([]).optional(),
-    relatedImages: z.array(z.any()).catch([]).optional(),
-  })
-  .passthrough()
 
 export const loginErrorRedirect = z.object({
   type: z.string().optional(),

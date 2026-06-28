@@ -114,7 +114,7 @@ export function PescriptionDrawer({
         <DrawerContent className="h-full w-full sm:min-w-[33.333333%] sm:w-auto ml-auto flex flex-col rounded-none">
           <DrawerHeader>
             <DrawerTitle>
-              {prescription.med_care_id || 'No ID Assigned'}
+              {prescription.medCareId || 'No ID Assigned'}
             </DrawerTitle>
             <DrawerDescription>
               {formatDateToDMY(prescription.createdPrescription)}
@@ -132,7 +132,7 @@ export function PescriptionDrawer({
                         <td className="bg-gray-600 font-bold px-4 py-4">
                           Med Care Id
                         </td>
-                        <td>{prescription.med_care_id || 'N/A'}</td>
+                        <td>{prescription.medCareId || 'N/A'}</td>
                       </tr>
                       <tr className="border-2 text-center">
                         <td className="bg-gray-600 font-bold px-4 py-4">
@@ -300,7 +300,7 @@ export function PescriptionDrawer({
           ref={componentRef}
           patientData={{
             name: prescription.patientName || 'Anonymous',
-            med_care_id: prescription.med_care_id || 'N/A',
+            medCareId: prescription.medCareId || 'N/A',
             age: atAge(),
             phone: prescription.patientPhone || 'N/A',
             gender: String(prescription.patientGender || 'Not Specified'),

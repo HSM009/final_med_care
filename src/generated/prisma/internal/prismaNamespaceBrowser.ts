@@ -55,7 +55,6 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  PatientRecord: 'PatientRecord',
   PatientPrescription: 'PatientPrescription',
   MedicineList: 'MedicineList'
 } as const
@@ -83,9 +82,11 @@ export const UserScalarFieldEnum = {
   email: 'email',
   qualification: 'qualification',
   cellNo: 'cellNo',
+  dateOfBirth: 'dateOfBirth',
+  gender: 'gender',
+  medCareId: 'medCareId',
   emailVerified: 'emailVerified',
   role: 'role',
-  isApproved: 'isApproved',
   banned: 'banned',
   bannedReason: 'bannedReason',
   banReason: 'banReason',
@@ -149,24 +150,8 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
-export const PatientRecordScalarFieldEnum = {
-  id: 'id',
-  med_care_id: 'med_care_id',
-  name: 'name',
-  age: 'age',
-  gender: 'gender',
-  email: 'email',
-  phone: 'phone',
-  createdProfile: 'createdProfile',
-  activeStatus: 'activeStatus'
-} as const
-
-export type PatientRecordScalarFieldEnum = (typeof PatientRecordScalarFieldEnum)[keyof typeof PatientRecordScalarFieldEnum]
-
-
 export const PatientPrescriptionScalarFieldEnum = {
   id: 'id',
-  med_care_id: 'med_care_id',
   note: 'note',
   prescriptionsContent: 'prescriptionsContent',
   createdPrescription: 'createdPrescription',
@@ -174,6 +159,7 @@ export const PatientPrescriptionScalarFieldEnum = {
   prescriptionImage: 'prescriptionImage',
   activeStatus: 'activeStatus',
   prescriptionSubmitted: 'prescriptionSubmitted',
+  medCareId: 'medCareId',
   doctorId: 'doctorId'
 } as const
 

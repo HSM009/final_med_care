@@ -5,7 +5,7 @@ import { formatDateToDMY } from '@/lib/types'
 interface PrintProps {
   patientData: {
     name: string
-    med_care_id: string
+    medCareId: string
     age: Number
     phone: string
     gender: string
@@ -72,7 +72,7 @@ export const PrescriptionPrintTemplate = React.forwardRef<
           <div className="grid grid-cols-4 gap-4 my-6 p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm">
             <div>
               <strong>Med Care ID:</strong>{' '}
-              <p className="text-gray-700">{patientData.med_care_id}</p>
+              <p className="text-gray-700">{patientData.medCareId}</p>
             </div>
             <div>
               <strong>Patient Name:</strong>{' '}

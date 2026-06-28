@@ -1,7 +1,7 @@
 import { ChevronsUpDown, LogOut } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { useHandleSignOut, type AuthUser } from '#/lib/types'
+import { type AuthUser } from '#/lib/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import {
   useSidebar,
 } from '#/components/ui/sidebar'
 import { Link } from '@tanstack/react-router'
+import { useHandleSignOut } from '#/server/actions'
 
 export function NavUser({ name, email }: AuthUser) {
   const { isMobile, setOpenMobile } = useSidebar()

@@ -5,6 +5,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 import { emailOTP } from 'better-auth/plugins'
+import { Gender, Roles } from '#/generated/prisma/enums'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -23,8 +24,8 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user }) => {
       try {
-        const userRole = (user as any).role.toLowerCase()
-        if (userRole === 'doctor')
+        const userRole = (user as any).role
+        if (userRole === Roles.Doctor)
           await adminNotification(user.name, user.email)
       } catch (error) {
         console.error(
@@ -39,6 +40,7 @@ export const auth = betterAuth({
       enabled: true,
     },
     additionalFields: {
+      med_care_id: { type: 'string', required: false, input: true },
       cellNo: { type: 'string', required: false, input: true },
       qualification: { type: 'string', required: false, input: true },
       banned: { type: 'boolean', required: false, input: false },
@@ -51,11 +53,16 @@ export const auth = betterAuth({
         input: true,
         defaultValue: 'Patient',
       },
-      isApproved: {
-        type: 'boolean',
-        required: true,
+      gender: {
+        type: 'string',
+        required: false,
         input: true,
-        defaultValue: true,
+        defaultValue: Gender.Other,
+      },
+      dateOfBirth: {
+        type: 'date',
+        required: false,
+        input: true,
       },
     },
   },
@@ -63,19 +70,57 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user, ctx) => {
-          const body = (ctx as any)?.body || {}
+        before: async (user) => {
+          // 🎯 CHECK ROLE: Only run sequence generator if the incoming user is a Patient
+          // Adjust 'user.role' to match your actual schema field name if it's different
+          if (user.role !== Roles.Patient) {
+            return {
+              data: user,
+              banned: true,
+            }
+          }
 
-          const submittedRole = body.role || 'Patient'
-          const isDoctor = submittedRole.toLowerCase() === 'doctor'
+          // We use an isolated Prisma transaction loop to guarantee consistency
+          const generatedId = await prisma.$transaction(async (tx) => {
+            const currentYear = new Date().getFullYear()
 
+            const lastPatientInYear = await tx.user.findFirst({
+              where: {
+                role: Roles.Patient, // Enforce tracking only against existing patients
+                med_care_id: {
+                  startsWith: `MC-${currentYear}-`,
+                },
+              },
+              orderBy: {
+                med_care_id: 'desc',
+              },
+              select: {
+                med_care_id: true,
+              },
+            })
+
+            let nextSerial = 1
+
+            if (lastPatientInYear && lastPatientInYear.med_care_id) {
+              const parts = lastPatientInYear.med_care_id.split('-')
+              const lastSerial = parseInt(parts[2], 10)
+              if (!isNaN(lastSerial)) {
+                nextSerial = lastSerial + 1
+              }
+            }
+
+            // Pad out numbers cleanly to a professional sequence (e.g., 0001, 0002)
+            const paddedSerial = String(nextSerial).padStart(4, '0')
+            return `MC-${currentYear}-${paddedSerial}`
+          })
+          console.log(generatedId)
           return {
             data: {
               ...user,
-              role: isDoctor ? 'Doctor' : 'Patient',
-              banned: isDoctor ? true : false,
-              banReason: isDoctor ? 'Pending for admin for access' : null,
-              bannedReason: isDoctor ? 'Pending for admin for access' : null,
+              med_care_id: generatedId,
+              bannedReason: null,
+              banReason: null,
+              banned: false,
             },
           }
         },

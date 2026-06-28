@@ -25,8 +25,21 @@ import {
   CarouselItem,
   type CarouselApi,
 } from './ui/carousel'
-import { useState } from 'react'
-import { Roles } from '#/generated/prisma/enums'
+import { lazy, Suspense, useState } from 'react'
+import { Gender } from '#/generated/prisma/enums'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+
+const DateOfBirthPicker = lazy(() =>
+  import('#/components/datePicker').then((mod) => ({
+    default: mod.DateOfBirthPicker,
+  })),
+)
 
 interface prop {
   type: string | undefined
@@ -34,7 +47,6 @@ interface prop {
 
 export function SignupForm({ type }: prop) {
   const navigate = useNavigate()
-
   const [api, setApi] = useState<CarouselApi>()
   const [otp, setOtp] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
@@ -44,21 +56,22 @@ export function SignupForm({ type }: prop) {
       fullName: '',
       email: '',
       password: '',
+      cellNo: '',
       role: type,
-      isApproved: false,
+      gender: Gender.Other as Gender,
+      dateOfBirth: new Date(),
     },
     validators: {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      const isApprovedStatus = type !== Roles.Doctor
-
       await authClient.signUp.email({
         name: value.fullName,
         email: value.email,
         password: value.password,
-        role: type || Roles.Patient,
-        isApproved: isApprovedStatus,
+        role: type,
+        gender: value.gender,
+        dateOfBirth: value.dateOfBirth,
         fetchOptions: {
           onSuccess: async () => {
             toast.loading('Sending the verification code ...', {
@@ -97,6 +110,8 @@ export function SignupForm({ type }: prop) {
                   onSubmit: 'This email address is already in use.',
                 },
               }))
+              // Auto-navigate back to step 1 where the email field lives
+              api?.scrollTo(0)
             } else {
               console.log(error.message)
               toast.error(error.message || 'An unexpected error occurred.')
@@ -107,7 +122,69 @@ export function SignupForm({ type }: prop) {
     },
   })
 
-  const handleVerifyOtp = async (e: React.SubmitEvent) => {
+  // Validate step 1 fields dynamically before moving forward via "Next" button
+  const handleStepOneNext = async () => {
+    form.setFieldMeta('fullName', (prev) => ({ ...prev, isTouched: true }))
+    form.setFieldMeta('email', (prev) => ({ ...prev, isTouched: true }))
+    form.setFieldMeta('password', (prev) => ({ ...prev, isTouched: true }))
+
+    await form.validateAllFields('submit')
+
+    const state = form.state
+    const hasStepOneErrors =
+      (state.fieldMeta.fullName?.errors?.length ?? 0) ||
+      (state.fieldMeta.email?.errors?.length ?? 0) ||
+      (state.fieldMeta.password?.errors?.length ?? 0)
+
+    if (!hasStepOneErrors) {
+      api?.scrollNext()
+    } else {
+      toast.error('Please resolve the errors on this page first.')
+    }
+  }
+
+  const handleMasterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // 🎯 OPTIMIZATION 1: Run validation EXACTLY ONCE for the entire form
+    await form.validateAllFields('submit')
+    const state = form.state
+
+    // Isolate Step 1 Error Metrics
+    const stepOneErrors =
+      (state.fieldMeta.fullName?.errors?.length ?? 0) ||
+      (state.fieldMeta.email?.errors?.length ?? 0) ||
+      (state.fieldMeta.password?.errors?.length ?? 0)
+
+    if (stepOneErrors) {
+      form.setFieldMeta('fullName', (prev) => ({ ...prev, isTouched: true }))
+      form.setFieldMeta('email', (prev) => ({ ...prev, isTouched: true }))
+      form.setFieldMeta('password', (prev) => ({ ...prev, isTouched: true }))
+
+      toast.error('Please correct the validation errors on Step 1.')
+      api?.scrollTo(0)
+      return
+    }
+
+    // Isolate Step 2 Error Metrics
+    const stepTwoErrors =
+      (state.fieldMeta.gender?.errors?.length ?? 0) ||
+      (state.fieldMeta.dateOfBirth?.errors?.length ?? 0)
+
+    if (stepTwoErrors) {
+      form.setFieldMeta('gender', (prev) => ({ ...prev, isTouched: true }))
+      form.setFieldMeta('dateOfBirth', (prev) => ({ ...prev, isTouched: true }))
+
+      toast.error('Please fill out all required profile information on Step 2.')
+      api?.scrollTo(1)
+      return
+    }
+
+    // Everything is clean -> Submit immediately
+    form.handleSubmit()
+  }
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!otp || otp.length < 6) {
       toast.error('Please input a complete 6-digit confirmation code.')
@@ -123,7 +200,7 @@ export function SignupForm({ type }: prop) {
       toast.error('Invalid or expired code.')
       return
     }
-    toast.success('Account Creates Successfully.')
+    toast.success('Account Created Successfully.')
     navigate({
       to: '/login',
       search: { type: type },
@@ -157,27 +234,22 @@ export function SignupForm({ type }: prop) {
       return { message: String(err) }
     })
   }
+
   return (
     <div>
-      <Carousel setApi={setApi} opts={{ watchDrag: false }}>
-        <CarouselContent>
-          <CarouselItem>
-            <Card>
-              <CardHeader>
-                <CardTitle>Create an account</CardTitle>
-                <CardDescription>
-                  Enter your information below to create your account
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form
-                  noValidate
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    form.handleSubmit()
-                  }}
-                >
+      <form noValidate onSubmit={handleMasterSubmit}>
+        <Carousel setApi={setApi} opts={{ watchDrag: false }}>
+          <CarouselContent>
+            {/* ================= STEP 1 ================= */}
+            <CarouselItem>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Create an account</CardTitle>
+                  <CardDescription>
+                    Enter your information below to create your account
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   <form.Subscribe
                     selector={(state) => [state.isSubmitting]}
                     children={([isSubmitting]) => (
@@ -215,6 +287,7 @@ export function SignupForm({ type }: prop) {
                             )
                           }}
                         />
+
                         <form.Field
                           name="email"
                           children={(field) => {
@@ -252,6 +325,7 @@ export function SignupForm({ type }: prop) {
                             )
                           }}
                         />
+
                         <form.Field
                           name="password"
                           children={(field) => {
@@ -286,92 +360,259 @@ export function SignupForm({ type }: prop) {
                             )
                           }}
                         />
+
                         <FieldGroup>
-                          <Field>
+                          <Field className="flex gap-2 mt-2">
                             <Button
                               className="cursor-pointer"
                               disabled={isSubmitting}
-                              type="submit"
+                              type="button"
+                              onClick={handleStepOneNext}
                             >
-                              {isSubmitting ? 'Verification Step...' : 'Next'}
+                              Next
                             </Button>
                             <Button variant="outline" type="button">
                               Sign up with Google
                             </Button>
-                            <FieldDescription className="px-6 text-center">
-                              Already have an account?{' '}
-                              <Link to="/login" search={{ type: type }}>
-                                Login
-                              </Link>
-                            </FieldDescription>
                           </Field>
+                          <FieldDescription className="text-center mt-2">
+                            Already have an account?{' '}
+                            <Link to="/login" search={{ type: type }}>
+                              Login
+                            </Link>
+                          </FieldDescription>
                         </FieldGroup>
                       </FieldGroup>
                     )}
-                  ></form.Subscribe>
-                </form>
-              </CardContent>
-            </Card>
-          </CarouselItem>
-          <CarouselItem>
-            <Card>
-              <CardHeader>
-                <CardTitle>Verification</CardTitle>
-                <CardDescription>
-                  Enter the 6 digit email OTP
-                  <form.Subscribe selector={(state) => state.values.email}>
-                    {(email) => (
-                      <span className="font-semibold text-foreground">
-                        {'  '}
-                        {email}
-                      </span>
-                    )}
-                  </form.Subscribe>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleVerifyOtp}>
+                  />
+                </CardContent>
+              </Card>
+            </CarouselItem>
+
+            <CarouselItem>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Additional Information</CardTitle>
+                  <CardDescription>
+                    Help us configure your context workspace profile setup.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <FieldGroup>
-                    <Field>
-                      <FieldLabel htmlFor="otpInput">One-Time Code</FieldLabel>
-                      <Input
-                        id="otpInput"
-                        type="text"
-                        maxLength={6}
-                        placeholder="123456"
-                        value={otp}
-                        onChange={(e) =>
-                          setOtp(e.target.value.replace(/\D/g, ''))
-                        }
-                        disabled={isVerifying}
-                        autoComplete="one-time-code"
-                        className="tracking-widest text-center text-lg font-mono"
-                      />
-                    </Field>
-                    <Field>
-                      <Button
-                        className="w-full cursor-pointer"
-                        type="submit"
-                        disabled={isVerifying || otp.length < 6}
-                      >
-                        {isVerifying ? 'Verifying Code...' : 'Verify Email'}
-                      </Button>
-                      <Button
-                        variant="link"
-                        type="button"
-                        className="w-full mt-2 text-xs cursor-pointer"
-                        onClick={handleResendOtp}
-                      >
-                        Didn't receive a code? Resend
-                      </Button>
-                    </Field>
+                    <form.Field
+                      name="cellNo"
+                      children={(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
+                        return (
+                          <Field data-invalid={isInvalid}>
+                            <FieldLabel htmlFor={field.name}>
+                              Phone Number:
+                            </FieldLabel>
+                            <Input
+                              id={field.name}
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              aria-invalid={isInvalid}
+                              placeholder="03211234567"
+                              autoComplete="off"
+                              disabled={form.state.isSubmitting}
+                            />
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        )
+                      }}
+                    />
                   </FieldGroup>
-                </form>
-              </CardContent>
-            </Card>
-          </CarouselItem>
-        </CarouselContent>
-      </Carousel>
+
+                  <FieldGroup>
+                    <form.Field
+                      name="gender"
+                      children={(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
+                        return (
+                          <Field
+                            orientation="responsive"
+                            data-invalid={isInvalid}
+                          >
+                            <FieldLabel htmlFor={field.name}>
+                              Gender:
+                            </FieldLabel>
+                            <Select
+                              key={field.state.value}
+                              value={field.state.value}
+                              onValueChange={(value) => {
+                                field.handleChange(value as Gender)
+                              }}
+                              onOpenChange={(open) => {
+                                if (!open) {
+                                  field.handleBlur()
+                                }
+                              }}
+                            >
+                              <SelectTrigger
+                                id={field.name}
+                                aria-invalid={isInvalid}
+                                className="w-full cursor-pointer text-left"
+                                disabled={form.state.isSubmitting}
+                              >
+                                <SelectValue placeholder="Select Gender">
+                                  {field.state.value}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent position="popper">
+                                {Object.values(Gender).map((gender) => (
+                                  <SelectItem
+                                    key={gender}
+                                    value={gender as string}
+                                    className="cursor-pointer"
+                                  >
+                                    {gender as string}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        )
+                      }}
+                    />
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <form.Field
+                      name="dateOfBirth"
+                      children={(field) => {
+                        const isInvalid =
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
+                        return (
+                          <Field
+                            orientation="responsive"
+                            data-invalid={isInvalid}
+                          >
+                            <FieldLabel htmlFor={field.name}>
+                              Date of Birth:
+                            </FieldLabel>
+                            <Suspense
+                              fallback={
+                                <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
+                              }
+                            >
+                              <DateOfBirthPicker
+                                onDateChange={(date) =>
+                                  field.handleChange(date ?? new Date())
+                                }
+                              />
+                            </Suspense>
+                            {isInvalid && (
+                              <FieldError errors={field.state.meta.errors} />
+                            )}
+                          </Field>
+                        )
+                      }}
+                    />
+                  </FieldGroup>
+
+                  <Field className="flex items-center gap-2 mt-4">
+                    <Button
+                      className="cursor-pointer"
+                      disabled={form.state.isSubmitting}
+                      type="button"
+                      variant="outline"
+                      onClick={() => api?.scrollPrev()}
+                    >
+                      Previous
+                    </Button>
+
+                    <Button
+                      className="cursor-pointer"
+                      disabled={form.state.isSubmitting}
+                      type="submit"
+                    >
+                      {form.state.isSubmitting
+                        ? 'Submitting...'
+                        : 'Register & Verify'}
+                    </Button>
+                  </Field>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+
+            {/* ================= STEP 3 (OTP) ================= */}
+            <CarouselItem>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Verification</CardTitle>
+                  <CardDescription>
+                    Enter the 6-digit email OTP sent to
+                    <form.Subscribe selector={(state) => state.values.email}>
+                      {(email) => (
+                        <span className="font-semibold text-foreground ml-1">
+                          {email}
+                        </span>
+                      )}
+                    </form.Subscribe>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor="otpInput">
+                          One-Time Code
+                        </FieldLabel>
+                        <Input
+                          id="otpInput"
+                          type="text"
+                          maxLength={6}
+                          placeholder="123456"
+                          value={otp}
+                          onChange={(e) =>
+                            setOtp(e.target.value.replace(/\D/g, ''))
+                          }
+                          disabled={isVerifying}
+                          autoComplete="one-time-code"
+                          className="tracking-widest text-center text-lg font-mono"
+                        />
+                      </Field>
+                      <Field>
+                        <Button
+                          className="w-full cursor-pointer"
+                          type="button"
+                          disabled={isVerifying || otp.length < 6}
+                          onClick={(e) => handleVerifyOtp(e)}
+                        >
+                          {isVerifying ? 'Verifying Code...' : 'Verify Email'}
+                        </Button>
+                        <Button
+                          variant="link"
+                          type="button"
+                          className="w-full mt-2 text-xs cursor-pointer"
+                          onClick={handleResendOtp}
+                        >
+                          Didn't receive a code? Resend
+                        </Button>
+                      </Field>
+                    </FieldGroup>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
+      </form>
     </div>
   )
 }

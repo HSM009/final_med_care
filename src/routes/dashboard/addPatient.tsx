@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { addPatientSchema } from '#/schemas/auth'
+import { signupSchema } from '#/schemas/auth'
 import {
   Field,
   FieldError,
@@ -11,7 +11,7 @@ import { Input } from '#/components/ui/input'
 import { toast } from 'sonner'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent } from '#/components/ui/card'
-import { Gender } from '#/generated/prisma/enums'
+import { Gender, Roles } from '#/generated/prisma/enums'
 import {
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select'
-import React from 'react'
+import React, { useTransition } from 'react'
 import { addPatientAction } from '#/server/actions'
 
 const DateOfBirthPicker = React.lazy(() =>
@@ -33,30 +33,47 @@ export const Route = createFileRoute('/dashboard/addPatient')({
 })
 function RouteComponent() {
   const navigate = useNavigate()
+  const [isPending, startTransition] = useTransition()
 
+  const addPatientSchema = signupSchema.omit({ password: true })
   const form = useForm({
     defaultValues: {
-      name: '',
+      fullName: '',
       email: '',
-      age: new Date(),
-      phone: '',
+      cellNo: '',
+      role: Roles.Patient as Roles,
       gender: '' as Gender,
+      dateOfBirth: new Date(),
     },
     validators: {
       onSubmit: addPatientSchema,
       onChange: addPatientSchema,
     },
-    onSubmit: async ({ value }) => {
-      try {
-        await addPatientAction({ data: value })
-        toast.success('Account Creates Successfully.')
-        navigate({
-          to: '/dashboard/viewPatients',
+
+    onSubmit: ({ value }) => {
+      startTransition(async () => {
+        toast.loading(`Creating user (${value.fullName}).`, {
+          id: 'create-account',
         })
-      } catch (error) {
-        console.error('Error creating patient:', error)
-        toast.error('Something went wrong saving the patient.')
-      }
+        try {
+          await addPatientAction({
+            ...value,
+            password: 'generatePassword',
+          })
+          toast.success(`Account (${value.fullName}) created successfully.`, {
+            id: 'create-account',
+          })
+          navigate({
+            to: '/dashboard/viewPatients',
+            search: { search: value.fullName },
+          })
+        } catch (error) {
+          console.error('Error creating patient:', error)
+          toast.error('Something went wrong saving the patient.', {
+            id: 'create-account',
+          })
+        }
+      })
     },
   })
   return (
@@ -65,6 +82,7 @@ function RouteComponent() {
         Add New Patient!
       </div>
       <form
+        noValidate
         onSubmit={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -75,7 +93,7 @@ function RouteComponent() {
           <CardContent>
             <FieldGroup>
               <form.Field
-                name="name"
+                name="fullName"
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid
@@ -91,7 +109,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="HSM"
                         autoComplete="off"
-                        disabled={form.state.isSubmitting}
+                        disabled={isPending}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -108,7 +126,7 @@ function RouteComponent() {
           <CardContent>
             <FieldGroup>
               <form.Field
-                name="phone"
+                name="cellNo"
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid
@@ -126,7 +144,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="03211234567"
                         autoComplete="off"
-                        disabled={form.state.isSubmitting}
+                        disabled={isPending}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -159,7 +177,7 @@ function RouteComponent() {
                         aria-invalid={isInvalid}
                         placeholder="hsm#example.com"
                         autoComplete="off"
-                        disabled={form.state.isSubmitting}
+                        disabled={isPending}
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -188,9 +206,7 @@ function RouteComponent() {
                         name={field.name}
                         value={field.state.value}
                         onValueChange={(value) =>
-                          field.handleChange(
-                            value as 'MALE' | 'FEMALE' | 'OTHER',
-                          )
+                          field.handleChange(value as Gender)
                         }
                       >
                         <SelectTrigger
@@ -198,15 +214,17 @@ function RouteComponent() {
                           onBlur={field.handleBlur}
                           aria-invalid={isInvalid}
                           className="w-full cursor-pointer"
-                          disabled={form.state.isSubmitting}
+                          disabled={isPending}
                         >
                           <SelectValue placeholder="Select Gender" />
                         </SelectTrigger>
 
                         <SelectContent position="popper">
-                          <SelectItem value="MALE">Male</SelectItem>
-                          <SelectItem value="FEMALE">Female</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
+                          {Object.values(Gender).map((gender) => (
+                            <SelectItem key={gender} value={gender as string}>
+                              {gender as string}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
 
@@ -225,7 +243,7 @@ function RouteComponent() {
           <CardContent>
             <FieldGroup>
               <form.Field
-                name="age"
+                name="dateOfBirth"
                 children={(field) => {
                   const isInvalid =
                     field.state.meta.isTouched && !field.state.meta.isValid
@@ -240,6 +258,7 @@ function RouteComponent() {
                         }
                       >
                         <DateOfBirthPicker
+                          isPending={isPending}
                           onDateChange={(date) =>
                             field.handleChange(date ?? new Date())
                           }
@@ -260,13 +279,11 @@ function RouteComponent() {
             <div className="mt-6">
               <Button
                 className="cursor-pointer bg-green-800 hover:bg-green-700 text-white px-20 relative"
-                disabled={form.state.isSubmitting}
+                disabled={isPending}
                 type="submit"
               >
                 <span className="absolute inset-0 flex items-center justify-center">
-                  {form.state.isSubmitting
-                    ? 'Creating Patient ID...'
-                    : 'Submit'}
+                  {isPending ? 'Creating Patient ID...' : 'Submit'}
                 </span>
               </Button>
             </div>

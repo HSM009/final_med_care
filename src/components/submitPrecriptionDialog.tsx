@@ -26,7 +26,7 @@ import {
 interface SubmitPrescriptionDialogProps {
   prescriptionId: string
   prescriptionType: string
-  med_care_id: string
+  medCareId: string
   doctorId: string
   note: string
   prescriptionVal: boolean
@@ -43,7 +43,7 @@ interface SubmitPrescriptionDialogProps {
 export function SubmitPrescriptionDialog({
   prescriptionId,
   prescriptionType,
-  med_care_id,
+  medCareId,
   doctorId,
   note,
   medicinesList,
@@ -112,7 +112,7 @@ export function SubmitPrescriptionDialog({
         )
         const databasePayload = {
           prescriptionId,
-          med_care_id,
+          medCareId,
           doctorId,
           note,
           prescriptionsContent: JSON.stringify(cleanedMedicinesList),
@@ -135,7 +135,7 @@ export function SubmitPrescriptionDialog({
         setIsOpen(false)
         onSuccess?.(true, prescriptionType, finalImagesPayload)
         await queryClient.invalidateQueries({
-          queryKey: ['prescriptions', databasePayload.med_care_id],
+          queryKey: ['prescriptions', databasePayload.medCareId],
         })
         await router.invalidate()
       } catch (error: any) {

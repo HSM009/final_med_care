@@ -44,7 +44,6 @@ const navItems: NavPrimaryProps['items'] = [
 ]
 
 export function AppSidebar({ auth }: AuthContextResult) {
-  console.log(auth.user?.role as Roles)
   return (
     <Sidebar collapsible="icon" className=" ">
       <SidebarHeader>

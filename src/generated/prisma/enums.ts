@@ -10,9 +10,9 @@
 */
 
 export const Gender = {
-  MALE: 'MALE',
-  FEMALE: 'FEMALE',
-  OTHER: 'OTHER'
+  Male: 'Male',
+  Female: 'Female',
+  Other: 'Other'
 } as const
 
 export type Gender = (typeof Gender)[keyof typeof Gender]

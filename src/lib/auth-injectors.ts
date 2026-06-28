@@ -15,6 +15,8 @@ export function createAuthContext(session: any): AuthContextResult {
             email: session.user.email,
             qualification: session.user.qualification,
             cellNo: session.user.cellNo,
+            gender: session.user.gender,
+            dateOfBirth: session.user.dateOfBirth,
             role: (session.user.role || Roles.Patient) as Roles,
           }
         : null,

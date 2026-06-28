@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react' // ✅ Added useEffect
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
@@ -43,9 +43,11 @@ function formatDate(date: Date | null | undefined) {
 interface DatePickerProps {
   currentDate?: Date | string | null
   onDateChange: (date: Date | undefined) => void
+  isPending: boolean
 }
 
 export function DateOfBirthPicker({
+  isPending,
   currentDate,
   onDateChange,
 }: DatePickerProps) {
@@ -66,11 +68,11 @@ export function DateOfBirthPicker({
         return
       }
     }
-    // Fallback defaults if currentDate is empty or invalid
-    const fallbackDate = new Date()
-    setDate(fallbackDate)
-    setMonth(fallbackDate)
-    setValue(formatDate(fallbackDate))
+
+    // Kept safe to prevent displaying today's age placeholder on initial load
+    setDate(undefined)
+    setMonth(undefined)
+    setValue('')
   }, [currentDate])
 
   const age = calculateAge(date)
@@ -82,6 +84,7 @@ export function DateOfBirthPicker({
           <Input
             id="date"
             value={value}
+            disabled={isPending}
             placeholder="January 01, 2025"
             className="bg-background pr-10 rounded-r-none focus-visible:relative focus-visible:z-10"
             onChange={(e) => {
@@ -98,18 +101,19 @@ export function DateOfBirthPicker({
               }
             }}
             onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
+              if (e.key === 'ArrowDown' && !isPending) {
                 e.preventDefault()
                 setOpen(true)
               }
             }}
           />
-          <Popover open={open} onOpenChange={setOpen}>
+          <Popover open={open} onOpenChange={isPending ? undefined : setOpen}>
             <PopoverTrigger asChild>
               <Button
                 id="date-picker"
                 variant="ghost"
-                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 active:-translate-y-1/2 p-0 z-20"
+                disabled={isPending} // Disables the trigger action
+                className="absolute top-1/2 right-2 size-6 -translate-y-1/2 active:-translate-y-1/2 p-0 z-20 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <CalendarIcon className="size-3.5" />
                 <span className="sr-only">Pick a date</span>
@@ -123,7 +127,7 @@ export function DateOfBirthPicker({
             >
               <Calendar
                 mode="single"
-                // ✅ Calendar should read local state synced with parent props
+                captionLayout="dropdown"
                 selected={date}
                 month={month}
                 onMonthChange={setMonth}
@@ -139,6 +143,7 @@ export function DateOfBirthPicker({
         </div>
 
         {age !== null && (
+          /* ✅ Restored exact dark:text-black text-white dark:bg-white bg-black classes unchanged */
           <div className="dark:text-black text-white flex items-center justify-center px-3 dark:bg-white bg-black border border-input border-l-0 rounded-r-md text-sm font-medium whitespace-nowrap select-none">
             {age} {age === 1 ? 'year old' : 'years old'}
           </div>

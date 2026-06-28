@@ -20,7 +20,7 @@ import { Input } from '#/components/ui/input'
 import { addOrUpdateMedicineSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 interface MedicineDialogProps {
@@ -31,6 +31,8 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
   const form = useForm({
     defaultValues: {
       medicineContentEnglish: '',
@@ -41,23 +43,36 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
       onSubmit: addOrUpdateMedicineSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        await addMedicineAction({ data: value })
-        toast.success('Medicine added successfully.')
-        setIsOpen(false)
-        navigate({
-          to: '/dashboard/viewMedicineList',
-          search: {
-            search: value.medicineContentEnglish.trim(),
-          },
-        })
-        setTimeout(() => {
-          form.reset()
-        }, 100)
-        await router.invalidate()
-      } catch (error) {
-        toast.error('Something went wrong saving the medicine.')
-      }
+      toast.loading(
+        `Adding ( ${value.medicineContentEnglish} - ${value.medicineContentUrdu} ).`,
+        { id: 'med-flow' },
+      )
+      startTransition(async () => {
+        try {
+          await addMedicineAction({ data: value })
+          toast.success(
+            `Medicine ( ${value.medicineContentEnglish} - ${value.medicineContentUrdu} ) added successfully.`,
+            { id: 'med-flow' },
+          )
+          setIsOpen(false)
+          navigate({
+            to: '/dashboard/viewMedicineList',
+            search: {
+              search: value.medicineContentEnglish,
+              page: 1,
+              rowsPerPage: 8,
+            },
+          })
+          setTimeout(() => {
+            form.reset()
+          }, 100)
+          await router.invalidate()
+        } catch (error) {
+          toast.error('Something went wrong saving the medicine.', {
+            id: 'med-flow',
+          })
+        }
+      })
     },
   })
   return (
@@ -98,7 +113,7 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
                       aria-invalid={isInvalid}
                       placeholder="Enter name in English"
                       autoComplete="off"
-                      disabled={form.state.isSubmitting}
+                      disabled={isPending}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -128,7 +143,7 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
                       aria-invalid={isInvalid}
                       placeholder="Enter name in Urdu"
                       autoComplete="off"
-                      disabled={form.state.isSubmitting}
+                      disabled={isPending}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -156,7 +171,7 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
                       aria-invalid={isInvalid}
                       placeholder="Enter dosage"
                       autoComplete="off"
-                      disabled={form.state.isSubmitting}
+                      disabled={isPending}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -178,13 +193,11 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
             </DialogClose>
             <Button
               className="cursor-pointer bg-green-800 hover:bg-green-700 text-white px-20 relative"
-              disabled={form.state.isSubmitting}
+              disabled={isPending}
               type="submit"
             >
               <span className="absolute inset-0 flex items-center justify-center">
-                {form.state.isSubmitting
-                  ? 'Creating Medicine ID...'
-                  : 'Add Medicine'}
+                {isPending ? 'Creating Medicine ID...' : 'Add Medicine'}
               </span>
             </Button>
           </DialogFooter>

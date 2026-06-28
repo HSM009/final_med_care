@@ -9,9 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import { type NavAdminProps } from '#/lib/types'
+import { type NavUserProps } from '#/lib/types'
 import { useState, type ReactNode } from 'react'
-import { AdminTemplateCard } from './adminTemplateCard'
+import { UserTemplateCard } from './userTemplateCard'
 import {
   bannedUpdateSchema,
   cellNoUpdateSchema,
@@ -22,11 +22,11 @@ import {
   roleUpdateSchema,
 } from '#/schemas/auth'
 interface ExtendedEditProps {
-  data: NavAdminProps
+  data: NavUserProps
   children: ReactNode
 }
 
-export function EditAdminDialog({ data, children }: ExtendedEditProps) {
+export function EditUserDialog({ data, children }: ExtendedEditProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -43,26 +43,26 @@ export function EditAdminDialog({ data, children }: ExtendedEditProps) {
             </DialogHeader>
             {data.editDialog === 1 ? (
               <>
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'qualification'}
                   currentData={data.userQualification}
                   validatorHandler={qualificationUpdateSchema}
                 />
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'cell-No'}
                   currentData={data.userCellNo}
                   validatorHandler={cellNoUpdateSchema}
                 />
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'email'}
                   currentData={data.userEmail}
                   sessionName={data.sessionName}
                   validatorHandler={emailUpdateSchema}
                 />
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'role'}
                   currentData={data.userRole}
@@ -71,19 +71,19 @@ export function EditAdminDialog({ data, children }: ExtendedEditProps) {
               </>
             ) : data.editDialog === 2 ? (
               <>
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'email-Verified'}
                   currentData={data.userEmailVerified}
                   validatorHandler={emailVerifiedUpdateSchema}
                 />
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'banned'}
                   currentData={data.userBanned}
                   validatorHandler={bannedUpdateSchema}
                 />
-                <AdminTemplateCard
+                <UserTemplateCard
                   userId={data.userId}
                   Title={'failed-Attempts'}
                   currentData={data.userFailedAttempts}

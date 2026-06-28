@@ -10,7 +10,7 @@ import { AppPagination } from '#/components/appPagination'
 import { Card, CardContent, CardHeader, CardTitle } from '#/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '#/components/ui/tabs'
 import { getPatientsFn, autoBanMaliciousUserFn } from '#/lib/admin-actions'
-import { EditAdminDialog } from '#/components/adminUser/editDialog'
+import { EditUserDialog } from '#/components/user/editAdminDialog'
 import { Roles } from '#/generated/prisma/enums'
 
 var o_PAGE_SIZE = 8
@@ -269,7 +269,7 @@ function RouteComponent() {
                             >
                               View
                             </span>
-                            <EditAdminDialog
+                            <EditUserDialog
                               data={{
                                 editDialog: 1,
                                 userId: userData.id,
@@ -288,7 +288,7 @@ function RouteComponent() {
                               <span className="font-medium text-red-500 hover:underline cursor-pointer select-none">
                                 Edit
                               </span>
-                            </EditAdminDialog>
+                            </EditUserDialog>
                           </td>
                         </tr>
                       ))}
@@ -403,7 +403,7 @@ function RouteComponent() {
                             {userData.failedAttempts || '0'}
                           </td>
                           <td className="px-6 py-3 flex items-center justify-end gap-3 whitespace-nowrap">
-                            <EditAdminDialog
+                            <EditUserDialog
                               data={{
                                 editDialog: 2,
                                 userId: userData.id,
@@ -423,7 +423,7 @@ function RouteComponent() {
                               <span className="font-medium text-red-500 hover:underline cursor-pointer select-none">
                                 Edit
                               </span>
-                            </EditAdminDialog>
+                            </EditUserDialog>
                           </td>
                         </tr>
                       ))}

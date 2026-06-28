@@ -32,6 +32,7 @@ export const Route = createFileRoute('/dashboard/patientPrescription')({
 
 function RouteComponent() {
   const prescription = Route.useSearch()
+
   const [attachments, setAttachments] = useState<File[]>([])
   const componentRef = useRef<HTMLDivElement>(null)
 
@@ -108,7 +109,7 @@ function RouteComponent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className=" text-3xl text-center text-blue-500">
-                    {prescription.med_care_id}
+                    {prescription.medCareId}
                   </CardContent>
                 </Card>
                 <Card className=" w-1/4 bg-secondary/50 border-secondary/50 border-2">
@@ -293,7 +294,7 @@ function RouteComponent() {
                       key={btn.type}
                       prescriptionId={prescription?.id!.toString()}
                       prescriptionType={btn.type}
-                      med_care_id={prescription.med_care_id!}
+                      medCareId={prescription.medCareId!}
                       doctorId={prescription?.doctorId!}
                       note={doctorNote}
                       medicinesList={selectedMedicines}
@@ -372,7 +373,7 @@ function RouteComponent() {
           ref={componentRef}
           patientData={{
             name: prescription.name || '',
-            med_care_id: prescription.med_care_id || '',
+            medCareId: prescription.medCareId || '',
             age: atAge(prescription.age) || 0,
             gender: prescription.gender || '',
             phone: prescription.phone || '',

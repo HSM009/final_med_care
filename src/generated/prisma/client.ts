@@ -62,11 +62,6 @@ export type Account = Prisma.AccountModel
  */
 export type Verification = Prisma.VerificationModel
 /**
- * Model PatientRecord
- * 
- */
-export type PatientRecord = Prisma.PatientRecordModel
-/**
  * Model PatientPrescription
  * 
  */

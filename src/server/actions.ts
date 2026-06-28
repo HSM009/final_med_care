@@ -1,11 +1,11 @@
 'use server'
-import { queryOptions } from '@tanstack/react-query'
+// import { queryOptions } from '@tanstack/react-query'
 import { prisma } from '#/db'
 import { authFnMiddleware } from '#/middlewares/auth'
 import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
-  addPatientSchema,
+  // addPatientSchema,
   medicineSearchSchema,
   patientSearchSchema,
   submitPrescriptionSchema,
@@ -14,109 +14,83 @@ import {
   updatePrescriptionSchema,
 } from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
+import { Roles } from '#/generated/prisma/enums'
+import { authClient } from '#/lib/auth-client'
+import { queryOptions } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
-export const addPatientAction = createServerFn({ method: 'POST' })
-  .validator(addPatientSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
-      const currentYear = new Date().getFullYear()
-      const lastPatientInYear = await tx.patientRecord.findFirst({
-        where: {
-          med_care_id: {
-            startsWith: `MC-${currentYear}-`,
-          },
-        },
-        orderBy: {
-          med_care_id: 'desc',
-        },
-        select: {
-          med_care_id: true,
-        },
-      })
-      let nextSerial = 1
-
-      if (lastPatientInYear && lastPatientInYear.med_care_id) {
-        const parts = lastPatientInYear.med_care_id.split('-')
-        const lastSerial = parseInt(parts[2], 10)
-        if (!isNaN(lastSerial)) {
-          nextSerial = lastSerial + 1
-        }
-      }
-
-      const paddedSerial = String(nextSerial).padStart(5, '0')
-      const generatedMedCareId = `MC-${currentYear}-${paddedSerial}`
-
-      const newPatient = await tx.patientRecord.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          age: data.age,
-          med_care_id: generatedMedCareId,
-          gender: data.gender,
-          phone: data.phone,
-        },
-      })
-      return newPatient
-    })
+export const addPatientAction = async (data: any) => {
+  return await authClient.signUp.email({
+    name: data.fullName,
+    email: data.email,
+    password: 'generatePassword',
+    cellNo: data.cellNo,
+    role: data.role,
+    gender: data.gender,
+    dateOfBirth: data.dateOfBirth,
   })
-
+}
 export const getPatientPrescriptions = createServerFn({ method: 'GET' })
   .validator((medCareId: string) => medCareId)
   .middleware([authFnMiddleware])
   .handler(async ({ data: medCareId }) => {
-    const prescription = await prisma.patientPrescription.findMany({
+    const prescriptions = await prisma.patientPrescription.findMany({
       where: {
-        med_care_id: medCareId,
+        medCareId: medCareId,
       },
       orderBy: {
         createdPrescription: 'desc',
       },
       select: {
         id: true,
-        med_care_id: true,
+        medCareId: true,
         prescriptionsContent: true,
         createdPrescription: true,
         prescriptionSubmitted: true,
         relatedImages: true,
         note: true,
-        user: {
+        doctor: {
           select: {
             name: true,
             qualification: true,
             cellNo: true,
           },
         },
-        patientRecord: {
+        patient: {
           select: {
             name: true,
-            age: true,
-            phone: true,
-            gender: true,
+            dateOfBirth: true,
             email: true,
+            cellNo: true,
+            gender: true,
           },
         },
       },
     })
-    if (!prescription) {
-      throw new Error('Prescription record not found')
+
+    if (prescriptions.length === 0) {
+      throw new Error('No prescription records found for this patient ID')
     }
-    return prescription.map((p) => ({
+
+    return prescriptions.map((p) => ({
       id: p.id,
-      med_care_id: p.med_care_id,
+      medCareId: p.medCareId,
       prescriptionsContent: p.prescriptionsContent,
       createdPrescription: p.createdPrescription,
       prescriptionSubmitted: p.prescriptionSubmitted,
-      doctorName: p.user?.name || 'Unknown Doctor',
-      doctorQualification: p.user?.qualification || 'Unknown Qualification',
-      doctorCellNo: p.user?.cellNo || 'Unknown Cell Number',
-      doctorNote: p.note || 'No note available',
-      patientName: p.patientRecord?.name || ' Unknown Patient',
-      patientAge: p.patientRecord?.age || new Date(),
-      patientEmail: p.patientRecord?.email,
-      patientPhone: p.patientRecord?.phone || 'Unknown Phone',
-      patientGender: p.patientRecord?.gender || 'Unknown Gender',
       patientImages: p.relatedImages,
+      doctorNote: p.note || 'No note available',
+
+      doctorName: p.doctor?.name || 'Unknown Doctor',
+      doctorQualification: p.doctor?.qualification || 'Unknown Qualification',
+      doctorCellNo: p.doctor?.cellNo || 'Unknown Cell Number',
+
+      patientName: p.patient?.name || 'Unknown Patient',
+      patientAge: p.patient?.dateOfBirth || new Date(),
+      patientEmail: p.patient?.email,
+      patientPhone: p.patient?.cellNo || 'Unknown Phone',
+      patientGender: p.patient?.gender || 'Unknown Gender',
     }))
   })
 
@@ -183,12 +157,12 @@ export const updatePatientAction = createServerFn({ method: 'POST' })
   .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
     return await prisma.$transaction(async (tx) => {
-      const newPatient = await tx.patientRecord.update({
+      const newPatient = await tx.user.update({
         where: { id: data.id },
         data: {
           name: data.name,
           email: data.email,
-          age: data.age,
+          dateOfBirth: data.age,
           phone: data.phone,
           gender: data.gender,
         },
@@ -204,7 +178,7 @@ export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
     return await prisma.$transaction(async (tx) => {
       const newPrescription = await tx.patientPrescription.create({
         data: {
-          med_care_id: data.med_care_id,
+          medCareId: data.medCareId,
           prescriptionsContent: data.prescriptionsContent,
           prescriptionSubmitted: data.prescriptionSubmitted,
           doctorId: data.doctorId,
@@ -297,14 +271,15 @@ export const getPatients = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const searchString = data?.search
     const currentPage = data?.page || 1
-    const PAGE_SIZE = data.pagePerRows
+    const PAGE_SIZE = data.pagePerRows || 8
 
     if (searchString === undefined) {
       return { items: [], totalCount: 0 }
     }
 
     const whereClause = {
-      activeStatus: true,
+      role: Roles.Patient,
+      banned: false,
 
       ...(searchString
         ? {
@@ -312,7 +287,7 @@ export const getPatients = createServerFn({ method: 'GET' })
               {
                 OR: [
                   {
-                    med_care_id: {
+                    medCareId: {
                       contains: searchString,
                       mode: 'insensitive' as const,
                     },
@@ -324,7 +299,7 @@ export const getPatients = createServerFn({ method: 'GET' })
                     },
                   },
                   {
-                    phone: {
+                    cellNo: {
                       contains: searchString,
                       mode: 'insensitive' as const,
                     },
@@ -337,14 +312,43 @@ export const getPatients = createServerFn({ method: 'GET' })
     }
 
     const [items, totalCount] = await Promise.all([
-      prisma.patientRecord.findMany({
+      prisma.user.findMany({
         where: whereClause,
-        skip: (currentPage - 1) * PAGE_SIZE, // Skips records based on active index page
-        take: PAGE_SIZE, //
-        orderBy: { id: 'asc' },
+        select: {
+          id: true,
+          medCareId: true,
+          name: true,
+          email: true,
+          cellNo: true,
+          gender: true,
+          dateOfBirth: true,
+          createdAt: true,
+        },
+        skip: (currentPage - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+        orderBy: { medCareId: 'asc' },
       }),
-      prisma.patientRecord.count({ where: whereClause }),
+      prisma.user.count({ where: whereClause }),
     ])
 
     return { items, totalCount }
   })
+
+export const useHandleSignOut = () => {
+  const navigate = useNavigate()
+  return async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          navigate({
+            to: '/',
+          })
+          toast.success('Signed out Successfully')
+        },
+        onError: ({ error }) => {
+          toast.error(error.message)
+        },
+      },
+    })
+  }
+}

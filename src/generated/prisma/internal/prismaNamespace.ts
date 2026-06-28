@@ -388,7 +388,6 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  PatientRecord: 'PatientRecord',
   PatientPrescription: 'PatientPrescription',
   MedicineList: 'MedicineList'
 } as const
@@ -406,7 +405,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "patientRecord" | "patientPrescription" | "medicineList"
+    modelProps: "user" | "session" | "account" | "verification" | "patientPrescription" | "medicineList"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -706,80 +705,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    PatientRecord: {
-      payload: Prisma.$PatientRecordPayload<ExtArgs>
-      fields: Prisma.PatientRecordFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.PatientRecordFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.PatientRecordFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        findFirst: {
-          args: Prisma.PatientRecordFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.PatientRecordFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        findMany: {
-          args: Prisma.PatientRecordFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>[]
-        }
-        create: {
-          args: Prisma.PatientRecordCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        createMany: {
-          args: Prisma.PatientRecordCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.PatientRecordCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>[]
-        }
-        delete: {
-          args: Prisma.PatientRecordDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        update: {
-          args: Prisma.PatientRecordUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        deleteMany: {
-          args: Prisma.PatientRecordDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.PatientRecordUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.PatientRecordUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>[]
-        }
-        upsert: {
-          args: Prisma.PatientRecordUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientRecordPayload>
-        }
-        aggregate: {
-          args: Prisma.PatientRecordAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregatePatientRecord>
-        }
-        groupBy: {
-          args: Prisma.PatientRecordGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PatientRecordGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.PatientRecordCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.PatientRecordCountAggregateOutputType> | number
-        }
-      }
-    }
     PatientPrescription: {
       payload: Prisma.$PatientPrescriptionPayload<ExtArgs>
       fields: Prisma.PatientPrescriptionFieldRefs
@@ -974,9 +899,11 @@ export const UserScalarFieldEnum = {
   email: 'email',
   qualification: 'qualification',
   cellNo: 'cellNo',
+  dateOfBirth: 'dateOfBirth',
+  gender: 'gender',
+  medCareId: 'medCareId',
   emailVerified: 'emailVerified',
   role: 'role',
-  isApproved: 'isApproved',
   banned: 'banned',
   bannedReason: 'bannedReason',
   banReason: 'banReason',
@@ -1040,24 +967,8 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
-export const PatientRecordScalarFieldEnum = {
-  id: 'id',
-  med_care_id: 'med_care_id',
-  name: 'name',
-  age: 'age',
-  gender: 'gender',
-  email: 'email',
-  phone: 'phone',
-  createdProfile: 'createdProfile',
-  activeStatus: 'activeStatus'
-} as const
-
-export type PatientRecordScalarFieldEnum = (typeof PatientRecordScalarFieldEnum)[keyof typeof PatientRecordScalarFieldEnum]
-
-
 export const PatientPrescriptionScalarFieldEnum = {
   id: 'id',
-  med_care_id: 'med_care_id',
   note: 'note',
   prescriptionsContent: 'prescriptionsContent',
   createdPrescription: 'createdPrescription',
@@ -1065,6 +976,7 @@ export const PatientPrescriptionScalarFieldEnum = {
   prescriptionImage: 'prescriptionImage',
   activeStatus: 'activeStatus',
   prescriptionSubmitted: 'prescriptionSubmitted',
+  medCareId: 'medCareId',
   doctorId: 'doctorId'
 } as const
 
@@ -1128,6 +1040,34 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender'
+ */
+export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender[]'
+ */
+export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -1149,20 +1089,6 @@ export type ListEnumRolesFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
- * Reference to a field of type 'DateTime'
- */
-export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime[]'
- */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1173,20 +1099,6 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
- * Reference to a field of type 'Gender'
- */
-export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
-    
-
-
-/**
- * Reference to a field of type 'Gender[]'
- */
-export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
     
 
 
@@ -1317,7 +1229,6 @@ export type GlobalOmitConfig = {
   session?: Prisma.SessionOmit
   account?: Prisma.AccountOmit
   verification?: Prisma.VerificationOmit
-  patientRecord?: Prisma.PatientRecordOmit
   patientPrescription?: Prisma.PatientPrescriptionOmit
   medicineList?: Prisma.MedicineListOmit
 }

@@ -6,7 +6,7 @@ export async function handleAfkSignOut(type: Roles, navigate: any) {
   await authClient.signOut({
     fetchOptions: {
       onSuccess: () => {
-        toast.success('Session expired due to inactivity.')
+        toast.info('Session expired due to inactivity.')
         navigate({
           to: '/login',
           search: {

@@ -73,16 +73,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { auth } = Route.useRouteContext()
-  const authUser = auth.user as AuthUser
   const userRole = auth.user?.role as Roles
+  const authUser = auth.user as AuthUser
   return (
-    <QueryClientProvider client={queryClient}>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <HeadContent />
-        </head>
-        <body>
-          <AfkMonitor type={userRole} user={authUser}>
+    <AfkMonitor type={userRole} user={authUser}>
+      <QueryClientProvider client={queryClient}>
+        <html lang="en" suppressHydrationWarning>
+          <head>
+            <HeadContent />
+          </head>
+          <body>
             <ThemeProvider>
               {children}
               <Toaster
@@ -95,10 +95,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 }}
               />
             </ThemeProvider>
-          </AfkMonitor>
-          <Scripts />
-        </body>
-      </html>
-    </QueryClientProvider>
+            <Scripts />
+          </body>
+        </html>
+      </QueryClientProvider>
+    </AfkMonitor>
   )
 }

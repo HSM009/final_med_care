@@ -106,7 +106,7 @@ export default function GetPrescriptions({
                         className="border-b hover:bg-neutral-600/50 transition-colors"
                       >
                         <td className="px-6 py-3 text-primary ">
-                          {prescription.med_care_id}
+                          {prescription.medCareId}
                         </td>
                         <td className="px-6 py-3 dark:text-primary text-secondary">
                           {prescription.doctorName}
@@ -135,9 +135,9 @@ export default function GetPrescriptions({
                                 <Link
                                   to="/dashboard/patientPrescription"
                                   search={{
-                                    id: prescription.id,
+                                    id: String(prescription.id),
                                     name: prescription.patientName,
-                                    med_care_id: prescription.med_care_id || '',
+                                    medCareId: prescription.medCareId || '',
                                     age: prescription.patientAge,
                                     phone: prescription.patientPhone,
                                     gender: prescription.patientGender,

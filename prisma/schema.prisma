@@ -9,34 +9,38 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  title         String?
-  name          String
-  email         String    @unique
-  qualification       String?
-  cellNo              String?
+  id                    String      @id
+  title                 String?
+  name                  String
+  email                 String      @unique
+  qualification         String?
+  cellNo                String?
+  dateOfBirth           DateTime    @default(now())       @map("dateOfBirth")
+  gender                Gender      @default(Other)  
+  medCareId           String?  
+  emailVerified         Boolean     @default(false)
+  role                  Roles       @default(Patient) 
 
-  emailVerified Boolean   @default(false)
-  role          Roles      @default(Patient) 
-  isApproved    Boolean?    @default(false)
+  banned                Boolean?    @default(true)
+  bannedReason          String?     @default("Pending for admin for access")
+  banReason             String?     @default("Pending for admin for access")
 
-  banned        Boolean?  @default(true)
-  bannedReason  String?   @default("Pending for admin for access")
-  banReason     String?      @default("Pending for admin for access")
+  bannedUntil           DateTime?   @db.Timestamptz(3)      
+  banExpires            DateTime?   @db.Timestamptz(3)      
 
-  bannedUntil   DateTime? @db.Timestamptz(3)      
-  banExpires   DateTime? @db.Timestamptz(3)      
+  impersonatedBy        String?
+  impersonatorId        String?
+  failedAttempts        Int         @default(0)
+  image                 String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+ 
+  sessions              Session[]
+  accounts              Account[]
+  patientPrescriptions  PatientPrescription[] @relation("PatientRelation")
+  doctorPrescriptions   PatientPrescription[] @relation("DoctorRelation")
 
-  impersonatedBy String?
-  impersonatorId String?
-  failedAttempts Int       @default(0)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  doctorDetails  PatientPrescription[]
-
+  @@unique([medCareId])
   @@map("user")
 }
 
@@ -89,25 +93,8 @@ model Verification {
   @@map("verification")
 }
 
-
-model PatientRecord {
-  id                      Int         @id  @default(autoincrement())
-  med_care_id             String?  
-  name                    String?
-  age                     DateTime    @default(now())
-  gender                  Gender                @default(MALE)  
-  email                   String?
-  phone                   String?  
-  createdProfile          DateTime    @default(now())
-  activeStatus            Boolean     @default(true)
-  prescriptions   PatientPrescription[]
-  @@index([id])
-  @@unique([med_care_id])
-}
-
 model PatientPrescription {
   id                      Int         @id  @default(autoincrement())
-  med_care_id             String?
   note                    String? 
   prescriptionsContent    String? 
   createdPrescription     DateTime    @default(now())
@@ -115,9 +102,12 @@ model PatientPrescription {
   prescriptionImage       String?
   activeStatus            Boolean     @default(true)
   prescriptionSubmitted   Boolean     @default(false)
-  patientRecord           PatientRecord?  @relation(fields: [med_care_id], references: [med_care_id])
+  medCareId             String?
+
+  patient               User?             @relation("PatientRelation", fields: [medCareId], references: [medCareId])  
   doctorId                String?
-  user                    User?     @relation(fields: [doctorId], references: [id])
+  doctor                User?             @relation("DoctorRelation", fields: [doctorId], references: [id])
+  
   @@index([id])
 }
 
@@ -132,9 +122,9 @@ model MedicineList {
 }
 
 enum Gender {
-  MALE
-  FEMALE
-  OTHER
+  Male
+  Female
+  Other
 }
 
 enum Roles {

@@ -211,3 +211,63 @@ body {
     }
   }
 }
+
+/* Target sonner toasts matching specific types within the .toaster container */
+
+.toaster [data-sonner-toast][data-type='success'] {
+  --normal-bg: color-mix(
+    in oklab,
+    light-dark(var(--color-green-600), var(--color-green-400)) 10%,
+    var(--background)
+  ) !important;
+  --normal-text: light-dark(
+    var(--color-green-600),
+    var(--color-green-400)
+  ) !important;
+  --normal-border: light-dark(
+    var(--color-green-600),
+    var(--color-green-400)
+  ) !important;
+}
+
+.toaster [data-sonner-toast][data-type='info'] {
+  --normal-bg: color-mix(
+    in oklab,
+    light-dark(var(--color-sky-600), var(--color-sky-400)) 10%,
+    var(--background)
+  ) !important;
+  --normal-text: light-dark(
+    var(--color-sky-600),
+    var(--color-sky-400)
+  ) !important;
+  --normal-border: light-dark(
+    var(--color-sky-600),
+    var(--color-sky-400)
+  ) !important;
+}
+
+.toaster [data-sonner-toast][data-type='warning'] {
+  --normal-bg: color-mix(
+    in oklab,
+    light-dark(var(--color-amber-600), var(--color-amber-400)) 10%,
+    var(--background)
+  ) !important;
+  --normal-text: light-dark(
+    var(--color-amber-600),
+    var(--color-amber-400)
+  ) !important;
+  --normal-border: light-dark(
+    var(--color-amber-600),
+    var(--color-amber-400)
+  ) !important;
+}
+
+.toaster [data-sonner-toast][data-type='error'] {
+  --normal-bg: color-mix(
+    in oklab,
+    var(--destructive) 10%,
+    var(--background)
+  ) !important;
+  --normal-text: var(--destructive) !important;
+  --normal-border: var(--destructive) !important;
+}

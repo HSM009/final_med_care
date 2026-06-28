@@ -1,4 +1,3 @@
-import { AfkMonitor } from '#/components/afk-monitor'
 import { AppSidebar } from '#/components/app-sidebar'
 import { buttonVariants } from '#/components/ui/button'
 import { Separator } from '#/components/ui/separator'
@@ -9,7 +8,6 @@ import {
 } from '#/components/ui/sidebar'
 import { Roles } from '#/generated/prisma/enums'
 import { hasPermission } from '#/lib/roleBaseActions'
-import type { AuthUser } from '#/lib/types'
 import { cn } from '#/lib/utils'
 import {
   createFileRoute,
@@ -68,9 +66,6 @@ export const Route = createFileRoute('/dashboard')({
 
 function RouteComponent() {
   const { auth } = Route.useRouteContext()
-  const authUser = auth.user as AuthUser
-
-  const userRole = auth.user?.role as Roles
   const router = useRouter()
 
   useEffect(() => {
@@ -83,25 +78,23 @@ function RouteComponent() {
 
   return (
     <div>
-      <AfkMonitor type={userRole} user={authUser}>
-        <SidebarProvider>
-          <AppSidebar auth={auth} />
-          <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-              <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="-ml-1 animate-bounce-x" />
-                <Separator
-                  orientation="vertical"
-                  className="mr-2 data-[orientation=vertical]:h-4"
-                />
-              </div>
-            </header>
-            <div className=" flex flex-1 flex-col gap-4 p-4 pt-4">
-              <Outlet />
+      <SidebarProvider>
+        <AppSidebar auth={auth} />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1 animate-bounce-x" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 data-[orientation=vertical]:h-4"
+              />
             </div>
-          </SidebarInset>
-        </SidebarProvider>
-      </AfkMonitor>
+          </header>
+          <div className=" flex flex-1 flex-col gap-4 p-4 pt-4">
+            <Outlet />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   )
 }
