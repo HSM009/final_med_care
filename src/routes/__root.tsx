@@ -88,6 +88,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               <Toaster
                 closeButton
                 position="top-center"
+                className="toaster"
                 toastOptions={{
                   classNames: {
                     closeButton: '!right-0 !left-auto !translate-x-1/2',
