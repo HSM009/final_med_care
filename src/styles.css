@@ -217,15 +217,15 @@ body {
   hex codes calibrated to standard Tailwind color ranges.
 */
 
-.toaster [data-sonner-toast] {
+/* .toaster [data-sonner-toast] {
   background: var(--popover) !important;
   color: var(--popover-foreground) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius) !important;
 }
-
+/* 
 /* Semantically styled production color states */
-.toaster [data-sonner-toast][data-type='success'] {
+/* .toaster [data-sonner-toast][data-type='success'] {
   background: color-mix(
     in oklab,
     light-dark(#16a34a, #4ade80) 10%,
@@ -263,4 +263,4 @@ body {
   ) !important;
   color: var(--destructive) !important;
   border: 1px solid var(--destructive) !important;
-}
+} */
