@@ -7,16 +7,20 @@ import {
   adminSearchSchema,
 } from '@/schemas/auth'
 import { emailChangeNotification } from '@/components/email'
+import { Roles } from '#/generated/prisma/enums'
 
 export const getPatientsFn = createServerFn({ method: 'GET' })
   .validator(adminSearchSchema)
   .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
-    const searchString = data?.search?.trim()
+    const searchString = data?.search
     const currentPage = data?.page || 1
     if (searchString === undefined) {
       return { items: [], totalCount: 0 }
     }
+    const matchingRole = Object.values(Roles).find(
+      (r) => r.toLowerCase() === searchString.toLowerCase(),
+    )
     const whereClause = {
       NOT: [
         {
@@ -34,12 +38,7 @@ export const getPatientsFn = createServerFn({ method: 'GET' })
                       mode: 'insensitive' as const,
                     },
                   },
-                  {
-                    name: {
-                      contains: searchString,
-                      mode: 'insensitive' as const,
-                    },
-                  },
+                  ...(matchingRole ? [{ role: matchingRole }] : []),
                 ],
               },
             ],
