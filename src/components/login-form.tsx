@@ -19,7 +19,6 @@ import { Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
 import { createAuthContext } from '#/lib/auth-injectors'
 import { hasPermission } from '#/lib/roleBaseActions'
-import { showToast } from '#/lib/showToast'
 import { loginSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -60,10 +59,10 @@ export function LoginForm({ type }: prop) {
             }
             if (hasPermission(receivedRole, Roles.Doctor)) {
               navigate({ to: '/dashboard' })
-              showToast.success('Logged in successfully')
+              toast.success('Logged in successfully')
             } else if (hasPermission(receivedRole, Roles.Patient)) {
               navigate({ to: '/patientDashboard' })
-              showToast.success('Logged in successfully')
+              toast.success('Logged in successfully')
             } else {
               console.log(3)
             }
