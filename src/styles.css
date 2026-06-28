@@ -218,41 +218,41 @@ body {
 */
 
 .toaster [data-sonner-toast][data-type='success'] {
-  --normal-bg: color-mix(
+  background: color-mix(
     in oklab,
     light-dark(#16a34a, #4ade80) 10%,
     var(--background)
   ) !important;
-  --normal-text: light-dark(#16a34a, #4ade80) !important;
-  --normal-border: light-dark(#16a34a, #4ade80) !important;
+  color: light-dark(#16a34a, #4ade80) !important;
+  border: 1px solid light-dark(#16a34a, #4ade80) !important;
 }
 
 .toaster [data-sonner-toast][data-type='info'] {
-  --normal-bg: color-mix(
+  background: color-mix(
     in oklab,
     light-dark(#0284c7, #38bdf8) 10%,
     var(--background)
   ) !important;
-  --normal-text: light-dark(#0284c7, #38bdf8) !important;
-  --normal-border: light-dark(#0284c7, #38bdf8) !important;
+  color: light-dark(#0284c7, #38bdf8) !important;
+  border: 1px solid light-dark(#0284c7, #38bdf8) !important;
 }
 
 .toaster [data-sonner-toast][data-type='warning'] {
-  --normal-bg: color-mix(
+  background: color-mix(
     in oklab,
     light-dark(#d97706, #fbbf24) 10%,
     var(--background)
   ) !important;
-  --normal-text: light-dark(#d97706, #fbbf24) !important;
-  --normal-border: light-dark(#d97706, #fbbf24) !important;
+  color: light-dark(#d97706, #fbbf24) !important;
+  border: 1px solid light-dark(#d97706, #fbbf24) !important;
 }
 
 .toaster [data-sonner-toast][data-type='error'] {
-  --normal-bg: color-mix(
+  background: color-mix(
     in oklab,
     var(--destructive) 10%,
     var(--background)
   ) !important;
-  --normal-text: var(--destructive) !important;
-  --normal-border: var(--destructive) !important;
+  color: var(--destructive) !important;
+  border: 1px solid var(--destructive) !important;
 }
