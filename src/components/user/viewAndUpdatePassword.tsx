@@ -1,3 +1,4 @@
+import { showToast } from '#/lib/showToast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -11,7 +12,6 @@ import { authClient } from '@/lib/auth-client'
 import { useForm } from '@tanstack/react-form'
 import { CheckIcon, EditIcon, Loader2, XIcon } from 'lucide-react'
 import { useRef, useState, useTransition } from 'react'
-import { toast } from 'sonner'
 
 interface ViewAndUpdateAccountSettingPasswordProps {
   validatorHandler: any
@@ -41,19 +41,21 @@ export function ViewAndUpdateAccountSettingPassword({
 
           fetchOptions: {
             onSuccess: () => {
-              toast.success('Password updated successfully.')
+              showToast.success('Password updated successfully.')
               setIsEditing(false)
               setIsForwarding(true)
             },
             onError: ({ error }) => {
               if (error.code === 'INCORRECT_PASSWORD') {
-                toast.error('Current password is incorrect. Please try again.')
+                showToast.error(
+                  'Current password is incorrect. Please try again.',
+                )
               } else if (error.code === '401') {
-                toast.error(
+                showToast.error(
                   'Your new password does not meet the required criteria.',
                 )
               } else if (error.code === 'INVALID_PASSWORD') {
-                toast.error('Your currnent password is invalid.')
+                showToast.error('Your currnent password is invalid.')
                 form.setFieldMeta('currentPassword', (prev) => ({
                   ...prev,
                   isTouched: true,
@@ -64,7 +66,7 @@ export function ViewAndUpdateAccountSettingPassword({
                   },
                 }))
               } else {
-                toast.error(error.message)
+                showToast.error(error.message)
               }
             },
           },

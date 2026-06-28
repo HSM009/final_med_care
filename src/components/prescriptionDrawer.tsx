@@ -18,7 +18,7 @@ import { useReactToPrint } from 'react-to-print'
 import { useRef } from 'react'
 import { getDownloadUrl, type UploadedFileInfo } from '#/lib/vercel-action'
 import { DownloadCloudIcon } from 'lucide-react'
-import { toast } from 'sonner'
+import { showToast } from '#/lib/showToast'
 
 interface MedicineItem {
   medicineContentEnglish: string
@@ -76,11 +76,11 @@ export function PescriptionDrawer({
 
   const handleDownloadUrl = async (fileUrl: string) => {
     try {
-      toast.loading('Preparing download...', { id: 'download-status' })
+      showToast.loading('Preparing download...', { id: 'download-status' })
       const result = await getDownloadUrl({ data: { fileUrl } })
 
       if (!result.ok) {
-        toast.error('Download Failed: File inaccessible.', {
+        showToast.error('Download Failed: File inaccessible.', {
           id: 'download-status',
         })
         return
@@ -97,10 +97,10 @@ export function PescriptionDrawer({
       document.body.removeChild(link)
       URL.revokeObjectURL(downloadUrl)
 
-      toast.success('Download complete!', { id: 'download-status' })
+      showToast.success('Download complete!', { id: 'download-status' })
     } catch (error) {
       console.error('Client download error:', error)
-      toast.error('An unexpected download error occurred.', {
+      showToast.error('An unexpected download error occurred.', {
         id: 'download-status',
       })
     }

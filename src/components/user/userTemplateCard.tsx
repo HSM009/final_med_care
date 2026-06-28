@@ -4,7 +4,6 @@ import { Field, FieldError, FieldGroup } from '../ui/field'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { CheckIcon, EditIcon, Loader2, XIcon } from 'lucide-react'
-import { toast } from 'sonner'
 import { authClient } from '@/lib/auth-client'
 import { lazy, Suspense, useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
@@ -21,6 +20,7 @@ import {
   SelectValue,
 } from '../ui/select'
 import { Gender, Roles } from '#/generated/prisma/enums'
+import { showToast } from '#/lib/showToast'
 
 const DateOfBirthPicker = lazy(() =>
   import('#/components/datePicker').then((mod) => ({
@@ -55,7 +55,7 @@ export function UserTemplateCard({
     defaultValues: { [defTitle]: currentData },
     validators: { onChange: validatorHandler },
     onSubmit: async ({ value }) => {
-      toast.loading('Verification email sent!', { id: 'user-flow' })
+      showToast.loading('Verification email sent!', { id: 'user-flow' })
       const targetValue = value[defTitle]
       try {
         if (lowerTitle === 'email') {
@@ -67,7 +67,7 @@ export function UserTemplateCard({
               currentEmail: currentData as string,
             },
           })
-          toast.success('Verification email sent!', { id: 'user-flow' })
+          showToast.success('Verification email sent!', { id: 'user-flow' })
         } else {
           await adminActions({
             data: {
@@ -82,7 +82,7 @@ export function UserTemplateCard({
                 | Gender,
             },
           })
-          toast.success(
+          showToast.success(
             `${initCTitle} "${targetValue}" updated successfully.`,
             { id: 'user-flow' },
           )
@@ -93,7 +93,7 @@ export function UserTemplateCard({
         setIsForwarding(true)
       } catch (error) {
         console.error(error)
-        toast.error('Something went wrong saving the user changes.', {
+        showToast.error('Something went wrong saving the user changes.', {
           id: 'user-flow',
         })
       }

@@ -16,8 +16,8 @@ import { useForm } from '@tanstack/react-form'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useState, type ReactNode } from 'react'
 import { Field, FieldError, FieldGroup, FieldLabel } from './ui/field'
-import { toast } from 'sonner'
 import { updateMedicineAction } from '#/server/actions'
+import { showToast } from '#/lib/showToast'
 
 interface ExtendedEditProps extends EditMedicineDialogNavProps {
   children: ReactNode
@@ -50,7 +50,7 @@ export function EditMedicineDialog({
         // Fixed: Passing primary row identification field along with payload tracking data object
         await updateMedicineAction({ data: { ...value, id: Id } })
 
-        toast.success('Medicine updated successfully.')
+        showToast.success('Medicine updated successfully.')
         setIsOpen(false)
 
         navigate({
@@ -66,7 +66,7 @@ export function EditMedicineDialog({
 
         await router.invalidate()
       } catch (error) {
-        toast.error('Something went wrong saving the medicine.')
+        showToast.error('Something went wrong saving the medicine.')
       }
     },
   })

@@ -18,7 +18,6 @@ import { Input } from '#/components/ui/input'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { signupSchema } from '#/schemas/auth'
 import { authClient } from '#/lib/auth-client'
-import { toast } from 'sonner'
 import {
   Carousel,
   CarouselContent,
@@ -34,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
+import { showToast } from '#/lib/showToast'
 
 const DateOfBirthPicker = lazy(() =>
   import('#/components/datePicker').then((mod) => ({
@@ -74,7 +74,7 @@ export function SignupForm({ type }: prop) {
         dateOfBirth: value.dateOfBirth,
         fetchOptions: {
           onSuccess: async () => {
-            toast.loading('Sending the verification code ...', {
+            showToast.loading('Sending the verification code ...', {
               id: 'auth-flow',
             })
 
@@ -85,21 +85,21 @@ export function SignupForm({ type }: prop) {
               })
 
             if (otpError) {
-              toast.error(
+              showToast.error(
                 otpError.message || 'Failed to dispatch verification code',
                 { id: 'auth-flow' },
               )
               return
             }
 
-            toast.success('Verification code is sent! check your inbox', {
+            showToast.success('Verification code is sent! check your inbox', {
               id: 'auth-flow',
             })
             api?.scrollNext()
           },
           onError: ({ error }) => {
             if (error && error.message === 'USER_ALREADY_EXISTS') {
-              toast.error(
+              showToast.error(
                 'Registration failed. Provided email is already in use.',
               )
               form.setFieldMeta('email', (prev) => ({
@@ -114,7 +114,7 @@ export function SignupForm({ type }: prop) {
               api?.scrollTo(0)
             } else {
               console.log(error.message)
-              toast.error(error.message || 'An unexpected error occurred.')
+              showToast.error(error.message || 'An unexpected error occurred.')
             }
           },
         },
@@ -139,7 +139,7 @@ export function SignupForm({ type }: prop) {
     if (!hasStepOneErrors) {
       api?.scrollNext()
     } else {
-      toast.error('Please resolve the errors on this page first.')
+      showToast.error('Please resolve the errors on this page first.')
     }
   }
 
@@ -162,7 +162,7 @@ export function SignupForm({ type }: prop) {
       form.setFieldMeta('email', (prev) => ({ ...prev, isTouched: true }))
       form.setFieldMeta('password', (prev) => ({ ...prev, isTouched: true }))
 
-      toast.error('Please correct the validation errors on Step 1.')
+      showToast.error('Please correct the validation errors on Step 1.')
       api?.scrollTo(0)
       return
     }
@@ -176,7 +176,9 @@ export function SignupForm({ type }: prop) {
       form.setFieldMeta('gender', (prev) => ({ ...prev, isTouched: true }))
       form.setFieldMeta('dateOfBirth', (prev) => ({ ...prev, isTouched: true }))
 
-      toast.error('Please fill out all required profile information on Step 2.')
+      showToast.error(
+        'Please fill out all required profile information on Step 2.',
+      )
       api?.scrollTo(1)
       return
     }
@@ -187,7 +189,7 @@ export function SignupForm({ type }: prop) {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!otp || otp.length < 6) {
-      toast.error('Please input a complete 6-digit confirmation code.')
+      showToast.error('Please input a complete 6-digit confirmation code.')
       return
     }
     setIsVerifying(true)
@@ -197,10 +199,10 @@ export function SignupForm({ type }: prop) {
     })
     setIsVerifying(false)
     if (error) {
-      toast.error('Invalid or expired code.')
+      showToast.error('Invalid or expired code.')
       return
     }
-    toast.success('Account Created Successfully.')
+    showToast.success('Account Created Successfully.')
     navigate({
       to: '/login',
       search: { type: type },
@@ -211,18 +213,20 @@ export function SignupForm({ type }: prop) {
     const email = form.state.values.email
     if (!email) return
 
-    toast.loading('Resending the verification code...', { id: 'resend-otp' })
+    showToast.loading('Resending the verification code...', {
+      id: 'resend-otp',
+    })
 
     const { error } = await authClient.emailOtp.sendVerificationOtp({
       email: email,
       type: 'email-verification',
     })
     if (error) {
-      toast.error(error.message || 'Failed to resend the email code.', {
+      showToast.error(error.message || 'Failed to resend the email code.', {
         id: 'resend-otp',
       })
     } else {
-      toast.success('New verification code sent.', { id: 'resend-otp' })
+      showToast.success('New verification code sent.', { id: 'resend-otp' })
     }
   }
 
@@ -511,6 +515,7 @@ export function SignupForm({ type }: prop) {
                               }
                             >
                               <DateOfBirthPicker
+                                isPending={form.state.isSubmitting}
                                 onDateChange={(date) =>
                                   field.handleChange(date ?? new Date())
                                 }

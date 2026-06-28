@@ -84,7 +84,7 @@ export const addPatientSchema = z.object({
 export const medicineSearchSchema = z.object({
   search: z.string().optional(),
   page: z.number().optional(),
-  rowsPerPage: z.number(),
+  rowsPerPage: z.number().optional(),
 })
 
 export const addOrUpdateMedicineSchema = z.object({

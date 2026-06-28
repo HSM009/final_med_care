@@ -10,7 +10,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '#/components/ui/dialog'
-import { toast } from 'sonner'
 import { useRouter } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -22,6 +21,7 @@ import {
   addPrescriptionSubmission,
   updatePrescriptionSubmission,
 } from '#/server/actions'
+import { showToast } from '#/lib/showToast'
 
 interface SubmitPrescriptionDialogProps {
   prescriptionId: string
@@ -66,7 +66,7 @@ export function SubmitPrescriptionDialog({
     for (let i = 0; i < attachments.length; i++) {
       const fileToUpload = attachments[i]
 
-      toast.loading(
+      showToast.loading(
         `Uploading asset (${i + 1}/${attachments.length}): ${fileToUpload.name}...`,
         { id: toastId },
       )
@@ -89,13 +89,13 @@ export function SubmitPrescriptionDialog({
   }
 
   const submitPrescriptionHandler = async () => {
-    const toastId = toast.loading('Initializing validation protocols...')
+    const toastId = showToast.loading('Initializing validation protocols...')
 
     startTransition(async () => {
       try {
         let newCloudAssets: UploadedFileInfo[] = []
         if (attachments.length > 0) {
-          toast.loading(
+          showToast.loading(
             `Preparing transmission for ${attachments.length} files...`,
             { id: toastId },
           )
@@ -125,7 +125,7 @@ export function SubmitPrescriptionDialog({
           await updatePrescriptionSubmission({ data: databasePayload })
         }
 
-        toast.success(
+        showToast.success(
           prescriptionVal
             ? 'Prescription submitted successfully.'
             : 'Prescription saved successfully.',
@@ -139,7 +139,7 @@ export function SubmitPrescriptionDialog({
         })
         await router.invalidate()
       } catch (error: any) {
-        toast.error(
+        showToast.error(
           error.message || 'Something went wrong finalizing the prescription.',
           { id: toastId },
         )

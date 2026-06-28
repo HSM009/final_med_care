@@ -19,11 +19,10 @@ import { Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
 import { createAuthContext } from '#/lib/auth-injectors'
 import { hasPermission } from '#/lib/roleBaseActions'
+import { showToast } from '#/lib/showToast'
 import { loginSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { Link, useNavigate } from '@tanstack/react-router'
-
-import { toast } from 'sonner'
 
 interface prop {
   type: string | undefined
@@ -52,34 +51,36 @@ export function LoginForm({ type }: prop) {
 
             if (receivedRole !== Roles.Admin) {
               if (currentFormType !== receivedRole) {
-                toast.error('You are not authorized to access this portal.')
+                showToast.error('You are not authorized to access this portal.')
                 await authClient.signOut()
                 return
               }
             }
             if (hasPermission(receivedRole, Roles.Doctor)) {
               navigate({ to: '/dashboard' })
-              toast.success('Logged in successfully')
+              showToast.success('Logged in successfully')
             } else if (hasPermission(receivedRole, Roles.Patient)) {
               navigate({ to: '/patientDashboard' })
-              toast.success('Logged in successfully')
+              showToast.success('Logged in successfully')
             } else {
               console.log(3)
             }
           },
           onError: ({ error }) => {
             if (error.message?.startsWith('PENDING_REGISTRATION:')) {
-              toast.error(
+              showToast.error(
                 'Your account is pending for approval from an administrator.',
               )
               return
             }
             if (error.message?.startsWith('ADMIN_BANNED:')) {
-              toast.error('Your account has been banned by an administrator.')
+              showToast.error(
+                'Your account has been banned by an administrator.',
+              )
               return
             }
             if (error.message?.startsWith('ADMIN_REJECT_REGISTRATION:')) {
-              toast.error(
+              showToast.error(
                 'Your account approval has been rejected by an administrator.',
               )
               return
@@ -89,7 +90,7 @@ export function LoginForm({ type }: prop) {
               const expiryTimestamp = parseInt(parts[1], 10)
               const remainingMs = expiryTimestamp - Date.now()
               const remainingMinutes = Math.ceil(remainingMs / (60 * 1000))
-              toast.error(
+              showToast.error(
                 `Too many failed attempts. Your account is locked for another ${remainingMinutes} minute(s).`,
               )
               return
@@ -99,13 +100,13 @@ export function LoginForm({ type }: prop) {
               (error.status === 401 ||
                 error.code === 'INVALID_EMAIL_OR_PASSWORD')
             ) {
-              toast.error(
+              showToast.error(
                 'This email is not registered, or the password you entered is incorrect.',
               )
               return
             }
 
-            toast.error(error.message || 'An unexpected error occurred.')
+            showToast.error(error.message || 'An unexpected error occurred.')
           },
         },
       })

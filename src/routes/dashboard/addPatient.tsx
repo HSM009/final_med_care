@@ -8,7 +8,6 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
-import { toast } from 'sonner'
 import { Button } from '#/components/ui/button'
 import { Card, CardContent } from '#/components/ui/card'
 import { Gender, Roles } from '#/generated/prisma/enums'
@@ -21,6 +20,7 @@ import {
 } from '#/components/ui/select'
 import React, { useTransition } from 'react'
 import { addPatientAction } from '#/server/actions'
+import { showToast } from '#/lib/showToast'
 
 const DateOfBirthPicker = React.lazy(() =>
   import('#/components/datePicker').then((mod) => ({
@@ -52,7 +52,7 @@ function RouteComponent() {
 
     onSubmit: ({ value }) => {
       startTransition(async () => {
-        toast.loading(`Creating user (${value.fullName}).`, {
+        showToast.loading(`Creating user (${value.fullName}).`, {
           id: 'create-account',
         })
         try {
@@ -60,16 +60,19 @@ function RouteComponent() {
             ...value,
             password: 'generatePassword',
           })
-          toast.success(`Account (${value.fullName}) created successfully.`, {
-            id: 'create-account',
-          })
+          showToast.success(
+            `Account (${value.fullName}) created successfully.`,
+            {
+              id: 'create-account',
+            },
+          )
           navigate({
             to: '/dashboard/viewPatients',
             search: { search: value.fullName },
           })
         } catch (error) {
           console.error('Error creating patient:', error)
-          toast.error('Something went wrong saving the patient.', {
+          showToast.error('Something went wrong saving the patient.', {
             id: 'create-account',
           })
         }

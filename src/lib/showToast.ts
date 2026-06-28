@@ -1,7 +1,7 @@
 import { toast, type ExternalToast } from 'sonner'
 import React from 'react'
 
-type ToastType = 'success' | 'info' | 'warning' | 'error'
+type ToastType = 'success' | 'info' | 'warning' | 'error' | 'loading'
 
 const getToastStyle = (type: ToastType): React.CSSProperties => {
   const configs = {
@@ -9,6 +9,7 @@ const getToastStyle = (type: ToastType): React.CSSProperties => {
     info: { light: '#0284c7', dark: '#38bdf8' },
     warning: { light: '#d97706', dark: '#fbbf24' },
     error: { light: 'var(--destructive)', dark: 'var(--destructive)' },
+    loading: { light: '#0284c7', dark: '#38bdf8' },
   }
   const { light, dark } = configs[type]
   return {
@@ -31,4 +32,7 @@ export const showToast = {
 
   error: (msg: string, options?: ExternalToast) =>
     toast.error(msg, { ...options, style: getToastStyle('error') }),
+
+  loading: (msg: string, options?: ExternalToast) =>
+    toast.loading(msg, { ...options, style: getToastStyle('loading') }),
 }

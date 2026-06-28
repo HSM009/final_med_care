@@ -21,7 +21,7 @@ import { addOrUpdateMedicineSchema } from '#/schemas/auth'
 import { useForm } from '@tanstack/react-form'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useState, useTransition } from 'react'
-import { toast } from 'sonner'
+import { showToast } from '#/lib/showToast'
 
 interface MedicineDialogProps {
   children: React.ReactNode
@@ -43,14 +43,14 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
       onSubmit: addOrUpdateMedicineSchema,
     },
     onSubmit: async ({ value }) => {
-      toast.loading(
+      showToast.loading(
         `Adding ( ${value.medicineContentEnglish} - ${value.medicineContentUrdu} ).`,
         { id: 'med-flow' },
       )
       startTransition(async () => {
         try {
           await addMedicineAction({ data: value })
-          toast.success(
+          showToast.success(
             `Medicine ( ${value.medicineContentEnglish} - ${value.medicineContentUrdu} ) added successfully.`,
             { id: 'med-flow' },
           )
@@ -68,7 +68,7 @@ export function MedicineDialog({ children }: MedicineDialogProps) {
           }, 100)
           await router.invalidate()
         } catch (error) {
-          toast.error('Something went wrong saving the medicine.', {
+          showToast.error('Something went wrong saving the medicine.', {
             id: 'med-flow',
           })
         }

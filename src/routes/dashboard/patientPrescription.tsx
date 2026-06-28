@@ -1,6 +1,5 @@
 import { ArrowLeft, Trash2 } from 'lucide-react'
 import { Button, buttonVariants } from '#/components/ui/button'
-import { toast } from 'sonner'
 import {
   Card,
   CardContent,
@@ -24,6 +23,7 @@ import { FileUploader } from '#/components/ui/file-uploader'
 
 import { patientPrescriptionSearchSchema } from '#/schemas/auth'
 import { Textarea } from '#/components/ui/textarea'
+import { showToast } from '#/lib/showToast'
 
 export const Route = createFileRoute('/dashboard/patientPrescription')({
   validateSearch: patientPrescriptionSearchSchema,
@@ -52,7 +52,7 @@ function RouteComponent() {
     setSelectedMedicines((prev: any) => {
       const alreadyAdded = prev.some((med: any) => med.id === newMed.id)
       if (alreadyAdded) {
-        toast.warning(
+        showToast.warning(
           `${newMed.medicineContentEnglish} ${newMed.Dosage} already added to prescription.`,
         )
         return prev

@@ -18,7 +18,6 @@ import { Input } from '#/components/ui/input'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { emailUpdateSchema, resetPasswordUpdateSchema } from '#/schemas/auth'
 import { authClient } from '#/lib/auth-client'
-import { toast } from 'sonner'
 import {
   Carousel,
   CarouselContent,
@@ -26,6 +25,7 @@ import {
   type CarouselApi,
 } from './ui/carousel'
 import { useState } from 'react'
+import { showToast } from '#/lib/showToast'
 
 export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
   const navigate = useNavigate()
@@ -42,14 +42,14 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
       onSubmit: emailUpdateSchema, // (not updating just using same validation for forgot password)
     },
     onSubmit: async ({ value }) => {
-      toast.loading('Sending the verification code ...', {
+      showToast.loading('Sending the verification code ...', {
         id: 'auth-flow',
       })
       await authClient.emailOtp.requestPasswordReset({
         email: value.email,
         fetchOptions: {
           onSuccess: () => {
-            toast.success(
+            showToast.success(
               'If that email matches an account, a code has been sent!',
               {
                 id: 'auth-flow',
@@ -59,7 +59,7 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
           },
           onError: ({ error }) => {
             console.log(error.message)
-            toast.error(error.message || 'An unexpected error occurred.', {
+            showToast.error(error.message || 'An unexpected error occurred.', {
               id: 'auth-flow',
             })
           },
@@ -73,21 +73,21 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
     },
     validators: { onSubmit: resetPasswordUpdateSchema },
     onSubmit: async ({ value }) => {
-      toast.loading('Reseting the password', { id: 'reset-flow' })
+      showToast.loading('Reseting the password', { id: 'reset-flow' })
       await authClient.emailOtp.resetPassword({
         email: form.state.values.email,
         otp: otp,
         password: value.password,
         fetchOptions: {
           onSuccess: () => {
-            toast.success('New Password updated.', { id: 'reset-flow' })
+            showToast.success('New Password updated.', { id: 'reset-flow' })
             navigate({
               to: '/login',
             })
           },
           onError: ({ error }) => {
             console.log(error.message)
-            toast.error(error.message || 'An unexpected error occurred.', {
+            showToast.error(error.message || 'An unexpected error occurred.', {
               id: 'reset-flow',
             })
           },
@@ -98,11 +98,11 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
   const handleVerifyOtp = async (e: React.SubmitEvent) => {
     e.preventDefault()
     if (!otp || otp.length < 6) {
-      toast.error('Please input a complete 6-digit confirmation code.')
+      showToast.error('Please input a complete 6-digit confirmation code.')
       return
     }
     setIsVerifying(true)
-    toast.loading('Verifying the OTP code.', { id: 'otp-flow' })
+    showToast.loading('Verifying the OTP code.', { id: 'otp-flow' })
     const { error } = await authClient.emailOtp.checkVerificationOtp({
       email: form.state.values.email,
       type: 'forget-password',
@@ -110,10 +110,10 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
     })
     setIsVerifying(false)
     if (error) {
-      toast.error('Invalid or expired code.', { id: 'otp-flow' })
+      showToast.error('Invalid or expired code.', { id: 'otp-flow' })
       return
     }
-    toast.success('Otp is verfied.', { id: 'otp-flow' })
+    showToast.success('Otp is verfied.', { id: 'otp-flow' })
     api?.scrollNext()
   }
 
@@ -121,17 +121,19 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
     const email = form.state.values.email
     if (!email) return
 
-    toast.loading('Resending the verification code...', { id: 'resend-otp' })
+    showToast.loading('Resending the verification code...', {
+      id: 'resend-otp',
+    })
 
     const { error } = await authClient.emailOtp.requestPasswordReset({
       email: email,
     })
     if (error) {
-      toast.error(error.message || 'Failed to resend the email code.', {
+      showToast.error(error.message || 'Failed to resend the email code.', {
         id: 'resend-otp',
       })
     } else {
-      toast.success('New verification code sent.', { id: 'resend-otp' })
+      showToast.success('New verification code sent.', { id: 'resend-otp' })
     }
   }
 
