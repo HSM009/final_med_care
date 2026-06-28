@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { Button, buttonVariants } from '../ui/button'
 import { ThemeToggle } from './theme-toggle'
 import { authClient } from '@/lib/auth-client'
-import { useHandleSignOut } from '@/lib/types'
+import { useHandleSignOut } from '#/server/actions'
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession()
