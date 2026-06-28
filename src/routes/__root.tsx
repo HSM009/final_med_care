@@ -86,7 +86,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <ThemeProvider>
               {children}
               <Toaster
-                closeButton
                 position="top-center"
                 className="toaster"
                 toastOptions={{
