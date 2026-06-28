@@ -35,7 +35,7 @@ export const getPatientsFn = createServerFn({ method: 'GET' })
                     },
                   },
                   {
-                    role: {
+                    name: {
                       contains: searchString,
                       mode: 'insensitive' as const,
                     },
