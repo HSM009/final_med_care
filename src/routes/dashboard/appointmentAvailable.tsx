@@ -224,7 +224,7 @@ function RouteComponent() {
   return (
     <div className="w-full">
       <div className="text-3xl font-bold text-white mb-10 text-center">
-        Account Settings
+        Appointment Scheduling
       </div>
       {showSuccess && (
         <div className="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-lg flex items-center gap-2 border border-emerald-500/20">
