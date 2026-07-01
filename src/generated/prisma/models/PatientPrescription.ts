@@ -218,7 +218,7 @@ export type PatientPrescriptionGroupByOutputType = {
   prescriptionImage: string | null
   activeStatus: boolean
   prescriptionSubmitted: boolean
-  medCareId: string | null
+  medCareId: string
   doctorId: string | null
   _count: PatientPrescriptionCountAggregateOutputType | null
   _avg: PatientPrescriptionAvgAggregateOutputType | null
@@ -254,7 +254,7 @@ export type PatientPrescriptionWhereInput = {
   prescriptionImage?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
   activeStatus?: Prisma.BoolFilter<"PatientPrescription"> | boolean
   prescriptionSubmitted?: Prisma.BoolFilter<"PatientPrescription"> | boolean
-  medCareId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
+  medCareId?: Prisma.StringFilter<"PatientPrescription"> | string
   doctorId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
   patient?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   doctor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -269,7 +269,7 @@ export type PatientPrescriptionOrderByWithRelationInput = {
   prescriptionImage?: Prisma.SortOrderInput | Prisma.SortOrder
   activeStatus?: Prisma.SortOrder
   prescriptionSubmitted?: Prisma.SortOrder
-  medCareId?: Prisma.SortOrderInput | Prisma.SortOrder
+  medCareId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrderInput | Prisma.SortOrder
   patient?: Prisma.UserOrderByWithRelationInput
   doctor?: Prisma.UserOrderByWithRelationInput
@@ -287,7 +287,7 @@ export type PatientPrescriptionWhereUniqueInput = Prisma.AtLeast<{
   prescriptionImage?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
   activeStatus?: Prisma.BoolFilter<"PatientPrescription"> | boolean
   prescriptionSubmitted?: Prisma.BoolFilter<"PatientPrescription"> | boolean
-  medCareId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
+  medCareId?: Prisma.StringFilter<"PatientPrescription"> | string
   doctorId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
   patient?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   doctor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
@@ -302,7 +302,7 @@ export type PatientPrescriptionOrderByWithAggregationInput = {
   prescriptionImage?: Prisma.SortOrderInput | Prisma.SortOrder
   activeStatus?: Prisma.SortOrder
   prescriptionSubmitted?: Prisma.SortOrder
-  medCareId?: Prisma.SortOrderInput | Prisma.SortOrder
+  medCareId?: Prisma.SortOrder
   doctorId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PatientPrescriptionCountOrderByAggregateInput
   _avg?: Prisma.PatientPrescriptionAvgOrderByAggregateInput
@@ -323,7 +323,7 @@ export type PatientPrescriptionScalarWhereWithAggregatesInput = {
   prescriptionImage?: Prisma.StringNullableWithAggregatesFilter<"PatientPrescription"> | string | null
   activeStatus?: Prisma.BoolWithAggregatesFilter<"PatientPrescription"> | boolean
   prescriptionSubmitted?: Prisma.BoolWithAggregatesFilter<"PatientPrescription"> | boolean
-  medCareId?: Prisma.StringNullableWithAggregatesFilter<"PatientPrescription"> | string | null
+  medCareId?: Prisma.StringWithAggregatesFilter<"PatientPrescription"> | string
   doctorId?: Prisma.StringNullableWithAggregatesFilter<"PatientPrescription"> | string | null
 }
 
@@ -348,7 +348,7 @@ export type PatientPrescriptionUncheckedCreateInput = {
   prescriptionImage?: string | null
   activeStatus?: boolean
   prescriptionSubmitted?: boolean
-  medCareId?: string | null
+  medCareId: string
   doctorId?: string | null
 }
 
@@ -373,7 +373,7 @@ export type PatientPrescriptionUncheckedUpdateInput = {
   prescriptionImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activeStatus?: Prisma.BoolFieldUpdateOperationsInput | boolean
   prescriptionSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medCareId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -386,7 +386,7 @@ export type PatientPrescriptionCreateManyInput = {
   prescriptionImage?: string | null
   activeStatus?: boolean
   prescriptionSubmitted?: boolean
-  medCareId?: string | null
+  medCareId: string
   doctorId?: string | null
 }
 
@@ -409,7 +409,7 @@ export type PatientPrescriptionUncheckedUpdateManyInput = {
   prescriptionImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activeStatus?: Prisma.BoolFieldUpdateOperationsInput | boolean
   prescriptionSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medCareId?: Prisma.StringFieldUpdateOperationsInput | string
   doctorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -607,7 +607,7 @@ export type PatientPrescriptionUncheckedCreateWithoutDoctorInput = {
   prescriptionImage?: string | null
   activeStatus?: boolean
   prescriptionSubmitted?: boolean
-  medCareId?: string | null
+  medCareId: string
 }
 
 export type PatientPrescriptionCreateOrConnectWithoutDoctorInput = {
@@ -648,7 +648,7 @@ export type PatientPrescriptionScalarWhereInput = {
   prescriptionImage?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
   activeStatus?: Prisma.BoolFilter<"PatientPrescription"> | boolean
   prescriptionSubmitted?: Prisma.BoolFilter<"PatientPrescription"> | boolean
-  medCareId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
+  medCareId?: Prisma.StringFilter<"PatientPrescription"> | string
   doctorId?: Prisma.StringNullableFilter<"PatientPrescription"> | string | null
 }
 
@@ -689,7 +689,7 @@ export type PatientPrescriptionCreateManyDoctorInput = {
   prescriptionImage?: string | null
   activeStatus?: boolean
   prescriptionSubmitted?: boolean
-  medCareId?: string | null
+  medCareId: string
 }
 
 export type PatientPrescriptionUpdateWithoutPatientInput = {
@@ -747,7 +747,7 @@ export type PatientPrescriptionUncheckedUpdateWithoutDoctorInput = {
   prescriptionImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activeStatus?: Prisma.BoolFieldUpdateOperationsInput | boolean
   prescriptionSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medCareId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PatientPrescriptionUncheckedUpdateManyWithoutDoctorInput = {
@@ -759,7 +759,7 @@ export type PatientPrescriptionUncheckedUpdateManyWithoutDoctorInput = {
   prescriptionImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activeStatus?: Prisma.BoolFieldUpdateOperationsInput | boolean
   prescriptionSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  medCareId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -851,7 +851,7 @@ export type $PatientPrescriptionPayload<ExtArgs extends runtime.Types.Extensions
     prescriptionImage: string | null
     activeStatus: boolean
     prescriptionSubmitted: boolean
-    medCareId: string | null
+    medCareId: string
     doctorId: string | null
   }, ExtArgs["result"]["patientPrescription"]>
   composites: {}
@@ -1511,7 +1511,7 @@ export type PatientPrescriptionCreateArgs<ExtArgs extends runtime.Types.Extensio
   /**
    * The data needed to create a PatientPrescription.
    */
-  data?: Prisma.XOR<Prisma.PatientPrescriptionCreateInput, Prisma.PatientPrescriptionUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.PatientPrescriptionCreateInput, Prisma.PatientPrescriptionUncheckedCreateInput>
 }
 
 /**

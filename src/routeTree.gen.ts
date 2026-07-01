@@ -9,14 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PatientDashboardRouteRouteImport } from './routes/patientDashboard/route'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PatientDashboardIndexRouteImport } from './routes/patientDashboard/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as PatientDashboardOverviewRouteImport } from './routes/patientDashboard/overview'
+import { Route as PatientDashboardHistoryRouteImport } from './routes/patientDashboard/history'
+import { Route as PatientDashboardAppointmentRouteImport } from './routes/patientDashboard/appointment'
 import { Route as DashboardViewPatientsRouteImport } from './routes/dashboard/viewPatients'
 import { Route as DashboardViewMedicineListRouteImport } from './routes/dashboard/viewMedicineList'
 import { Route as DashboardPatientPrescriptionRouteImport } from './routes/dashboard/patientPrescription'
+import { Route as DashboardAppointmentAvailableRouteImport } from './routes/dashboard/appointmentAvailable'
 import { Route as DashboardAdministerUserRouteImport } from './routes/dashboard/administerUser'
 import { Route as DashboardAddPatientRouteImport } from './routes/dashboard/addPatient'
 import { Route as DashboardAccountSettingRouteImport } from './routes/dashboard/accountSetting'
@@ -27,6 +32,11 @@ import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forg
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
 
+const PatientDashboardRouteRoute = PatientDashboardRouteRouteImport.update({
+  id: '/patientDashboard',
+  path: '/patientDashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -42,15 +52,32 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PatientDashboardIndexRoute = PatientDashboardIndexRouteImport.update({
-  id: '/patientDashboard/',
-  path: '/patientDashboard/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => PatientDashboardRouteRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const PatientDashboardOverviewRoute =
+  PatientDashboardOverviewRouteImport.update({
+    id: '/overview',
+    path: '/overview',
+    getParentRoute: () => PatientDashboardRouteRoute,
+  } as any)
+const PatientDashboardHistoryRoute = PatientDashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => PatientDashboardRouteRoute,
+} as any)
+const PatientDashboardAppointmentRoute =
+  PatientDashboardAppointmentRouteImport.update({
+    id: '/appointment',
+    path: '/appointment',
+    getParentRoute: () => PatientDashboardRouteRoute,
+  } as any)
 const DashboardViewPatientsRoute = DashboardViewPatientsRouteImport.update({
   id: '/viewPatients',
   path: '/viewPatients',
@@ -66,6 +93,12 @@ const DashboardPatientPrescriptionRoute =
   DashboardPatientPrescriptionRouteImport.update({
     id: '/patientPrescription',
     path: '/patientPrescription',
+    getParentRoute: () => DashboardRouteRoute,
+  } as any)
+const DashboardAppointmentAvailableRoute =
+  DashboardAppointmentAvailableRouteImport.update({
+    id: '/appointmentAvailable',
+    path: '/appointmentAvailable',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
 const DashboardAdministerUserRoute = DashboardAdministerUserRouteImport.update({
@@ -117,13 +150,18 @@ const ApiAdminApproveUserRoute = ApiAdminApproveUserRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/patientDashboard': typeof PatientDashboardRouteRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/appointmentAvailable': typeof DashboardAppointmentAvailableRoute
   '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/patientDashboard/appointment': typeof PatientDashboardAppointmentRoute
+  '/patientDashboard/history': typeof PatientDashboardHistoryRoute
+  '/patientDashboard/overview': typeof PatientDashboardOverviewRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
@@ -138,9 +176,13 @@ export interface FileRoutesByTo {
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/appointmentAvailable': typeof DashboardAppointmentAvailableRoute
   '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/patientDashboard/appointment': typeof PatientDashboardAppointmentRoute
+  '/patientDashboard/history': typeof PatientDashboardHistoryRoute
+  '/patientDashboard/overview': typeof PatientDashboardOverviewRoute
   '/dashboard': typeof DashboardIndexRoute
   '/patientDashboard': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
@@ -154,13 +196,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteRouteWithChildren
   '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/patientDashboard': typeof PatientDashboardRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/dashboard/accountSetting': typeof DashboardAccountSettingRoute
   '/dashboard/addPatient': typeof DashboardAddPatientRoute
   '/dashboard/administerUser': typeof DashboardAdministerUserRoute
+  '/dashboard/appointmentAvailable': typeof DashboardAppointmentAvailableRoute
   '/dashboard/patientPrescription': typeof DashboardPatientPrescriptionRoute
   '/dashboard/viewMedicineList': typeof DashboardViewMedicineListRoute
   '/dashboard/viewPatients': typeof DashboardViewPatientsRoute
+  '/patientDashboard/appointment': typeof PatientDashboardAppointmentRoute
+  '/patientDashboard/history': typeof PatientDashboardHistoryRoute
+  '/patientDashboard/overview': typeof PatientDashboardOverviewRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
@@ -174,13 +221,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/patientDashboard'
     | '/login'
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/appointmentAvailable'
     | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
+    | '/patientDashboard/appointment'
+    | '/patientDashboard/history'
+    | '/patientDashboard/overview'
     | '/dashboard/'
     | '/patientDashboard/'
     | '/api/admin/approve-user'
@@ -195,9 +247,13 @@ export interface FileRouteTypes {
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/appointmentAvailable'
     | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
+    | '/patientDashboard/appointment'
+    | '/patientDashboard/history'
+    | '/patientDashboard/overview'
     | '/dashboard'
     | '/patientDashboard'
     | '/api/admin/approve-user'
@@ -210,13 +266,18 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/dashboard'
+    | '/patientDashboard'
     | '/_auth/login'
     | '/dashboard/accountSetting'
     | '/dashboard/addPatient'
     | '/dashboard/administerUser'
+    | '/dashboard/appointmentAvailable'
     | '/dashboard/patientPrescription'
     | '/dashboard/viewMedicineList'
     | '/dashboard/viewPatients'
+    | '/patientDashboard/appointment'
+    | '/patientDashboard/history'
+    | '/patientDashboard/overview'
     | '/dashboard/'
     | '/patientDashboard/'
     | '/api/admin/approve-user'
@@ -230,13 +291,20 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
-  PatientDashboardIndexRoute: typeof PatientDashboardIndexRoute
+  PatientDashboardRouteRoute: typeof PatientDashboardRouteRouteWithChildren
   ApiAdminApproveUserRoute: typeof ApiAdminApproveUserRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/patientDashboard': {
+      id: '/patientDashboard'
+      path: '/patientDashboard'
+      fullPath: '/patientDashboard'
+      preLoaderRoute: typeof PatientDashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -260,10 +328,10 @@ declare module '@tanstack/react-router' {
     }
     '/patientDashboard/': {
       id: '/patientDashboard/'
-      path: '/patientDashboard'
+      path: '/'
       fullPath: '/patientDashboard/'
       preLoaderRoute: typeof PatientDashboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PatientDashboardRouteRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -271,6 +339,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/patientDashboard/overview': {
+      id: '/patientDashboard/overview'
+      path: '/overview'
+      fullPath: '/patientDashboard/overview'
+      preLoaderRoute: typeof PatientDashboardOverviewRouteImport
+      parentRoute: typeof PatientDashboardRouteRoute
+    }
+    '/patientDashboard/history': {
+      id: '/patientDashboard/history'
+      path: '/history'
+      fullPath: '/patientDashboard/history'
+      preLoaderRoute: typeof PatientDashboardHistoryRouteImport
+      parentRoute: typeof PatientDashboardRouteRoute
+    }
+    '/patientDashboard/appointment': {
+      id: '/patientDashboard/appointment'
+      path: '/appointment'
+      fullPath: '/patientDashboard/appointment'
+      preLoaderRoute: typeof PatientDashboardAppointmentRouteImport
+      parentRoute: typeof PatientDashboardRouteRoute
     }
     '/dashboard/viewPatients': {
       id: '/dashboard/viewPatients'
@@ -291,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/patientPrescription'
       fullPath: '/dashboard/patientPrescription'
       preLoaderRoute: typeof DashboardPatientPrescriptionRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/appointmentAvailable': {
+      id: '/dashboard/appointmentAvailable'
+      path: '/appointmentAvailable'
+      fullPath: '/dashboard/appointmentAvailable'
+      preLoaderRoute: typeof DashboardAppointmentAvailableRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/administerUser': {
@@ -381,6 +477,7 @@ interface DashboardRouteRouteChildren {
   DashboardAccountSettingRoute: typeof DashboardAccountSettingRoute
   DashboardAddPatientRoute: typeof DashboardAddPatientRoute
   DashboardAdministerUserRoute: typeof DashboardAdministerUserRoute
+  DashboardAppointmentAvailableRoute: typeof DashboardAppointmentAvailableRoute
   DashboardPatientPrescriptionRoute: typeof DashboardPatientPrescriptionRoute
   DashboardViewMedicineListRoute: typeof DashboardViewMedicineListRoute
   DashboardViewPatientsRoute: typeof DashboardViewPatientsRoute
@@ -391,6 +488,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAccountSettingRoute: DashboardAccountSettingRoute,
   DashboardAddPatientRoute: DashboardAddPatientRoute,
   DashboardAdministerUserRoute: DashboardAdministerUserRoute,
+  DashboardAppointmentAvailableRoute: DashboardAppointmentAvailableRoute,
   DashboardPatientPrescriptionRoute: DashboardPatientPrescriptionRoute,
   DashboardViewMedicineListRoute: DashboardViewMedicineListRoute,
   DashboardViewPatientsRoute: DashboardViewPatientsRoute,
@@ -401,11 +499,30 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
+interface PatientDashboardRouteRouteChildren {
+  PatientDashboardAppointmentRoute: typeof PatientDashboardAppointmentRoute
+  PatientDashboardHistoryRoute: typeof PatientDashboardHistoryRoute
+  PatientDashboardOverviewRoute: typeof PatientDashboardOverviewRoute
+  PatientDashboardIndexRoute: typeof PatientDashboardIndexRoute
+}
+
+const PatientDashboardRouteRouteChildren: PatientDashboardRouteRouteChildren = {
+  PatientDashboardAppointmentRoute: PatientDashboardAppointmentRoute,
+  PatientDashboardHistoryRoute: PatientDashboardHistoryRoute,
+  PatientDashboardOverviewRoute: PatientDashboardOverviewRoute,
+  PatientDashboardIndexRoute: PatientDashboardIndexRoute,
+}
+
+const PatientDashboardRouteRouteWithChildren =
+  PatientDashboardRouteRoute._addFileChildren(
+    PatientDashboardRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRouteRoute: AuthRouteRouteWithChildren,
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
-  PatientDashboardIndexRoute: PatientDashboardIndexRoute,
+  PatientDashboardRouteRoute: PatientDashboardRouteRouteWithChildren,
   ApiAdminApproveUserRoute: ApiAdminApproveUserRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

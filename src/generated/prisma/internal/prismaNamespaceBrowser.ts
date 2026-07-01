@@ -56,7 +56,9 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   PatientPrescription: 'PatientPrescription',
-  MedicineList: 'MedicineList'
+  MedicineList: 'MedicineList',
+  Appointment: 'Appointment',
+  DoctorSlots: 'DoctorSlots'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -176,6 +178,33 @@ export const MedicineListScalarFieldEnum = {
 } as const
 
 export type MedicineListScalarFieldEnum = (typeof MedicineListScalarFieldEnum)[keyof typeof MedicineListScalarFieldEnum]
+
+
+export const AppointmentScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  date: 'date',
+  time: 'time',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AppointmentScalarFieldEnum = (typeof AppointmentScalarFieldEnum)[keyof typeof AppointmentScalarFieldEnum]
+
+
+export const DoctorSlotsScalarFieldEnum = {
+  id: 'id',
+  doctorId: 'doctorId',
+  day: 'day',
+  startTimeMinutes: 'startTimeMinutes',
+  endTimeMinutes: 'endTimeMinutes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DoctorSlotsScalarFieldEnum = (typeof DoctorSlotsScalarFieldEnum)[keyof typeof DoctorSlotsScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -20,7 +20,8 @@ export interface AuthContextResult {
   }
 }
 
-export interface NavUserProps {}
+export type NavUProps = Pick<AuthUser, 'name' | 'email'>
+export type NavPProps = Pick<AuthUser, 'name'>
 
 export interface NavPrimaryProps {
   items: {
@@ -129,4 +130,9 @@ export interface SinglePrescription {
   patientPhone: string | null
   patientGender: Gender | string | null
   patientImages: string | UploadedFileInfo[] | null
+}
+
+export interface TimeSlotItem {
+  startTime: string
+  endTime: string
 }

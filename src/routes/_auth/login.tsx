@@ -23,7 +23,7 @@ function RouteComponent() {
           {!user ? (
             <>
               {reason && (
-                <div className=" font-bold text-red-500 text-xs italic border-2 border-transparent bg-red-500/5 p-4 rounded-xl mb-2">
+                <div className=" font-bold text-red-900 text-xs italic  bg-red-500/60 p-4 rounded-xl mb-2">
                   You were inactive too long. So your current session has
                   expired. ({reason})
                 </div>

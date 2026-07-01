@@ -71,3 +71,13 @@ export type PatientPrescription = Prisma.PatientPrescriptionModel
  * 
  */
 export type MedicineList = Prisma.MedicineListModel
+/**
+ * Model Appointment
+ * 
+ */
+export type Appointment = Prisma.AppointmentModel
+/**
+ * Model DoctorSlots
+ * 
+ */
+export type DoctorSlots = Prisma.DoctorSlotsModel

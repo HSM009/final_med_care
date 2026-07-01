@@ -13,9 +13,11 @@ const getToastStyle = (type: ToastType): React.CSSProperties => {
   }
   const { light, dark } = configs[type]
   return {
-    '--normal-bg': `color-mix(in oklab, light-dark(${light}, ${dark}) 10%, var(--background))`,
+    '--normal-bg': `color-mix(in oklab, light-dark(${light}, ${dark}) 10%, transparent)`,
     '--normal-text': `light-dark(${light}, ${dark})`,
     '--normal-border': `light-dark(${light}, ${dark})`,
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
   } as React.CSSProperties
 }
 

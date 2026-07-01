@@ -212,3 +212,33 @@ body {
     }
   }
 }
+
+/* ==========================================================================
+   TRANSLUCENT INTERACTIVE NAVIGATION NAVIGATION COMPONENT
+   ========================================================================== */
+.nav-link-dynamic {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  height: 36px;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Ensure icons remain perfectly static inside the moving background template framework */
+.nav-link-dynamic svg {
+  position: relative;
+  z-index: 10;
+}
+
+.nav-link-dynamic span {
+  position: relative;
+  z-index: 10;
+}

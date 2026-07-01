@@ -9,6 +9,28 @@
 * 🟢 You can import this file directly.
 */
 
+export const DayOfWeek = {
+  Monday: 'Monday',
+  Tuesday: 'Tuesday',
+  Wednesday: 'Wednesday',
+  Thursday: 'Thursday',
+  Friday: 'Friday',
+  Saturday: 'Saturday',
+  Sunday: 'Sunday'
+} as const
+
+export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek]
+
+
+export const AppointmentStatus = {
+  Upcoming: 'Upcoming',
+  Completed: 'Completed',
+  Cancelled: 'Cancelled'
+} as const
+
+export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof AppointmentStatus]
+
+
 export const Gender = {
   Male: 'Male',
   Female: 'Female',

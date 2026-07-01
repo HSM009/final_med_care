@@ -17,7 +17,7 @@ model User {
   cellNo                String?
   dateOfBirth           DateTime    @default(now())       @map("dateOfBirth")
   gender                Gender      @default(Other)  
-  medCareId           String?  
+  medCareId             String?  
   emailVerified         Boolean     @default(false)
   role                  Roles       @default(Patient) 
 
@@ -39,6 +39,9 @@ model User {
   accounts              Account[]
   patientPrescriptions  PatientPrescription[] @relation("PatientRelation")
   doctorPrescriptions   PatientPrescription[] @relation("DoctorRelation")
+  patientAppointments   Appointment[]         @relation("PatientRelation")
+  doctorAppointments    Appointment[]         @relation("DoctorRelation")
+  doctorSlots           DoctorSlots[]         @relation("DoctorRelation")
 
   @@unique([medCareId])
   @@map("user")
@@ -102,9 +105,8 @@ model PatientPrescription {
   prescriptionImage       String?
   activeStatus            Boolean     @default(true)
   prescriptionSubmitted   Boolean     @default(false)
-  medCareId             String?
-
-  patient               User?             @relation("PatientRelation", fields: [medCareId], references: [medCareId])  
+  medCareId               String
+  patient                 User?             @relation("PatientRelation", fields: [medCareId], references: [medCareId])  
   doctorId                String?
   doctor                User?             @relation("DoctorRelation", fields: [doctorId], references: [id])
   
@@ -119,6 +121,52 @@ model MedicineList {
   createdPrescription             DateTime    @default(now())
   activeStatus                    Boolean     @default(true)                        
   @@index([id])
+}
+
+model Appointment { //--Booking 
+  id                      Int         @id  @default(autoincrement())
+  patientId               String?
+  patient                 User?             @relation("PatientRelation", fields: [patientId], references: [id])  
+  doctorId                String?
+  doctor                  User?             @relation("DoctorRelation", fields: [doctorId], references: [id])
+  date                    String
+  time                    String
+  status                  AppointmentStatus
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+  
+  @@index([id])
+  @@index([doctorId, date])
+}
+
+model DoctorSlots {
+  id                    Int           @id  @default(autoincrement())
+  doctorId              String
+  doctor                User?             @relation("DoctorRelation", fields: [doctorId], references: [id])
+  day                   DayOfWeek  
+  startTimeMinutes      Int
+  endTimeMinutes        Int  
+  createdAt             DateTime    @default(now())
+
+
+@@unique([doctorId, day, startTimeMinutes])
+@@index([doctorId])
+}
+
+enum DayOfWeek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}
+
+enum AppointmentStatus {
+  Upcoming
+  Completed
+  Cancelled
 }
 
 enum Gender {

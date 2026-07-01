@@ -5,20 +5,21 @@ import { authFnMiddleware } from '#/middlewares/auth'
 import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
+  getDoctorSlotsSchema,
   // addPatientSchema,
   medicineSearchSchema,
   patientSearchSchema,
   submitPrescriptionSchema,
   updateMedicineSchema,
-  updatePatientSchema,
   updatePrescriptionSchema,
+  upsertDoctorSlotsSchema,
 } from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
 import { Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
 import { queryOptions } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
+import { showToast } from '#/lib/showToast'
 
 export const addPatientAction = async (data: any) => {
   return await authClient.signUp.email({
@@ -152,25 +153,6 @@ export const updateMedicineAction = createServerFn({ method: 'POST' })
     })
   })
 
-export const updatePatientAction = createServerFn({ method: 'POST' })
-  .validator(updatePatientSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
-      const newPatient = await tx.user.update({
-        where: { id: data.id },
-        data: {
-          name: data.name,
-          email: data.email,
-          dateOfBirth: data.age,
-          phone: data.phone,
-          gender: data.gender,
-        },
-      })
-      return newPatient
-    })
-  })
-
 export const addPrescriptionSubmission = createServerFn({ method: 'POST' })
   .middleware([authFnMiddleware])
   .validator(submitPrescriptionSchema)
@@ -216,7 +198,7 @@ export const getMedicineList = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const searchString = data?.search
     const currentPage = data?.page || 1
-    const PAGE_SIZE = data.rowsPerPage
+    const PAGE_SIZE = data.rowsPerPage || 8
     if (searchString === undefined) {
       return { items: [], totalCount: 0 }
     }
@@ -343,12 +325,84 @@ export const useHandleSignOut = () => {
           navigate({
             to: '/',
           })
-          toast.success('Signed out Successfully')
+          showToast.success('Signed out Successfully')
         },
         onError: ({ error }) => {
-          toast.error(error.message)
+          showToast.error(error.message)
         },
       },
     })
   }
 }
+
+export const getDoctorSlots = createServerFn({ method: 'GET' })
+  .validator(getDoctorSlotsSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const records = await prisma.doctorSlots.findMany({
+      where: {
+        doctorId: data.doctorId,
+      },
+      select: {
+        day: true,
+        startTimeMinutes: true,
+        endTimeMinutes: true,
+      },
+      orderBy: { day: 'asc' },
+    })
+
+    // Converts total minutes into "HH:MM" for both start and end bounds
+    const items = records.map((record) => {
+      const startH = Math.floor(record.startTimeMinutes / 60)
+        .toString()
+        .padStart(2, '0')
+      const startM = (record.startTimeMinutes % 60).toString().padStart(2, '0')
+
+      const endH = Math.floor(record.endTimeMinutes / 60)
+        .toString()
+        .padStart(2, '0')
+      const endM = (record.endTimeMinutes % 60).toString().padStart(2, '0')
+
+      return {
+        day: record.day,
+        startTime: `${startH}:${startM}`,
+        endTime: `${endH}:${endM}`,
+      }
+    })
+
+    return { items }
+  })
+
+export const upsertDoctorSlots = createServerFn({ method: 'POST' })
+  .validator(upsertDoctorSlotsSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data, context }) => {
+    const doctorId = context.session.user.id
+
+    if (!doctorId) {
+      throw new Error('Unauthorized operational access.')
+    }
+
+    // Isolate operations inside a database transaction block
+    const result = await prisma.$transaction(async (tx) => {
+      // Step A: Purge current rows for this specific provider
+      await tx.doctorSlots.deleteMany({
+        where: { doctorId },
+      })
+
+      // Step B: If new slots exist, write the updated record array matrix
+      if (data.slots.length > 0) {
+        return await tx.doctorSlots.createMany({
+          data: data.slots.map((slot) => ({
+            doctorId,
+            day: slot.day,
+            startTimeMinutes: slot.startTimeMinutes,
+            endTimeMinutes: slot.endTimeMinutes,
+          })),
+        })
+      }
+
+      return { count: 0 }
+    })
+    return { success: true, recordsUpdated: result.count }
+  })

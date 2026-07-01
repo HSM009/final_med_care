@@ -1,7 +1,7 @@
 import { ChevronsUpDown, LogOut } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
-import { type AuthUser } from '#/lib/types'
+import { type NavUProps } from '#/lib/types'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useHandleSignOut } from '#/server/actions'
 
-export function NavUser({ name, email }: AuthUser) {
+export function NavUser({ name, email }: NavUProps) {
   const { isMobile, setOpenMobile } = useSidebar()
   const handleSignOut = useHandleSignOut()
   const handleNavigation = () => {
@@ -76,6 +76,11 @@ export function NavUser({ name, email }: AuthUser) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild onClick={handleNavigation}>
+              <Link to="/dashboard/appointmentAvailable">
+                Appointment Available
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild onClick={handleNavigation}>
               <Link to="/dashboard/accountSetting">Account Settings</Link>
             </DropdownMenuItem>
