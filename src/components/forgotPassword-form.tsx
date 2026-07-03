@@ -351,7 +351,7 @@ export function ForgotPassword({}: React.ComponentProps<typeof Card>) {
                               disabled={isSubmitting}
                               type="submit"
                             >
-                              {isSubmitting ? 'Updating Email...' : 'Update'}
+                              {isSubmitting ? 'Updating Password...' : 'Update'}
                             </Button>
                           </Field>
                         </FieldGroup>

@@ -239,10 +239,6 @@ export const signInType = z.object({
   type: z.string().optional(),
 })
 
-export const getDoctorSlotsSchema = z.object({
-  doctorId: z.string(),
-})
-
 export const upsertDoctorSlotsSchema = z.object({
   slots: z.array(
     z.object({
@@ -251,4 +247,15 @@ export const upsertDoctorSlotsSchema = z.object({
       endTimeMinutes: z.number().min(0).max(1440),
     }),
   ),
+  doctorId: z.string(),
+})
+
+export const SearchSchema = z.object({
+  search: z.string().default(''),
+})
+
+export const DashboardDataSchema = z.object({
+  doctorId: z.string(),
+  shouldFetchName: z.boolean().default(false),
+  shouldFetchQualification: z.boolean().default(false),
 })

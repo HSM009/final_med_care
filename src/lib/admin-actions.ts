@@ -5,6 +5,7 @@ import {
   adminActionSchema,
   forceChangeEmailSchemaExtended,
   adminSearchSchema,
+  SearchSchema,
 } from '@/schemas/auth'
 import { emailChangeNotification } from '@/components/email'
 import { Roles } from '#/generated/prisma/enums'
@@ -105,4 +106,30 @@ export const adminActions = createServerFn({
         [Title]: newValue,
       },
     })
+  })
+
+export const getDoctor = createServerFn({ method: 'GET' })
+  .validator(SearchSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const searchString = data?.search?.trim()
+    if (!searchString) return { items: [] }
+
+    const doctors = await prisma.user.findMany({
+      where: {
+        role: Roles.Doctor,
+        OR: [
+          { name: { contains: searchString, mode: 'insensitive' } },
+          { id: searchString }, // ✅ Added: Allows route loaders to fetch directly by ID
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        qualification: true,
+      },
+      take: 10,
+    })
+
+    return { items: doctors || [] }
   })

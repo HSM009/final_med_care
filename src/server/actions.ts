@@ -5,21 +5,23 @@ import { authFnMiddleware } from '#/middlewares/auth'
 import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
-  getDoctorSlotsSchema,
+  DashboardDataSchema,
   // addPatientSchema,
   medicineSearchSchema,
   patientSearchSchema,
+  SearchSchema,
   submitPrescriptionSchema,
   updateMedicineSchema,
   updatePrescriptionSchema,
   upsertDoctorSlotsSchema,
 } from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
-import { Roles } from '#/generated/prisma/enums'
+import { DayOfWeek, Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
 import { queryOptions } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { showToast } from '#/lib/showToast'
+import { getInitialScheduleState } from '#/lib/types'
 
 export const addPatientAction = async (data: any) => {
   return await authClient.signUp.email({
@@ -335,74 +337,100 @@ export const useHandleSignOut = () => {
   }
 }
 
-export const getDoctorSlots = createServerFn({ method: 'GET' })
-  .validator(getDoctorSlotsSchema)
-  .middleware([authFnMiddleware])
-  .handler(async ({ data }) => {
-    const records = await prisma.doctorSlots.findMany({
-      where: {
-        doctorId: data.doctorId,
-      },
-      select: {
-        day: true,
-        startTimeMinutes: true,
-        endTimeMinutes: true,
-      },
-      orderBy: { day: 'asc' },
-    })
-
-    // Converts total minutes into "HH:MM" for both start and end bounds
-    const items = records.map((record) => {
-      const startH = Math.floor(record.startTimeMinutes / 60)
-        .toString()
-        .padStart(2, '0')
-      const startM = (record.startTimeMinutes % 60).toString().padStart(2, '0')
-
-      const endH = Math.floor(record.endTimeMinutes / 60)
-        .toString()
-        .padStart(2, '0')
-      const endM = (record.endTimeMinutes % 60).toString().padStart(2, '0')
-
-      return {
-        day: record.day,
-        startTime: `${startH}:${startM}`,
-        endTime: `${endH}:${endM}`,
-      }
-    })
-
-    return { items }
-  })
-
 export const upsertDoctorSlots = createServerFn({ method: 'POST' })
   .validator(upsertDoctorSlotsSchema)
   .middleware([authFnMiddleware])
-  .handler(async ({ data, context }) => {
-    const doctorId = context.session.user.id
+  .handler(async ({ data }) => {
+    const { doctorId, slots } = data
+    if (!doctorId) throw new Error('Unauthorized operational access.')
 
-    if (!doctorId) {
-      throw new Error('Unauthorized operational access.')
-    }
-
-    // Isolate operations inside a database transaction block
     const result = await prisma.$transaction(async (tx) => {
-      // Step A: Purge current rows for this specific provider
-      await tx.doctorSlots.deleteMany({
-        where: { doctorId },
-      })
+      await tx.doctorSlots.deleteMany({ where: { doctorId } })
 
-      // Step B: If new slots exist, write the updated record array matrix
-      if (data.slots.length > 0) {
+      if (slots.length > 0) {
         return await tx.doctorSlots.createMany({
-          data: data.slots.map((slot) => ({
+          data: slots.map((s) => ({
             doctorId,
-            day: slot.day,
-            startTimeMinutes: slot.startTimeMinutes,
-            endTimeMinutes: slot.endTimeMinutes,
+            day: s.day,
+            startTimeMinutes: s.startTimeMinutes,
+            endTimeMinutes: s.endTimeMinutes,
           })),
         })
       }
-
       return { count: 0 }
     })
     return { success: true, recordsUpdated: result.count }
+  })
+
+export const getDoctorNameById = createServerFn({ method: 'GET' })
+  .validator(SearchSchema)
+  .middleware([authFnMiddleware]) // Keeps your standard auth verification active
+  .handler(async ({ data }) => {
+    // Changed to findFirst to safely accommodate the non-unique 'role' constraint
+    const doctor = await prisma.user.findFirst({
+      where: {
+        id: data.search,
+        role: Roles.Doctor,
+      },
+      select: {
+        name: true,
+      },
+    })
+
+    return doctor || null
+  })
+
+export const getAppointmentDashboardData = createServerFn({ method: 'GET' })
+  .validator(DashboardDataSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data }) => {
+    const { doctorId, shouldFetchName, shouldFetchQualification } = data
+    const loadedState = getInitialScheduleState()
+
+    // Database query execution stays strictly on the server
+    const doctorProfile = await prisma.user.findUnique({
+      where: { id: doctorId },
+      select: {
+        name: shouldFetchName,
+        qualification: shouldFetchQualification,
+        doctorSlots: {
+          select: {
+            day: true,
+            startTimeMinutes: true,
+            endTimeMinutes: true,
+          },
+          orderBy: [{ day: 'asc' }, { startTimeMinutes: 'asc' }],
+        },
+      },
+    })
+
+    const dbSlots = doctorProfile?.doctorSlots || []
+
+    // Transformation logic executes on the server before sending clean JSON to the browser
+    for (let i = 0; i < dbSlots.length; i++) {
+      const slot = dbSlots[i]
+      const dayKey = slot.day as DayOfWeek
+
+      const startH = Math.floor(slot.startTimeMinutes / 60)
+        .toString()
+        .padStart(2, '0')
+      const startM = (slot.startTimeMinutes % 60).toString().padStart(2, '0')
+      const endH = Math.floor(slot.endTimeMinutes / 60)
+        .toString()
+        .padStart(2, '0')
+      const endM = (slot.endTimeMinutes % 60).toString().padStart(2, '0')
+
+      if (loadedState[dayKey]) {
+        loadedState[dayKey].push({
+          startTime: `${startH}:${startM}`,
+          endTime: `${endH}:${endM}`,
+        })
+      }
+    }
+
+    return {
+      initialSchedule: loadedState,
+      // resolvedName: doctorProfile?.name || null,
+      // resolvedQualification: doctorProfile?.qualification || null,
+    }
   })

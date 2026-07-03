@@ -1,7 +1,9 @@
 import { type LucideIcon } from 'lucide-react'
-import { Gender, Roles } from '@/generated/prisma/browser'
+
 import type { UploadedFileInfo } from './vercel-action'
 import type { MedicineItem } from '#/components/addPatientMedicineDialog'
+import type { Gender, Roles } from '#/generated/prisma/enums'
+import { DayOfWeek } from '#/generated/prisma/enums'
 
 export interface AuthUser {
   id: string
@@ -135,4 +137,25 @@ export interface SinglePrescription {
 export interface TimeSlotItem {
   startTime: string
   endTime: string
+}
+
+export interface SearchParams {
+  doctorId?: string
+  doctorName?: string
+  doctorQualification?: string
+}
+
+export interface DoctorAppointment {
+  id: string
+  name: string
+  qualification: string
+}
+
+type WeeklyScheduleState = Record<DayOfWeek, TimeSlotItem[]>
+const DAYS_ARRAY = Object.values(DayOfWeek) as DayOfWeek[]
+
+export const getInitialScheduleState = (): WeeklyScheduleState => {
+  return Object.fromEntries(
+    DAYS_ARRAY.map((day) => [day, []]),
+  ) as unknown as WeeklyScheduleState
 }
