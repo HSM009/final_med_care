@@ -18,8 +18,10 @@ import { createAuthContext } from '#/lib/auth-injectors'
 import type { AuthContextResult, AuthUser } from '#/lib/types'
 import { AfkMonitor } from '#/components/afk-monitor'
 import type { Roles } from '#/generated/prisma/enums'
+import { ConfirmProvider } from '#/hooks/confirm-context'
+import { GlobalConfirmDialog } from '#/components/web/confirmationDialog'
 
-interface MyRouterContext {
+export interface MyRouterContext {
   queryClient: QueryClient
   auth: AuthContextResult
 }
@@ -76,15 +78,17 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   const userRole = auth.user?.role as Roles
   const authUser = auth.user as AuthUser
   return (
-    <AfkMonitor type={userRole} user={authUser}>
-      <QueryClientProvider client={queryClient}>
-        <html lang="en" suppressHydrationWarning>
-          <head>
-            <HeadContent />
-          </head>
-          <body>
-            <ThemeProvider>
-              {children}
+    <QueryClientProvider client={queryClient}>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
+          <ThemeProvider>
+            <ConfirmProvider>
+              <AfkMonitor type={userRole} user={authUser}>
+                {children}
+              </AfkMonitor>
               <Toaster
                 position="top-center"
                 toastOptions={{
@@ -93,11 +97,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                   },
                 }}
               />
-            </ThemeProvider>
-            <Scripts />
-          </body>
-        </html>
-      </QueryClientProvider>
-    </AfkMonitor>
+              <GlobalConfirmDialog />
+            </ConfirmProvider>
+          </ThemeProvider>
+          <Scripts />
+        </body>
+      </html>
+    </QueryClientProvider>
   )
 }

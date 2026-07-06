@@ -1,12 +1,12 @@
 import type { Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
-import { toast } from 'sonner'
+import { showToast } from '#/lib/showToast'
 
 export async function handleAfkSignOut(type: Roles, navigate: any) {
   await authClient.signOut({
     fetchOptions: {
       onSuccess: () => {
-        toast.info('Session expired due to inactivity.')
+        showToast.info('Session expired due to inactivity.')
         navigate({
           to: '/login',
           search: {

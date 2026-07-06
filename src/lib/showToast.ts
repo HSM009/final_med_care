@@ -8,7 +8,7 @@ const getToastStyle = (type: ToastType): React.CSSProperties => {
     success: { light: '#16a34a', dark: '#4ade80' },
     info: { light: '#0284c7', dark: '#38bdf8' },
     warning: { light: '#d97706', dark: '#fbbf24' },
-    error: { light: 'var(--destructive)', dark: 'var(--destructive)' },
+    error: { light: '#82181a', dark: '#82181a' },
     loading: { light: '#0284c7', dark: '#38bdf8' },
   }
   const { light, dark } = configs[type]
@@ -21,7 +21,6 @@ const getToastStyle = (type: ToastType): React.CSSProperties => {
   } as React.CSSProperties
 }
 
-// ✅ Merge our custom styles with any incoming Sonner options (like id)
 export const showToast = {
   success: (msg: string, options?: ExternalToast) =>
     toast.success(msg, { ...options, style: getToastStyle('success') }),

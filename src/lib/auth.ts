@@ -87,22 +87,22 @@ export const auth = betterAuth({
             const lastPatientInYear = await tx.user.findFirst({
               where: {
                 role: Roles.Patient, // Enforce tracking only against existing patients
-                med_care_id: {
+                medCareId: {
                   startsWith: `MC-${currentYear}-`,
                 },
               },
               orderBy: {
-                med_care_id: 'desc',
+                medCareId: 'desc',
               },
               select: {
-                med_care_id: true,
+                medCareId: true,
               },
             })
 
             let nextSerial = 1
 
-            if (lastPatientInYear && lastPatientInYear.med_care_id) {
-              const parts = lastPatientInYear.med_care_id.split('-')
+            if (lastPatientInYear && lastPatientInYear.medCareId) {
+              const parts = lastPatientInYear.medCareId.split('-')
               const lastSerial = parseInt(parts[2], 10)
               if (!isNaN(lastSerial)) {
                 nextSerial = lastSerial + 1
