@@ -96,6 +96,7 @@ export type UserCountAggregateOutputType = {
   medCareId: number
   emailVerified: number
   role: number
+  specialties: number
   banned: number
   bannedReason: number
   banReason: number
@@ -181,6 +182,7 @@ export type UserCountAggregateInputType = {
   medCareId?: true
   emailVerified?: true
   role?: true
+  specialties?: true
   banned?: true
   bannedReason?: true
   banReason?: true
@@ -293,6 +295,7 @@ export type UserGroupByOutputType = {
   medCareId: string | null
   emailVerified: boolean
   role: $Enums.Roles
+  specialties: $Enums.Specialty[]
   banned: boolean | null
   bannedReason: string | null
   banReason: string | null
@@ -341,6 +344,7 @@ export type UserWhereInput = {
   medCareId?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.EnumRolesFilter<"User"> | $Enums.Roles
+  specialties?: Prisma.EnumSpecialtyNullableListFilter<"User">
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -373,6 +377,7 @@ export type UserOrderByWithRelationInput = {
   medCareId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  specialties?: Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -408,6 +413,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   gender?: Prisma.EnumGenderFilter<"User"> | $Enums.Gender
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.EnumRolesFilter<"User"> | $Enums.Roles
+  specialties?: Prisma.EnumSpecialtyNullableListFilter<"User">
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableFilter<"User"> | string | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
@@ -440,6 +446,7 @@ export type UserOrderByWithAggregationInput = {
   medCareId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  specialties?: Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   bannedReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -473,6 +480,7 @@ export type UserScalarWhereWithAggregatesInput = {
   medCareId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   role?: Prisma.EnumRolesWithAggregatesFilter<"User"> | $Enums.Roles
+  specialties?: Prisma.EnumSpecialtyNullableListFilter<"User">
   banned?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   bannedReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -498,6 +506,7 @@ export type UserCreateInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -530,6 +539,7 @@ export type UserUncheckedCreateInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -562,6 +572,7 @@ export type UserUpdateInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -594,6 +605,7 @@ export type UserUncheckedUpdateInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -626,6 +638,7 @@ export type UserCreateManyInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -651,6 +664,7 @@ export type UserUpdateManyMutationInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -676,6 +690,7 @@ export type UserUncheckedUpdateManyInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -687,6 +702,14 @@ export type UserUncheckedUpdateManyInput = {
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type EnumSpecialtyNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.Specialty[] | Prisma.ListEnumSpecialtyFieldRefInput<$PrismaModel> | null
+  has?: $Enums.Specialty | Prisma.EnumSpecialtyFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.Specialty[] | Prisma.ListEnumSpecialtyFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.Specialty[] | Prisma.ListEnumSpecialtyFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -701,6 +724,7 @@ export type UserCountOrderByAggregateInput = {
   medCareId?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  specialties?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   bannedReason?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
@@ -782,6 +806,10 @@ export type UserNullableScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput | null
 }
 
+export type UserCreatespecialtiesInput = {
+  set: $Enums.Specialty[]
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -804,6 +832,11 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type EnumRolesFieldUpdateOperationsInput = {
   set?: $Enums.Roles
+}
+
+export type UserUpdatespecialtiesInput = {
+  set?: $Enums.Specialty[]
+  push?: $Enums.Specialty | $Enums.Specialty[]
 }
 
 export type NullableBoolFieldUpdateOperationsInput = {
@@ -942,6 +975,7 @@ export type UserCreateWithoutSessionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -973,6 +1007,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1020,6 +1055,7 @@ export type UserUpdateWithoutSessionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1051,6 +1087,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1082,6 +1119,7 @@ export type UserCreateWithoutAccountsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1113,6 +1151,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1160,6 +1199,7 @@ export type UserUpdateWithoutAccountsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1191,6 +1231,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1222,6 +1263,7 @@ export type UserCreateWithoutPatientPrescriptionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1253,6 +1295,7 @@ export type UserUncheckedCreateWithoutPatientPrescriptionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1289,6 +1332,7 @@ export type UserCreateWithoutDoctorPrescriptionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1320,6 +1364,7 @@ export type UserUncheckedCreateWithoutDoctorPrescriptionsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1367,6 +1412,7 @@ export type UserUpdateWithoutPatientPrescriptionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1398,6 +1444,7 @@ export type UserUncheckedUpdateWithoutPatientPrescriptionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1440,6 +1487,7 @@ export type UserUpdateWithoutDoctorPrescriptionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1471,6 +1519,7 @@ export type UserUncheckedUpdateWithoutDoctorPrescriptionsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1502,6 +1551,7 @@ export type UserCreateWithoutPatientAppointmentsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1533,6 +1583,7 @@ export type UserUncheckedCreateWithoutPatientAppointmentsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1569,6 +1620,7 @@ export type UserCreateWithoutDoctorAppointmentsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1600,6 +1652,7 @@ export type UserUncheckedCreateWithoutDoctorAppointmentsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1647,6 +1700,7 @@ export type UserUpdateWithoutPatientAppointmentsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1678,6 +1732,7 @@ export type UserUncheckedUpdateWithoutPatientAppointmentsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1720,6 +1775,7 @@ export type UserUpdateWithoutDoctorAppointmentsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1751,6 +1807,7 @@ export type UserUncheckedUpdateWithoutDoctorAppointmentsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1782,6 +1839,7 @@ export type UserCreateWithoutDoctorSlotsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1813,6 +1871,7 @@ export type UserUncheckedCreateWithoutDoctorSlotsInput = {
   medCareId?: string | null
   emailVerified?: boolean
   role?: $Enums.Roles
+  specialties?: Prisma.UserCreatespecialtiesInput | $Enums.Specialty[]
   banned?: boolean | null
   bannedReason?: string | null
   banReason?: string | null
@@ -1860,6 +1919,7 @@ export type UserUpdateWithoutDoctorSlotsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1891,6 +1951,7 @@ export type UserUncheckedUpdateWithoutDoctorSlotsInput = {
   medCareId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRolesFieldUpdateOperationsInput | $Enums.Roles
+  specialties?: Prisma.UserUpdatespecialtiesInput | $Enums.Specialty[]
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   bannedReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2007,6 +2068,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   medCareId?: boolean
   emailVerified?: boolean
   role?: boolean
+  specialties?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -2040,6 +2102,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   medCareId?: boolean
   emailVerified?: boolean
   role?: boolean
+  specialties?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -2065,6 +2128,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   medCareId?: boolean
   emailVerified?: boolean
   role?: boolean
+  specialties?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -2090,6 +2154,7 @@ export type UserSelectScalar = {
   medCareId?: boolean
   emailVerified?: boolean
   role?: boolean
+  specialties?: boolean
   banned?: boolean
   bannedReason?: boolean
   banReason?: boolean
@@ -2103,7 +2168,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "name" | "email" | "qualification" | "cellNo" | "dateOfBirth" | "gender" | "medCareId" | "emailVerified" | "role" | "banned" | "bannedReason" | "banReason" | "bannedUntil" | "banExpires" | "impersonatedBy" | "impersonatorId" | "failedAttempts" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "name" | "email" | "qualification" | "cellNo" | "dateOfBirth" | "gender" | "medCareId" | "emailVerified" | "role" | "specialties" | "banned" | "bannedReason" | "banReason" | "bannedUntil" | "banExpires" | "impersonatedBy" | "impersonatorId" | "failedAttempts" | "image" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
@@ -2140,6 +2205,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     medCareId: string | null
     emailVerified: boolean
     role: $Enums.Roles
+    specialties: $Enums.Specialty[]
     banned: boolean | null
     bannedReason: string | null
     banReason: string | null
@@ -2592,6 +2658,7 @@ export interface UserFieldRefs {
   readonly medCareId: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly role: Prisma.FieldRef<"User", 'Roles'>
+  readonly specialties: Prisma.FieldRef<"User", 'Specialty[]'>
   readonly banned: Prisma.FieldRef<"User", 'Boolean'>
   readonly bannedReason: Prisma.FieldRef<"User", 'String'>
   readonly banReason: Prisma.FieldRef<"User", 'String'>

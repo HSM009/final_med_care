@@ -7,8 +7,8 @@ import type { AuthUser } from '#/lib/types'
 import { showToast } from '#/lib/showToast'
 
 // Constants calculated in milliseconds
-const TOTAL_TIMEOUT_MS = 1000 * 60 * 10 // 15 Minutes total session duration
-const WARNING_THRESHOLD_MS = 1000 * 60 * 3 // 5 Minutes warning threshold
+const TOTAL_TIMEOUT_MS = 1000 * 60 * 10 // 10 Minutes total session duration
+const WARNING_THRESHOLD_MS = 1000 * 60 * 2 // 2 Minutes warning threshold
 const QUIET_DURATION_MS = TOTAL_TIMEOUT_MS - WARNING_THRESHOLD_MS // 10 Minutes silent mode
 
 interface AfkInterface {
@@ -53,6 +53,7 @@ export function AfkMonitor({ type, user, children }: AfkInterface) {
             <span className="text-red-600 font-bold animate-pulse">
               {formattedTime}
             </span>{' '}
+            {minutes === 0 ? 'minute ' : 'minutes '}
             due to inactivity.
           </span>
         ),

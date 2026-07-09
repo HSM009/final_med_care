@@ -1054,6 +1054,7 @@ export const UserScalarFieldEnum = {
   medCareId: 'medCareId',
   emailVerified: 'emailVerified',
   role: 'role',
+  specialties: 'specialties',
   banned: 'banned',
   bannedReason: 'bannedReason',
   banReason: 'banReason',
@@ -1150,7 +1151,6 @@ export const AppointmentScalarFieldEnum = {
   patientId: 'patientId',
   doctorId: 'doctorId',
   date: 'date',
-  time: 'time',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1165,8 +1165,7 @@ export const DoctorSlotsScalarFieldEnum = {
   day: 'day',
   startTimeMinutes: 'startTimeMinutes',
   endTimeMinutes: 'endTimeMinutes',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  createdAt: 'createdAt'
 } as const
 
 export type DoctorSlotsScalarFieldEnum = (typeof DoctorSlotsScalarFieldEnum)[keyof typeof DoctorSlotsScalarFieldEnum]
@@ -1262,6 +1261,20 @@ export type EnumRolesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
  * Reference to a field of type 'Roles[]'
  */
 export type ListEnumRolesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Roles[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Specialty[]'
+ */
+export type ListEnumSpecialtyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Specialty[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Specialty'
+ */
+export type EnumSpecialtyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Specialty'>
     
 
 

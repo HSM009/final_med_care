@@ -20,7 +20,7 @@ model User {
   medCareId             String?  
   emailVerified         Boolean     @default(false)
   role                  Roles       @default(Patient) 
-
+  specialties           Specialty[]
   banned                Boolean?    @default(true)
   bannedReason          String?     @default("Pending for admin for access")
   banReason             String?     @default("Pending for admin for access")
@@ -129,11 +129,10 @@ model Appointment { //--Booking
   patient                 User?             @relation("PatientRelation", fields: [patientId], references: [id])  
   doctorId                String?
   doctor                  User?             @relation("DoctorRelation", fields: [doctorId], references: [id])
-  date                    String
-  time                    String
+  date                    DateTime
   status                  AppointmentStatus
   createdAt               DateTime    @default(now())
-  updatedAt               DateTime    @updatedAt
+  updatedAt               DateTime?    @updatedAt
   
   @@index([id])
   @@index([doctorId, date])
@@ -179,4 +178,11 @@ enum Roles {
   Patient
   Doctor
   Admin
+}
+
+enum Specialty{
+    Cardiology
+    Dermatology
+    General_Medicine @map("General Medicine")
+    Pediatrics
 }

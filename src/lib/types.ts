@@ -159,3 +159,22 @@ export const getInitialScheduleState = (): WeeklyScheduleState => {
     DAYS_ARRAY.map((day) => [day, []]),
   ) as unknown as WeeklyScheduleState
 }
+
+export function formatMinutesToTimeStr(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60)
+  const mins = totalMinutes % 60
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  const displayHours = hours % 12 === 0 ? 12 : hours % 12
+  const displayMins = mins.toString().padStart(2, '0')
+  return `${displayHours}:${displayMins} ${ampm}`
+}
+
+export const PRISMA_DAYS_ARRAY: DayOfWeek[] = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+]

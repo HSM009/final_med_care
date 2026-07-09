@@ -1,4 +1,4 @@
-import { DayOfWeek, Gender, Roles } from '@/generated/prisma/enums'
+import { DayOfWeek, Gender, Roles, Specialty } from '@/generated/prisma/enums'
 import z from 'zod'
 
 export const loginSchema = z.object({
@@ -258,4 +258,20 @@ export const DashboardDataSchema = z.object({
   doctorId: z.string(),
   shouldFetchName: z.boolean().default(false),
   shouldFetchQualification: z.boolean().default(false),
+})
+
+export const SpecialtySchema = z.nativeEnum(Specialty)
+export const DoctorIdSchema = z.object({
+  doctorId: z.string(),
+})
+
+export const SlotsQuerySchema = z.object({
+  doctorId: z.string(),
+  dateString: z.string(), // Format: "YYYY-MM-DD"
+})
+
+export const CreateAppointmentSchema = z.object({
+  doctorId: z.string(),
+  dateString: z.string(), // e.g., "2026-07-08"
+  timeMinutes: z.union([z.string(), z.number()]), // Handles raw string from select components
 })

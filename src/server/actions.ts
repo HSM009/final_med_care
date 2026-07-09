@@ -5,23 +5,31 @@ import { authFnMiddleware } from '#/middlewares/auth'
 import {
   addOrUpdateMedicineSchema,
   addPatientMedicineSearch,
+  CreateAppointmentSchema,
   DashboardDataSchema,
+  DoctorIdSchema,
   // addPatientSchema,
   medicineSearchSchema,
   patientSearchSchema,
   SearchSchema,
+  SlotsQuerySchema,
+  SpecialtySchema,
   submitPrescriptionSchema,
   updateMedicineSchema,
   updatePrescriptionSchema,
   upsertDoctorSlotsSchema,
 } from '#/schemas/auth'
 import { createServerFn } from '@tanstack/react-start'
-import { DayOfWeek, Roles } from '#/generated/prisma/enums'
+import { AppointmentStatus, DayOfWeek, Roles } from '#/generated/prisma/enums'
 import { authClient } from '#/lib/auth-client'
 import { queryOptions } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { showToast } from '#/lib/showToast'
-import { getInitialScheduleState } from '#/lib/types'
+import {
+  formatMinutesToTimeStr,
+  getInitialScheduleState,
+  PRISMA_DAYS_ARRAY,
+} from '#/lib/types'
 
 export const addPatientAction = async (data: any) => {
   return await authClient.signUp.email({
@@ -387,7 +395,6 @@ export const getAppointmentDashboardData = createServerFn({ method: 'GET' })
     const { doctorId, shouldFetchName, shouldFetchQualification } = data
     const loadedState = getInitialScheduleState()
 
-    // Database query execution stays strictly on the server
     const doctorProfile = await prisma.user.findUnique({
       where: { id: doctorId },
       select: {
@@ -406,7 +413,6 @@ export const getAppointmentDashboardData = createServerFn({ method: 'GET' })
 
     const dbSlots = doctorProfile?.doctorSlots || []
 
-    // Transformation logic executes on the server before sending clean JSON to the browser
     for (let i = 0; i < dbSlots.length; i++) {
       const slot = dbSlots[i]
       const dayKey = slot.day as DayOfWeek
@@ -430,7 +436,229 @@ export const getAppointmentDashboardData = createServerFn({ method: 'GET' })
 
     return {
       initialSchedule: loadedState,
-      // resolvedName: doctorProfile?.name || null,
-      // resolvedQualification: doctorProfile?.qualification || null,
     }
+  })
+
+export const getPatientDashboardOverview = createServerFn({ method: 'GET' })
+  .middleware([authFnMiddleware])
+  .handler(async ({ context }) => {
+    const overViewData = await prisma.appointment.findMany({
+      where: {
+        patientId: context.session.user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        date: true,
+        status: true,
+        createdAt: true,
+        doctor: {
+          select: {
+            name: true,
+            qualification: true,
+            specialties: true,
+          },
+        },
+      },
+    })
+
+    return overViewData
+  })
+
+export const getPatientDashboardOverviewQueryOptions = () =>
+  queryOptions({
+    queryKey: ['overViewData'],
+    queryFn: async () => {
+      const response = await getPatientDashboardOverview()
+      return response
+    },
+    staleTime: 1000 * 60 * 10,
+  })
+
+// Day mapper to bridge JavaScript's Date.getDay() (0-6) with your Prisma Enum
+
+/**
+ * 1. Fetch Verified Doctors based on your Specialty[] array field
+ */
+const serverGetDoctorsBySpecialty = createServerFn({ method: 'GET' })
+  .validator((data: unknown) => SpecialtySchema.parse(data))
+  .handler(async ({ data: chosenSpecialty }) => {
+    return await prisma.user.findMany({
+      where: {
+        role: Roles.Doctor,
+        specialties: {
+          has: chosenSpecialty, // Matches your Specialty[] list setup perfectly
+        },
+        OR: [{ banned: false }, { banned: null }],
+      },
+      select: {
+        id: true,
+        name: true,
+        title: true,
+        qualification: true,
+      },
+      orderBy: { name: 'asc' },
+    })
+  })
+
+/**
+ * 2. Generate a rolling 14-day booking calendar based on recurring DoctorSlots
+ */
+const serverGetDoctorAvailableDates = createServerFn({ method: 'GET' })
+  .validator(DoctorIdSchema)
+  .handler(async ({ data: { doctorId } }) => {
+    // 1. Immediately fetch the unique active working days for this doctor
+    const activeSlots = await prisma.doctorSlots.findMany({
+      where: { doctorId: doctorId },
+      select: { day: true },
+      distinct: ['day'],
+    })
+    // If the doctor hasn't setup any recurring slots, exit early to save cycles
+    if (activeSlots.length === 0) {
+      console.warn(
+        `[Booking System] Doctor ID ${doctorId} has no records in DoctorSlots table.`,
+      )
+      return []
+    }
+
+    const activeDaysSet = new Set(activeSlots.map((s) => s.day))
+    const results: { dateString: string; displayLabel: string }[] = []
+
+    // 2. Establish a timezone-safe baseline matching the client's current calendar day
+    const baseDate = new Date()
+
+    // 3. Loop exactly 7 days forward
+    for (let i = 0; i < 7; i++) {
+      const loopDate = new Date(baseDate)
+      loopDate.setDate(baseDate.getDate() + i) // Pure independent offset calculation
+
+      // Map JavaScript's localized 0-6 index safely to your Prisma DayOfWeek Enum
+      const dayNameInPrisma = PRISMA_DAYS_ARRAY[loopDate.getDay()]
+
+      // Only include the day if the doctor actually has slots defined for it
+      if (activeDaysSet.has(dayNameInPrisma)) {
+        // Format as a clean date-only string: YYYY-MM-DD
+        const year = loopDate.getFullYear()
+        const month = String(loopDate.getMonth() + 1).padStart(2, '0')
+        const day = String(loopDate.getDate()).padStart(2, '0')
+        const isoDateString = `${year}-${month}-${day}`
+
+        results.push({
+          dateString: isoDateString,
+          displayLabel: loopDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+          }),
+        })
+      }
+    }
+
+    return results
+  })
+
+/**
+ * 3. Evaluate active DoctorSlots against existing checked-out Appointments
+ */
+const serverGetDoctorTimeSlots = createServerFn({ method: 'GET' })
+  .validator((data: unknown) => SlotsQuerySchema.parse(data))
+  .handler(async ({ data: { doctorId, dateString } }) => {
+    const targetDate = new Date(dateString)
+    const dayOfWeekStr = PRISMA_DAYS_ARRAY[targetDate.getDay()]
+
+    // 1. Fetch all template slots defined for this recurring day
+    const baseSlots = await prisma.doctorSlots.findMany({
+      where: { doctorId, day: dayOfWeekStr },
+      orderBy: { startTimeMinutes: 'asc' },
+    })
+
+    // 2. Fetch all conflicting active bookings assigned on this calendar date range
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0))
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999))
+
+    const activeAppointments = await prisma.appointment.findMany({
+      where: {
+        doctorId,
+        date: { gte: startOfDay, lte: endOfDay },
+        status: { not: 'Cancelled' },
+      },
+      select: { date: true },
+    })
+
+    // Map booked hours to minutes from midnight to check availability
+    const bookedMinutesStream = new Set(
+      activeAppointments.map(
+        (appt) => appt.date.getHours() * 60 + appt.date.getMinutes(),
+      ),
+    )
+
+    // 3. Filter out any matching conflicts
+    return baseSlots
+      .filter((slot) => !bookedMinutesStream.has(slot.startTimeMinutes))
+      .map((slot) => ({
+        rawMinutes: slot.startTimeMinutes,
+        displayLabel: `${formatMinutesToTimeStr(slot.startTimeMinutes)} - ${formatMinutesToTimeStr(slot.endTimeMinutes)}`,
+      }))
+  })
+
+export const medicalQueries = {
+  all: ['medical-core-matrix'] as const,
+
+  doctors: (specialty: string | undefined) =>
+    queryOptions({
+      queryKey: [...medicalQueries.all, 'doctors', specialty] as const,
+      queryFn: () => serverGetDoctorsBySpecialty({ data: specialty! }),
+      enabled: !!specialty,
+      staleTime: 1000 * 60 * 15, // Cache doctor directory for 15 minutes
+      gcTime: 1000 * 60 * 45,
+    }),
+
+  dates: (doctorId: string | undefined) =>
+    queryOptions({
+      queryKey: [...medicalQueries.all, 'dates', doctorId] as const,
+      queryFn: () =>
+        serverGetDoctorAvailableDates({ data: { doctorId: doctorId! } }),
+      enabled: !!doctorId,
+      staleTime: 1000 * 60 * 10, // Cache operational days for 10 minutes
+      gcTime: 1000 * 60 * 30,
+    }),
+
+  slots: (doctorId: string | undefined, dateString: string | undefined) =>
+    queryOptions({
+      queryKey: [...medicalQueries.all, 'slots', doctorId, dateString] as const,
+      queryFn: () =>
+        serverGetDoctorTimeSlots({
+          data: { doctorId: doctorId!, dateString: dateString! },
+        }),
+      enabled: !!doctorId && !!dateString,
+      staleTime: 1000 * 15,
+      gcTime: 1000 * 60 * 5,
+    }),
+}
+
+export const postPatientAppointment = createServerFn({ method: 'POST' })
+  .validator(CreateAppointmentSchema)
+  .middleware([authFnMiddleware])
+  .handler(async ({ data, context }) => {
+    const totalMinutes =
+      typeof data.timeMinutes === 'string'
+        ? parseInt(data.timeMinutes, 10)
+        : data.timeMinutes
+    const appointmentTimestamp = new Date(data.dateString)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+    appointmentTimestamp.setHours(hours, minutes, 0, 0)
+
+    await prisma.appointment.create({
+      data: {
+        patientId: context.session.user.id,
+        doctorId: data.doctorId,
+        date: appointmentTimestamp,
+        status: AppointmentStatus.Upcoming, // Matches standard default workflows
+      },
+    })
+
+    return { success: true }
   })

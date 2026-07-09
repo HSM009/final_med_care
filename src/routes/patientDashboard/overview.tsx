@@ -1,63 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   Calendar,
-  Activity,
-  ClipboardList,
   Clock,
   ArrowUpRight,
   User,
   ShieldAlert,
+  Activity,
 } from 'lucide-react'
+import { getPatientDashboardOverviewQueryOptions } from '#/server/actions'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { AppointmentStatus } from '#/generated/prisma/enums'
 
 export const Route = createFileRoute('/patientDashboard/overview')({
+  loader: ({ context }) => {
+    const { auth, queryClient } = context
+
+    queryClient.prefetchQuery(getPatientDashboardOverviewQueryOptions())
+    return { auth }
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { auth } = Route.useRouteContext()
+  const { auth } = Route.useLoaderData()
   const user = auth.user
-  const stats = [
-    {
-      title: 'Next Appointment',
-      value: 'Tom, 10:30 AM',
-      icon: Calendar,
-      description: 'Dr. Sarah Khan (Cardio)',
-      color: 'text-emerald-600 bg-emerald-500/10',
-    },
-    {
-      title: 'Active Prescriptions',
-      value: '3 Active Meds',
-      icon: ClipboardList,
-      description: '2 pending refills remaining',
-      color: 'text-blue-600 bg-blue-500/10',
-    },
-    {
-      title: 'Latest Vitals Status',
-      value: '120/80 mmHg',
-      icon: Activity,
-      description: 'Recorded 2 days ago (Normal)',
-      color: 'text-purple-600 bg-purple-500/10',
-    },
-  ]
-
-  const upcomingAppointments = [
-    {
-      id: 1,
-      doctor: 'Dr. Sarah Khan',
-      specialty: 'Cardiologist',
-      date: 'July 02, 2026',
-      time: '10:30 AM',
-      status: 'Confirmed',
-    },
-    {
-      id: 2,
-      doctor: 'Dr. Asif Ali',
-      specialty: 'Dermatologist',
-      date: 'July 15, 2026',
-      time: '02:15 PM',
-      status: 'Pending Review',
-    },
-  ]
+  const { data: appointments } = useSuspenseQuery(
+    getPatientDashboardOverviewQueryOptions(),
+  )
 
   const recentLogs = [
     {
@@ -80,6 +49,12 @@ function RouteComponent() {
     },
   ]
 
+  const navigate = useNavigate()
+  const handleAppointment = () => {
+    navigate({
+      to: '/patientDashboard/appointment',
+    })
+  }
   return (
     <div className="space-y-6">
       {/* Welcome Header Column Layout */}
@@ -95,29 +70,40 @@ function RouteComponent() {
 
       {/* Grid Stats Deck Matrix */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat, idx) => (
+        {appointments.slice(0, 2).map((appointment, idx) => (
           <div
             key={idx}
             className="p-5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 shadow-xs flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {stat.title}
+                {appointment.status}
               </span>
-              <div className={`p-2 rounded-lg ${stat.color}`}>
-                <stat.icon className="size-4.5" />
+              <div
+                className={`p-2 rounded-lg text-emerald-600 bg-emerald-500/10`}
+              >
+                {idx === 0 ? (
+                  <Calendar className="size-4.5" />
+                ) : (
+                  <Activity className="size-4.5" />
+                )}
               </div>
             </div>
             <div className="mt-4">
               <span className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
-                {stat.value}
+                {appointment.date.toLocaleDateString()}
               </span>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
-                {stat.description}
+                {appointment.doctor?.name +
+                  ' ' +
+                  appointment.doctor?.qualification +
+                  ' ' +
+                  appointment.doctor?.specialties}
               </p>
             </div>
           </div>
         ))}
+        <div></div>
       </div>
 
       {/* Split Console Layer Layout Matrix */}
@@ -131,13 +117,16 @@ function RouteComponent() {
                 Upcoming Consultations
               </h2>
             </div>
-            <button className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5 cursor-pointer">
+            <button
+              onClick={handleAppointment}
+              className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+            >
               Book Appointment <ArrowUpRight className="size-3" />
             </button>
           </div>
 
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800/40">
-            {upcomingAppointments.map((appt) => (
+            {appointments.slice(0, 3).map((appt) => (
               <div
                 key={appt.id}
                 className="flex flex-col sm:flex-row sm:items-center justify-between py-3.5 first:pt-0 last:pb-0 gap-3"
@@ -148,10 +137,12 @@ function RouteComponent() {
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-zinc-900 dark:text-white">
-                      {appt.doctor}
+                      {appt.doctor?.name}
                     </h3>
                     <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                      {appt.specialty}
+                      {appt.doctor?.qualification +
+                        ' ' +
+                        appt.doctor?.specialties}
                     </p>
                   </div>
                 </div>
@@ -159,13 +150,15 @@ function RouteComponent() {
                 <div className="flex items-center justify-between sm:justify-end gap-6">
                   <div className="text-left sm:text-right">
                     <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
-                      {appt.date}
+                      {appt.date.toLocaleDateString()}
                     </p>
-                    <p className="text-xs text-zinc-400">{appt.time}</p>
+                    <p className="text-xs text-zinc-400">
+                      {appt.createdAt.toLocaleDateString()}
+                    </p>
                   </div>
                   <span
                     className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      appt.status === 'Confirmed'
+                      appt.status === AppointmentStatus.Upcoming
                         ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                         : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                     }`}

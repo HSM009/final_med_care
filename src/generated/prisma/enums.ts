@@ -47,3 +47,13 @@ export const Roles = {
 } as const
 
 export type Roles = (typeof Roles)[keyof typeof Roles]
+
+
+export const Specialty = {
+  Cardiology: 'Cardiology',
+  Dermatology: 'Dermatology',
+  General_Medicine: 'General_Medicine',
+  Pediatrics: 'Pediatrics'
+} as const
+
+export type Specialty = (typeof Specialty)[keyof typeof Specialty]
