@@ -25,7 +25,8 @@ export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek]
 export const AppointmentStatus = {
   Upcoming: 'Upcoming',
   Completed: 'Completed',
-  Cancelled: 'Cancelled'
+  Cancelled: 'Cancelled',
+  NoShow: 'NoShow'
 } as const
 
 export type AppointmentStatus = (typeof AppointmentStatus)[keyof typeof AppointmentStatus]

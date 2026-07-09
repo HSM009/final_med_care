@@ -45,6 +45,7 @@ export type DoctorSlotsMinAggregateOutputType = {
   startTimeMinutes: number | null
   endTimeMinutes: number | null
   createdAt: Date | null
+  isBooked: boolean | null
 }
 
 export type DoctorSlotsMaxAggregateOutputType = {
@@ -54,6 +55,7 @@ export type DoctorSlotsMaxAggregateOutputType = {
   startTimeMinutes: number | null
   endTimeMinutes: number | null
   createdAt: Date | null
+  isBooked: boolean | null
 }
 
 export type DoctorSlotsCountAggregateOutputType = {
@@ -63,6 +65,7 @@ export type DoctorSlotsCountAggregateOutputType = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt: number
+  isBooked: number
   _all: number
 }
 
@@ -86,6 +89,7 @@ export type DoctorSlotsMinAggregateInputType = {
   startTimeMinutes?: true
   endTimeMinutes?: true
   createdAt?: true
+  isBooked?: true
 }
 
 export type DoctorSlotsMaxAggregateInputType = {
@@ -95,6 +99,7 @@ export type DoctorSlotsMaxAggregateInputType = {
   startTimeMinutes?: true
   endTimeMinutes?: true
   createdAt?: true
+  isBooked?: true
 }
 
 export type DoctorSlotsCountAggregateInputType = {
@@ -104,6 +109,7 @@ export type DoctorSlotsCountAggregateInputType = {
   startTimeMinutes?: true
   endTimeMinutes?: true
   createdAt?: true
+  isBooked?: true
   _all?: true
 }
 
@@ -200,6 +206,7 @@ export type DoctorSlotsGroupByOutputType = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt: Date
+  isBooked: boolean
   _count: DoctorSlotsCountAggregateOutputType | null
   _avg: DoctorSlotsAvgAggregateOutputType | null
   _sum: DoctorSlotsSumAggregateOutputType | null
@@ -232,6 +239,7 @@ export type DoctorSlotsWhereInput = {
   startTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   endTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   createdAt?: Prisma.DateTimeFilter<"DoctorSlots"> | Date | string
+  isBooked?: Prisma.BoolFilter<"DoctorSlots"> | boolean
   doctor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -242,6 +250,7 @@ export type DoctorSlotsOrderByWithRelationInput = {
   startTimeMinutes?: Prisma.SortOrder
   endTimeMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  isBooked?: Prisma.SortOrder
   doctor?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -256,6 +265,7 @@ export type DoctorSlotsWhereUniqueInput = Prisma.AtLeast<{
   startTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   endTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   createdAt?: Prisma.DateTimeFilter<"DoctorSlots"> | Date | string
+  isBooked?: Prisma.BoolFilter<"DoctorSlots"> | boolean
   doctor?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "doctorId_day_startTimeMinutes">
 
@@ -266,6 +276,7 @@ export type DoctorSlotsOrderByWithAggregationInput = {
   startTimeMinutes?: Prisma.SortOrder
   endTimeMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  isBooked?: Prisma.SortOrder
   _count?: Prisma.DoctorSlotsCountOrderByAggregateInput
   _avg?: Prisma.DoctorSlotsAvgOrderByAggregateInput
   _max?: Prisma.DoctorSlotsMaxOrderByAggregateInput
@@ -283,6 +294,7 @@ export type DoctorSlotsScalarWhereWithAggregatesInput = {
   startTimeMinutes?: Prisma.IntWithAggregatesFilter<"DoctorSlots"> | number
   endTimeMinutes?: Prisma.IntWithAggregatesFilter<"DoctorSlots"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DoctorSlots"> | Date | string
+  isBooked?: Prisma.BoolWithAggregatesFilter<"DoctorSlots"> | boolean
 }
 
 export type DoctorSlotsCreateInput = {
@@ -290,6 +302,7 @@ export type DoctorSlotsCreateInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
   doctor?: Prisma.UserCreateNestedOneWithoutDoctorSlotsInput
 }
 
@@ -300,6 +313,7 @@ export type DoctorSlotsUncheckedCreateInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
 }
 
 export type DoctorSlotsUpdateInput = {
@@ -307,6 +321,7 @@ export type DoctorSlotsUpdateInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
   doctor?: Prisma.UserUpdateOneWithoutDoctorSlotsNestedInput
 }
 
@@ -317,6 +332,7 @@ export type DoctorSlotsUncheckedUpdateInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type DoctorSlotsCreateManyInput = {
@@ -326,6 +342,7 @@ export type DoctorSlotsCreateManyInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
 }
 
 export type DoctorSlotsUpdateManyMutationInput = {
@@ -333,6 +350,7 @@ export type DoctorSlotsUpdateManyMutationInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type DoctorSlotsUncheckedUpdateManyInput = {
@@ -342,6 +360,7 @@ export type DoctorSlotsUncheckedUpdateManyInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type DoctorSlotsListRelationFilter = {
@@ -367,6 +386,7 @@ export type DoctorSlotsCountOrderByAggregateInput = {
   startTimeMinutes?: Prisma.SortOrder
   endTimeMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  isBooked?: Prisma.SortOrder
 }
 
 export type DoctorSlotsAvgOrderByAggregateInput = {
@@ -382,6 +402,7 @@ export type DoctorSlotsMaxOrderByAggregateInput = {
   startTimeMinutes?: Prisma.SortOrder
   endTimeMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  isBooked?: Prisma.SortOrder
 }
 
 export type DoctorSlotsMinOrderByAggregateInput = {
@@ -391,6 +412,7 @@ export type DoctorSlotsMinOrderByAggregateInput = {
   startTimeMinutes?: Prisma.SortOrder
   endTimeMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  isBooked?: Prisma.SortOrder
 }
 
 export type DoctorSlotsSumOrderByAggregateInput = {
@@ -450,6 +472,7 @@ export type DoctorSlotsCreateWithoutDoctorInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
 }
 
 export type DoctorSlotsUncheckedCreateWithoutDoctorInput = {
@@ -458,6 +481,7 @@ export type DoctorSlotsUncheckedCreateWithoutDoctorInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
 }
 
 export type DoctorSlotsCreateOrConnectWithoutDoctorInput = {
@@ -496,6 +520,7 @@ export type DoctorSlotsScalarWhereInput = {
   startTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   endTimeMinutes?: Prisma.IntFilter<"DoctorSlots"> | number
   createdAt?: Prisma.DateTimeFilter<"DoctorSlots"> | Date | string
+  isBooked?: Prisma.BoolFilter<"DoctorSlots"> | boolean
 }
 
 export type DoctorSlotsCreateManyDoctorInput = {
@@ -504,6 +529,7 @@ export type DoctorSlotsCreateManyDoctorInput = {
   startTimeMinutes: number
   endTimeMinutes: number
   createdAt?: Date | string
+  isBooked?: boolean
 }
 
 export type DoctorSlotsUpdateWithoutDoctorInput = {
@@ -511,6 +537,7 @@ export type DoctorSlotsUpdateWithoutDoctorInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type DoctorSlotsUncheckedUpdateWithoutDoctorInput = {
@@ -519,6 +546,7 @@ export type DoctorSlotsUncheckedUpdateWithoutDoctorInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type DoctorSlotsUncheckedUpdateManyWithoutDoctorInput = {
@@ -527,6 +555,7 @@ export type DoctorSlotsUncheckedUpdateManyWithoutDoctorInput = {
   startTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   endTimeMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isBooked?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -538,6 +567,7 @@ export type DoctorSlotsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   startTimeMinutes?: boolean
   endTimeMinutes?: boolean
   createdAt?: boolean
+  isBooked?: boolean
   doctor?: boolean | Prisma.DoctorSlots$doctorArgs<ExtArgs>
 }, ExtArgs["result"]["doctorSlots"]>
 
@@ -548,6 +578,7 @@ export type DoctorSlotsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   startTimeMinutes?: boolean
   endTimeMinutes?: boolean
   createdAt?: boolean
+  isBooked?: boolean
   doctor?: boolean | Prisma.DoctorSlots$doctorArgs<ExtArgs>
 }, ExtArgs["result"]["doctorSlots"]>
 
@@ -558,6 +589,7 @@ export type DoctorSlotsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   startTimeMinutes?: boolean
   endTimeMinutes?: boolean
   createdAt?: boolean
+  isBooked?: boolean
   doctor?: boolean | Prisma.DoctorSlots$doctorArgs<ExtArgs>
 }, ExtArgs["result"]["doctorSlots"]>
 
@@ -568,9 +600,10 @@ export type DoctorSlotsSelectScalar = {
   startTimeMinutes?: boolean
   endTimeMinutes?: boolean
   createdAt?: boolean
+  isBooked?: boolean
 }
 
-export type DoctorSlotsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "day" | "startTimeMinutes" | "endTimeMinutes" | "createdAt", ExtArgs["result"]["doctorSlots"]>
+export type DoctorSlotsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "doctorId" | "day" | "startTimeMinutes" | "endTimeMinutes" | "createdAt" | "isBooked", ExtArgs["result"]["doctorSlots"]>
 export type DoctorSlotsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   doctor?: boolean | Prisma.DoctorSlots$doctorArgs<ExtArgs>
 }
@@ -593,6 +626,7 @@ export type $DoctorSlotsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     startTimeMinutes: number
     endTimeMinutes: number
     createdAt: Date
+    isBooked: boolean
   }, ExtArgs["result"]["doctorSlots"]>
   composites: {}
 }
@@ -1023,6 +1057,7 @@ export interface DoctorSlotsFieldRefs {
   readonly startTimeMinutes: Prisma.FieldRef<"DoctorSlots", 'Int'>
   readonly endTimeMinutes: Prisma.FieldRef<"DoctorSlots", 'Int'>
   readonly createdAt: Prisma.FieldRef<"DoctorSlots", 'DateTime'>
+  readonly isBooked: Prisma.FieldRef<"DoctorSlots", 'Boolean'>
 }
     
 

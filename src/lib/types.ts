@@ -85,8 +85,20 @@ export function formatDateToDMY(dateString: Date | string | number) {
     hour12: true,
   }).format(dateObj)
 
-  // Combined Output: "28-MAY-2026 09:15 PM"
   return `${datePart} ${timePart}`
+}
+export function formatDateToDMY2(dateString: Date | string | number) {
+  if (!dateString) return ''
+  const dateObj = new Date(dateString)
+  const datePart = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+    .format(dateObj)
+    .replace(/ /g, '-')
+    .toUpperCase()
+  return `${datePart}`
 }
 
 export interface AppPaginationNavProps {

@@ -146,7 +146,7 @@ model DoctorSlots {
   startTimeMinutes      Int
   endTimeMinutes        Int  
   createdAt             DateTime    @default(now())
-
+  isBooked              Boolean    @default(false)
 
 @@unique([doctorId, day, startTimeMinutes])
 @@index([doctorId])
@@ -166,6 +166,7 @@ enum AppointmentStatus {
   Upcoming
   Completed
   Cancelled
+  NoShow
 }
 
 enum Gender {

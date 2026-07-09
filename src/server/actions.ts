@@ -372,9 +372,8 @@ export const upsertDoctorSlots = createServerFn({ method: 'POST' })
 
 export const getDoctorNameById = createServerFn({ method: 'GET' })
   .validator(SearchSchema)
-  .middleware([authFnMiddleware]) // Keeps your standard auth verification active
+  .middleware([authFnMiddleware])
   .handler(async ({ data }) => {
-    // Changed to findFirst to safely accommodate the non-unique 'role' constraint
     const doctor = await prisma.user.findFirst({
       where: {
         id: data.search,
@@ -477,11 +476,6 @@ export const getPatientDashboardOverviewQueryOptions = () =>
     staleTime: 1000 * 60 * 10,
   })
 
-// Day mapper to bridge JavaScript's Date.getDay() (0-6) with your Prisma Enum
-
-/**
- * 1. Fetch Verified Doctors based on your Specialty[] array field
- */
 const serverGetDoctorsBySpecialty = createServerFn({ method: 'GET' })
   .validator((data: unknown) => SpecialtySchema.parse(data))
   .handler(async ({ data: chosenSpecialty }) => {
@@ -503,19 +497,14 @@ const serverGetDoctorsBySpecialty = createServerFn({ method: 'GET' })
     })
   })
 
-/**
- * 2. Generate a rolling 14-day booking calendar based on recurring DoctorSlots
- */
 const serverGetDoctorAvailableDates = createServerFn({ method: 'GET' })
   .validator(DoctorIdSchema)
   .handler(async ({ data: { doctorId } }) => {
-    // 1. Immediately fetch the unique active working days for this doctor
     const activeSlots = await prisma.doctorSlots.findMany({
-      where: { doctorId: doctorId },
+      where: { doctorId: doctorId, isBooked: false },
       select: { day: true },
       distinct: ['day'],
     })
-    // If the doctor hasn't setup any recurring slots, exit early to save cycles
     if (activeSlots.length === 0) {
       console.warn(
         `[Booking System] Doctor ID ${doctorId} has no records in DoctorSlots table.`,
@@ -526,20 +515,15 @@ const serverGetDoctorAvailableDates = createServerFn({ method: 'GET' })
     const activeDaysSet = new Set(activeSlots.map((s) => s.day))
     const results: { dateString: string; displayLabel: string }[] = []
 
-    // 2. Establish a timezone-safe baseline matching the client's current calendar day
     const baseDate = new Date()
 
-    // 3. Loop exactly 7 days forward
     for (let i = 0; i < 7; i++) {
       const loopDate = new Date(baseDate)
       loopDate.setDate(baseDate.getDate() + i) // Pure independent offset calculation
 
-      // Map JavaScript's localized 0-6 index safely to your Prisma DayOfWeek Enum
       const dayNameInPrisma = PRISMA_DAYS_ARRAY[loopDate.getDay()]
 
-      // Only include the day if the doctor actually has slots defined for it
       if (activeDaysSet.has(dayNameInPrisma)) {
-        // Format as a clean date-only string: YYYY-MM-DD
         const year = loopDate.getFullYear()
         const month = String(loopDate.getMonth() + 1).padStart(2, '0')
         const day = String(loopDate.getDate()).padStart(2, '0')
@@ -559,22 +543,17 @@ const serverGetDoctorAvailableDates = createServerFn({ method: 'GET' })
     return results
   })
 
-/**
- * 3. Evaluate active DoctorSlots against existing checked-out Appointments
- */
 const serverGetDoctorTimeSlots = createServerFn({ method: 'GET' })
   .validator((data: unknown) => SlotsQuerySchema.parse(data))
   .handler(async ({ data: { doctorId, dateString } }) => {
     const targetDate = new Date(dateString)
     const dayOfWeekStr = PRISMA_DAYS_ARRAY[targetDate.getDay()]
 
-    // 1. Fetch all template slots defined for this recurring day
     const baseSlots = await prisma.doctorSlots.findMany({
       where: { doctorId, day: dayOfWeekStr },
       orderBy: { startTimeMinutes: 'asc' },
     })
 
-    // 2. Fetch all conflicting active bookings assigned on this calendar date range
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0))
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999))
 
@@ -587,14 +566,12 @@ const serverGetDoctorTimeSlots = createServerFn({ method: 'GET' })
       select: { date: true },
     })
 
-    // Map booked hours to minutes from midnight to check availability
     const bookedMinutesStream = new Set(
       activeAppointments.map(
         (appt) => appt.date.getHours() * 60 + appt.date.getMinutes(),
       ),
     )
 
-    // 3. Filter out any matching conflicts
     return baseSlots
       .filter((slot) => !bookedMinutesStream.has(slot.startTimeMinutes))
       .map((slot) => ({
@@ -646,18 +623,34 @@ export const postPatientAppointment = createServerFn({ method: 'POST' })
       typeof data.timeMinutes === 'string'
         ? parseInt(data.timeMinutes, 10)
         : data.timeMinutes
+
     const appointmentTimestamp = new Date(data.dateString)
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
     appointmentTimestamp.setHours(hours, minutes, 0, 0)
 
-    await prisma.appointment.create({
-      data: {
-        patientId: context.session.user.id,
-        doctorId: data.doctorId,
-        date: appointmentTimestamp,
-        status: AppointmentStatus.Upcoming, // Matches standard default workflows
-      },
+    const resolvedDayName = PRISMA_DAYS_ARRAY[appointmentTimestamp.getDay()]
+
+    await prisma.$transaction(async (tx) => {
+      await tx.appointment.create({
+        data: {
+          patientId: context.session.user.id, // Double-check if your middleware uses context.auth.user.id instead!
+          doctorId: data.doctorId,
+          date: appointmentTimestamp,
+          status: AppointmentStatus.Upcoming,
+        },
+      })
+
+      await tx.doctorSlots.update({
+        where: {
+          doctorId_day_startTimeMinutes: {
+            doctorId: data.doctorId,
+            startTimeMinutes: totalMinutes,
+            day: resolvedDayName,
+          },
+        },
+        data: { isBooked: true },
+      })
     })
 
     return { success: true }

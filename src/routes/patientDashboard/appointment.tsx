@@ -14,6 +14,8 @@ import {
 } from 'lucide-react'
 import { medicalQueries, postPatientAppointment } from '#/server/actions'
 import { showToast } from '#/lib/showToast'
+import { useConfirm } from '#/hooks/confirm-context'
+import { formatDateToDMY2 } from '#/lib/types'
 
 export const Route = createFileRoute('/patientDashboard/appointment')({
   component: RouteComponent,
@@ -77,13 +79,20 @@ function RouteComponent() {
       return updated
     })
   }
-
+  const confirm = useConfirm()
   const handleSubmit = async (e: React.FormEvent) => {
     showToast.loading('Creating the appointment.', { id: 'create-appoint' })
     e.preventDefault()
     if (!formData.doctorId || !formData.dateString || !formData.timeMinutes)
       return
     try {
+      const choice = await confirm({
+        title: 'Confirmation Alert?',
+        description: 'Are you sure you want to submit this appointment?.',
+        confirmText: 'Confirm',
+        variant: 'destructive', // Change to 'default' or 'emerald' if this isn't a deletion style action!
+      })
+      if (!choice) return
       const response = await postPatientAppointment({
         data: {
           doctorId: formData.doctorId,
@@ -147,7 +156,7 @@ function RouteComponent() {
             <span className="font-semibold text-zinc-400 w-24 shrink-0">
               Date Target:
             </span>
-            <span>{formData.dateString}</span>
+            <span>{formatDateToDMY2(formData.dateString)}</span>
           </div>
           <div className="flex items-start gap-2 text-zinc-700 dark:text-zinc-300">
             <span className="font-semibold text-zinc-400 w-24 shrink-0">
@@ -440,7 +449,7 @@ function RouteComponent() {
         {/* Sticky System Verification Matrix Panel */}
         <aside className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 shadow-xs space-y-4 lg:sticky lg:top-24">
           <h3 className="text-sm font-bold text-zinc-900 dark:text-white border-b border-zinc-100 dark:border-zinc-800/60 pb-2.5 flex items-center justify-between">
-            <span>Allocation Metrics</span>
+            <span>Appointment Status</span>
             <ChevronRight className="size-4 text-zinc-400" />
           </h3>
 
@@ -464,7 +473,7 @@ function RouteComponent() {
             <div className="flex justify-between items-center py-3">
               <span className="text-zinc-400 font-medium">Target Date:</span>
               <span className="font-mono font-semibold text-zinc-800 dark:text-zinc-200">
-                {formData.dateString || 'Not Configured'}
+                {formatDateToDMY2(formData.dateString) || 'Not Configured'}
               </span>
             </div>
             <div className="flex justify-between items-center py-3">
@@ -492,7 +501,7 @@ function RouteComponent() {
             }
             className="w-full py-3 text-xs font-bold rounded-xl text-center tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-800 disabled:text-zinc-400 transition-all cursor-pointer disabled:cursor-not-allowed font-mono shadow-md shadow-emerald-600/5"
           >
-            Lock Allocation Strategy
+            Submit Appointment.
           </button>
         </aside>
       </div>

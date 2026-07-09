@@ -1165,7 +1165,8 @@ export const DoctorSlotsScalarFieldEnum = {
   day: 'day',
   startTimeMinutes: 'startTimeMinutes',
   endTimeMinutes: 'endTimeMinutes',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isBooked: 'isBooked'
 } as const
 
 export type DoctorSlotsScalarFieldEnum = (typeof DoctorSlotsScalarFieldEnum)[keyof typeof DoctorSlotsScalarFieldEnum]
