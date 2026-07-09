@@ -29,6 +29,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthSignUpIndexRouteImport } from './routes/_auth/signUp/index'
 import { Route as AuthRoleSelectIndexRouteImport } from './routes/_auth/roleSelect/index'
 import { Route as AuthForgotPasswordIndexRouteImport } from './routes/_auth/forgotPassword/index'
+import { Route as ApiCronCleanupAppointmentRouteImport } from './routes/api/cron/cleanupAppointment'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdminApproveUserRouteImport } from './routes/api/admin/approve-user'
 
@@ -136,6 +137,12 @@ const AuthForgotPasswordIndexRoute = AuthForgotPasswordIndexRouteImport.update({
   path: '/forgotPassword/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const ApiCronCleanupAppointmentRoute =
+  ApiCronCleanupAppointmentRouteImport.update({
+    id: '/api/cron/cleanupAppointment',
+    path: '/api/cron/cleanupAppointment',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/cleanupAppointment': typeof ApiCronCleanupAppointmentRoute
   '/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/roleSelect/': typeof AuthRoleSelectIndexRoute
   '/signUp/': typeof AuthSignUpIndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/patientDashboard': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/cleanupAppointment': typeof ApiCronCleanupAppointmentRoute
   '/forgotPassword': typeof AuthForgotPasswordIndexRoute
   '/roleSelect': typeof AuthRoleSelectIndexRoute
   '/signUp': typeof AuthSignUpIndexRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/patientDashboard/': typeof PatientDashboardIndexRoute
   '/api/admin/approve-user': typeof ApiAdminApproveUserRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/cleanupAppointment': typeof ApiCronCleanupAppointmentRoute
   '/_auth/forgotPassword/': typeof AuthForgotPasswordIndexRoute
   '/_auth/roleSelect/': typeof AuthRoleSelectIndexRoute
   '/_auth/signUp/': typeof AuthSignUpIndexRoute
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/patientDashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
+    | '/api/cron/cleanupAppointment'
     | '/forgotPassword/'
     | '/roleSelect/'
     | '/signUp/'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/patientDashboard'
     | '/api/admin/approve-user'
     | '/api/auth/$'
+    | '/api/cron/cleanupAppointment'
     | '/forgotPassword'
     | '/roleSelect'
     | '/signUp'
@@ -282,6 +294,7 @@ export interface FileRouteTypes {
     | '/patientDashboard/'
     | '/api/admin/approve-user'
     | '/api/auth/$'
+    | '/api/cron/cleanupAppointment'
     | '/_auth/forgotPassword/'
     | '/_auth/roleSelect/'
     | '/_auth/signUp/'
@@ -294,6 +307,7 @@ export interface RootRouteChildren {
   PatientDashboardRouteRoute: typeof PatientDashboardRouteRouteWithChildren
   ApiAdminApproveUserRoute: typeof ApiAdminApproveUserRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCronCleanupAppointmentRoute: typeof ApiCronCleanupAppointmentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -438,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/api/cron/cleanupAppointment': {
+      id: '/api/cron/cleanupAppointment'
+      path: '/api/cron/cleanupAppointment'
+      fullPath: '/api/cron/cleanupAppointment'
+      preLoaderRoute: typeof ApiCronCleanupAppointmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -525,6 +546,7 @@ const rootRouteChildren: RootRouteChildren = {
   PatientDashboardRouteRoute: PatientDashboardRouteRouteWithChildren,
   ApiAdminApproveUserRoute: ApiAdminApproveUserRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCronCleanupAppointmentRoute: ApiCronCleanupAppointmentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
