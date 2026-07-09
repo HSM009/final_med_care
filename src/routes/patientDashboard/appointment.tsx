@@ -81,7 +81,6 @@ function RouteComponent() {
   }
   const confirm = useConfirm()
   const handleSubmit = async (e: React.FormEvent) => {
-    showToast.loading('Creating the appointment.', { id: 'create-appoint' })
     e.preventDefault()
     if (!formData.doctorId || !formData.dateString || !formData.timeMinutes)
       return
@@ -93,6 +92,7 @@ function RouteComponent() {
         variant: 'destructive', // Change to 'default' or 'emerald' if this isn't a deletion style action!
       })
       if (!choice) return
+      showToast.loading('Creating the appointment.', { id: 'create-appoint' })
       const response = await postPatientAppointment({
         data: {
           doctorId: formData.doctorId,

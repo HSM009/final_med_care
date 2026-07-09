@@ -6,7 +6,6 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        // 1. Grab the bearer token from the automated incoming request
         const authHeader = request.headers.get('Authorization')
 
         if (authHeader !== `Bearer ${process.env.CRON_SECRET_TOKEN}`) {
@@ -20,7 +19,6 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
         }
 
         try {
-          // 2. Perform your database operations
           const missed = await prisma.appointment.updateMany({
             where: {
               status: AppointmentStatus.Upcoming,

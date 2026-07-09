@@ -123,7 +123,7 @@ model MedicineList {
   @@index([id])
 }
 
-model Appointment { //--Booking 
+model Appointment {
   id                      Int         @id  @default(autoincrement())
   patientId               String?
   patient                 User?             @relation("PatientRelation", fields: [patientId], references: [id])  
