@@ -22,6 +22,7 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
 
           return Response.json({ success: true, updatedCount: missed.count })
         } catch (error: any) {
+          console.error('❌ CRON JOB DATABASE FAILURE:', error)
           return Response.json(
             { success: false, error: error.message },
             { status: 500 },
