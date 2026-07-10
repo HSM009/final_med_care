@@ -7,15 +7,8 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
     handlers: {
       GET: async ({ request }) => {
         const authHeader = request.headers.get('Authorization')
-
-        if (authHeader !== `Bearer ${process.env.CRON_SECRET_TOKEN}`) {
-          return new Response(
-            JSON.stringify({ error: 'Unauthorized access' }),
-            {
-              status: 401,
-              headers: { 'Content-Type': 'application/json' },
-            },
-          )
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+          return new Response('Unauthorized', { status: 401 })
         }
 
         try {

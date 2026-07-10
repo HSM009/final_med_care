@@ -501,7 +501,7 @@ function RouteComponent() {
             }
             className="w-full py-3 text-xs font-bold rounded-xl text-center tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-800 disabled:text-zinc-400 transition-all cursor-pointer disabled:cursor-not-allowed font-mono shadow-md shadow-emerald-600/5"
           >
-            Submit Appointment.
+            Submit Appointment
           </button>
         </aside>
       </div>

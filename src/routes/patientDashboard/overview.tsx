@@ -77,7 +77,7 @@ function RouteComponent() {
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {appointment.status}
+                {appointment.status} Appointment
               </span>
               <div
                 className={`p-2 rounded-lg text-emerald-600 bg-emerald-500/10`}
