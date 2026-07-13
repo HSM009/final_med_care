@@ -58,7 +58,8 @@ export const ModelName = {
   PatientPrescription: 'PatientPrescription',
   MedicineList: 'MedicineList',
   Appointment: 'Appointment',
-  DoctorSlots: 'DoctorSlots'
+  DoctorSlots: 'DoctorSlots',
+  CronJobsLog: 'CronJobsLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -205,6 +206,18 @@ export const DoctorSlotsScalarFieldEnum = {
 } as const
 
 export type DoctorSlotsScalarFieldEnum = (typeof DoctorSlotsScalarFieldEnum)[keyof typeof DoctorSlotsScalarFieldEnum]
+
+
+export const CronJobsLogScalarFieldEnum = {
+  id: 'id',
+  cronType: 'cronType',
+  cronStatus: 'cronStatus',
+  cronStatusText: 'cronStatusText',
+  updatedCount: 'updatedCount',
+  createdAt: 'createdAt'
+} as const
+
+export type CronJobsLogScalarFieldEnum = (typeof CronJobsLogScalarFieldEnum)[keyof typeof CronJobsLogScalarFieldEnum]
 
 
 export const SortOrder = {

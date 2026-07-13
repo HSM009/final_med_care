@@ -152,6 +152,29 @@ model DoctorSlots {
 @@index([doctorId])
 }
 
+model CronJobsLog {
+  id               Int       @id @default(autoincrement())
+  cronType         CronType
+  cronStatus       CronStatus
+  cronStatusText   String
+  updatedCount     Int
+  createdAt        DateTime  @default(now())
+
+  @@index([id])
+
+}
+
+enum CronType {
+  Upcoming_update_NoShow    
+  Email_sent_NoShow        
+}
+
+enum CronStatus {
+  Success
+  Failed
+  Warning
+}
+
 enum DayOfWeek {
   Monday
   Tuesday

@@ -57,3 +57,8 @@ export type Appointment = Prisma.AppointmentModel
  * 
  */
 export type DoctorSlots = Prisma.DoctorSlotsModel
+/**
+ * Model CronJobsLog
+ * 
+ */
+export type CronJobsLog = Prisma.CronJobsLogModel

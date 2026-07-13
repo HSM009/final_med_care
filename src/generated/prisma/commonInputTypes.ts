@@ -256,6 +256,40 @@ export type EnumDayOfWeekWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDayOfWeekFilter<$PrismaModel>
 }
 
+export type EnumCronTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronType | Prisma.EnumCronTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronTypeFilter<$PrismaModel> | $Enums.CronType
+}
+
+export type EnumCronStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronStatus | Prisma.EnumCronStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronStatusFilter<$PrismaModel> | $Enums.CronStatus
+}
+
+export type EnumCronTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronType | Prisma.EnumCronTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronTypeWithAggregatesFilter<$PrismaModel> | $Enums.CronType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCronTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCronTypeFilter<$PrismaModel>
+}
+
+export type EnumCronStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronStatus | Prisma.EnumCronStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronStatusWithAggregatesFilter<$PrismaModel> | $Enums.CronStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCronStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCronStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -509,6 +543,40 @@ export type NestedEnumDayOfWeekWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumDayOfWeekFilter<$PrismaModel>
   _max?: Prisma.NestedEnumDayOfWeekFilter<$PrismaModel>
+}
+
+export type NestedEnumCronTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronType | Prisma.EnumCronTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronTypeFilter<$PrismaModel> | $Enums.CronType
+}
+
+export type NestedEnumCronStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronStatus | Prisma.EnumCronStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronStatusFilter<$PrismaModel> | $Enums.CronStatus
+}
+
+export type NestedEnumCronTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronType | Prisma.EnumCronTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronType[] | Prisma.ListEnumCronTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronTypeWithAggregatesFilter<$PrismaModel> | $Enums.CronType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCronTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCronTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumCronStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CronStatus | Prisma.EnumCronStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CronStatus[] | Prisma.ListEnumCronStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCronStatusWithAggregatesFilter<$PrismaModel> | $Enums.CronStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCronStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCronStatusFilter<$PrismaModel>
 }
 
 

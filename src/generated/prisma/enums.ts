@@ -9,6 +9,23 @@
 * 🟢 You can import this file directly.
 */
 
+export const CronType = {
+  Upcoming_update_NoShow: 'Upcoming_update_NoShow',
+  Email_sent_NoShow: 'Email_sent_NoShow'
+} as const
+
+export type CronType = (typeof CronType)[keyof typeof CronType]
+
+
+export const CronStatus = {
+  Success: 'Success',
+  Failed: 'Failed',
+  Warning: 'Warning'
+} as const
+
+export type CronStatus = (typeof CronStatus)[keyof typeof CronStatus]
+
+
 export const DayOfWeek = {
   Monday: 'Monday',
   Tuesday: 'Tuesday',

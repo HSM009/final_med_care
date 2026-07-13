@@ -3,6 +3,7 @@ import { type LucideIcon } from 'lucide-react'
 import type { UploadedFileInfo } from './vercel-action'
 import type { MedicineItem } from '#/components/addPatientMedicineDialog'
 import type { Gender, Roles } from '#/generated/prisma/enums'
+import { CronType } from '#/generated/prisma/enums'
 import { DayOfWeek } from '#/generated/prisma/enums'
 
 export interface AuthUser {
@@ -190,3 +191,8 @@ export const PRISMA_DAYS_ARRAY: DayOfWeek[] = [
   'Friday',
   'Saturday',
 ]
+
+export const cronTypeDescriptions: Record<CronType, string> = {
+  [CronType.Upcoming_update_NoShow]: 'Upcoming Appointment updated to NoShow',
+  [CronType.Email_sent_NoShow]: 'Email sent to NoShow Appointment',
+}

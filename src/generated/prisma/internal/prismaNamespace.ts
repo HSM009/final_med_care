@@ -391,7 +391,8 @@ export const ModelName = {
   PatientPrescription: 'PatientPrescription',
   MedicineList: 'MedicineList',
   Appointment: 'Appointment',
-  DoctorSlots: 'DoctorSlots'
+  DoctorSlots: 'DoctorSlots',
+  CronJobsLog: 'CronJobsLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "patientPrescription" | "medicineList" | "appointment" | "doctorSlots"
+    modelProps: "user" | "session" | "account" | "verification" | "patientPrescription" | "medicineList" | "appointment" | "doctorSlots" | "cronJobsLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1004,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CronJobsLog: {
+      payload: Prisma.$CronJobsLogPayload<ExtArgs>
+      fields: Prisma.CronJobsLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CronJobsLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CronJobsLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        findFirst: {
+          args: Prisma.CronJobsLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CronJobsLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        findMany: {
+          args: Prisma.CronJobsLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>[]
+        }
+        create: {
+          args: Prisma.CronJobsLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        createMany: {
+          args: Prisma.CronJobsLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CronJobsLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>[]
+        }
+        delete: {
+          args: Prisma.CronJobsLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        update: {
+          args: Prisma.CronJobsLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.CronJobsLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CronJobsLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CronJobsLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.CronJobsLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CronJobsLogPayload>
+        }
+        aggregate: {
+          args: Prisma.CronJobsLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCronJobsLog>
+        }
+        groupBy: {
+          args: Prisma.CronJobsLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CronJobsLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CronJobsLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CronJobsLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1172,6 +1247,18 @@ export const DoctorSlotsScalarFieldEnum = {
 export type DoctorSlotsScalarFieldEnum = (typeof DoctorSlotsScalarFieldEnum)[keyof typeof DoctorSlotsScalarFieldEnum]
 
 
+export const CronJobsLogScalarFieldEnum = {
+  id: 'id',
+  cronType: 'cronType',
+  cronStatus: 'cronStatus',
+  cronStatusText: 'cronStatusText',
+  updatedCount: 'updatedCount',
+  createdAt: 'createdAt'
+} as const
+
+export type CronJobsLogScalarFieldEnum = (typeof CronJobsLogScalarFieldEnum)[keyof typeof CronJobsLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1322,6 +1409,34 @@ export type ListEnumDayOfWeekFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
+ * Reference to a field of type 'CronType'
+ */
+export type EnumCronTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CronType'>
+    
+
+
+/**
+ * Reference to a field of type 'CronType[]'
+ */
+export type ListEnumCronTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CronType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CronStatus'
+ */
+export type EnumCronStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CronStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CronStatus[]'
+ */
+export type ListEnumCronStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CronStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1452,6 +1567,7 @@ export type GlobalOmitConfig = {
   medicineList?: Prisma.MedicineListOmit
   appointment?: Prisma.AppointmentOmit
   doctorSlots?: Prisma.DoctorSlotsOmit
+  cronJobsLog?: Prisma.CronJobsLogOmit
 }
 
 /* Types for Logging */

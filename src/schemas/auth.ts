@@ -1,4 +1,11 @@
-import { DayOfWeek, Gender, Roles, Specialty } from '@/generated/prisma/enums'
+import {
+  CronStatus,
+  CronType,
+  DayOfWeek,
+  Gender,
+  Roles,
+  Specialty,
+} from '@/generated/prisma/enums'
 import z from 'zod'
 
 export const loginSchema = z.object({
@@ -274,4 +281,11 @@ export const CreateAppointmentSchema = z.object({
   doctorId: z.string(),
   dateString: z.string(), // e.g., "2026-07-08"
   timeMinutes: z.union([z.string(), z.number()]), // Handles raw string from select components
+})
+
+export const cronJobLogSchema = z.object({
+  cronType: z.enum(CronType),
+  cronStatus: z.enum(CronStatus),
+  cronStatusText: z.string,
+  updatedCount: z.number(),
 })
