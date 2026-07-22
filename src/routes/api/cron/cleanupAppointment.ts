@@ -31,10 +31,10 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
                   email: true,
                   medCareId: true,
                 },
-                doctor: {
-                  select: {
-                    name: true,
-                  },
+              },
+              doctor: {
+                select: {
+                  name: true,
                 },
               },
             },
