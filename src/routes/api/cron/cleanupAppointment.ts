@@ -48,7 +48,7 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
           })
 
           if (!missedAppointments || missedAppointments.length === 0) {
-            console.log(
+            console.error(
               '✅ CRON SUCCESS: No pending expired appointments found.',
             )
             return Response.json({

@@ -286,6 +286,6 @@ export const CreateAppointmentSchema = z.object({
 export const cronJobLogSchema = z.object({
   cronType: z.enum(CronType),
   cronStatus: z.enum(CronStatus),
-  cronStatusText: z.string,
+  cronStatusText: z.string(),
   updatedCount: z.number(),
 })
