@@ -6,70 +6,97 @@ import {
 } from '#/generated/prisma/enums'
 import { cronTypeDescriptions } from '#/lib/types'
 import { CronJobsLog } from '#/server/actions'
+import { createFileRoute } from '@tanstack/react-router'
 
-export const config = {
-  runtime: 'edge', // Using Edge ensures lightning fast, zero-cold-start execution
-}
+// Forces Vercel to compute live data instead of serving a cached 404/200 frame
+export const dynamic = 'force-dynamic'
 
-export default async function handler(request: Request) {
-  // Ensure it's a GET request
-  if (request.method !== 'GET') {
-    return new Response('Method Not Allowed', { status: 405 })
-  }
+export const Route = createFileRoute('/api/cron/cleanupAppointment')({
+  server: {
+    handlers: {
+      GET: async ({ request }) => {
+        const authHeader = request.headers.get('Authorization')
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+          return new Response('Unauthorized', { status: 401 })
+        }
 
-  const authHeader = request.headers.get('Authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 })
-  }
+        try {
+          const nowDate = new Date()
 
-  try {
-    const nowDate = new Date()
-    const missedAppointments = await prisma.appointment.findMany({
-      where: {
-        status: AppointmentStatus.Upcoming,
-        date: {
-          lte: nowDate,
-        },
+          // Using a less-than-or-equal target to catch all missed slots properly
+          const missedAppointments = await prisma.appointment.findMany({
+            where: {
+              status: AppointmentStatus.Upcoming,
+              date: {
+                lte: nowDate,
+              },
+            },
+            include: {
+              patient: {
+                select: {
+                  name: true,
+                  email: true,
+                  medCareId: true,
+                },
+                doctor: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          })
+
+          if (!missedAppointments || missedAppointments.length === 0) {
+            console.log(
+              '✅ CRON SUCCESS: No pending expired appointments found.',
+            )
+            return Response.json({
+              success: true,
+              updatedCount: 0,
+            })
+          }
+
+          const missedIds = missedAppointments.map((NoShow) => NoShow.id)
+          await prisma.appointment.updateMany({
+            where: {
+              id: { in: missedIds },
+            },
+            data: { status: AppointmentStatus.NoShow },
+          })
+
+          await CronJobsLog({
+            data: {
+              cronType: CronType.Email_sent_NoShow,
+              cronStatus: CronStatus.Success,
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow],
+              updatedCount: missedAppointments.length,
+            },
+          })
+
+          console.log(
+            `✅ CRON SUCCESS: Processed ${missedIds.length} no-shows.`,
+          )
+          return Response.json({
+            success: true,
+            updatedCount: missedIds.length,
+          })
+        } catch (error: any) {
+          await CronJobsLog({
+            data: {
+              cronType: CronType.Email_sent_NoShow,
+              cronStatus: CronStatus.Failed,
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow],
+              updatedCount: 0,
+            },
+          })
+          console.error('❌ CRON DATABASE FAILURE:', error)
+          return Response.json(
+            { success: false, error: error.message },
+            { status: 500 },
+          )
+        }
       },
-    })
-
-    if (!missedAppointments || missedAppointments.length === 0) {
-      return new Response(JSON.stringify({ success: true, updatedCount: 0 }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
-
-    const missedIds = missedAppointments.map((NoShow) => NoShow.id)
-    await prisma.appointment.updateMany({
-      where: { id: { in: missedIds } },
-      data: { status: AppointmentStatus.NoShow },
-    })
-
-    await CronJobsLog({
-      data: {
-        cronType: CronType.Email_sent_NoShow,
-        cronStatus: CronStatus.Success,
-        cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow],
-        updatedCount: missedAppointments.length,
-      },
-    })
-
-    return new Response(
-      JSON.stringify({ success: true, updatedCount: missedIds.length }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  } catch (error: any) {
-    console.error('❌ CRON JOB FAILURE:', error)
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-}
+    },
+  },
+})
