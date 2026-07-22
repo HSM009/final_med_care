@@ -4,11 +4,5 @@
       "path": "/api/cron/cleanupAppointment",
       "schedule": "0 0 * * *"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/cron/cleanupAppointment",
-      "destination": "/__server?_data=/api/cron/cleanupAppointment"
-    }
   ]
 }
