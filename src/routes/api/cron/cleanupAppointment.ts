@@ -11,7 +11,7 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/api/cron/cleanupAppointment')({
   server: {
     handlers: {
-      POST: async ({ request }) => {
+      GET: async ({ request }) => {
         const authHeader = request.headers.get('Authorization')
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
           return new Response('Unauthorized', { status: 401 })
