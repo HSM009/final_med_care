@@ -8,9 +8,13 @@ import { cronTypeDescriptions } from '#/lib/types'
 import { CronJobsLog } from '#/server/actions'
 import { createFileRoute } from '@tanstack/react-router'
 
+// 1. Force Vercel to bypass build caching and process live code on every hit
+export const dynamic = 'force-dynamic'
+
 export const Route = createFileRoute('/api/cron/cleanupAppointment')({
   server: {
     handlers: {
+      // 2. Must be GET because Vercel Cron infra exclusively calls GET
       GET: async ({ request }) => {
         const authHeader = request.headers.get('Authorization')
         if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -19,10 +23,14 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
 
         try {
           const nowDate = new Date()
+
+          // 3. Fix exact time mismatch: target all appointments older/equal to "now"
           const missedAppointments = await prisma.appointment.findMany({
             where: {
               status: AppointmentStatus.Upcoming,
-              date: nowDate,
+              date: {
+                lte: nowDate,
+              },
             },
             include: {
               patient: {
@@ -39,14 +47,16 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
               },
             },
           })
-          if (!missedAppointments) {
-            console.log('success : true, updatedCount: 0, emailSent: 0')
+
+          if (!missedAppointments || missedAppointments.length === 0) {
+            console.log('✅ CRON JOB RUN: success : true, updatedCount: 0')
             return Response.json({
               success: true,
               updatedCount: 0,
               emailSent: 0,
             })
           }
+
           const missedIds = missedAppointments.map((NoShow) => NoShow.id)
           await prisma.appointment.updateMany({
             where: {
@@ -55,21 +65,20 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
             data: { status: AppointmentStatus.NoShow },
           })
 
-          // const emailBatch = missedAppointments.filter
-
           await CronJobsLog({
             data: {
               cronType: CronType.Email_sent_NoShow,
               cronStatus: CronStatus.Success,
-              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow],
               updatedCount: missedAppointments.length,
             },
           })
+
           console.log(
             '✅ CRON JOB CLEAN UP APPOINTMENT SUCCESS : Updated Count:',
             missedIds.length,
-            '.',
           )
+
           return Response.json({
             success: true,
             updatedCount: missedIds.length,
@@ -79,7 +88,7 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
             data: {
               cronType: CronType.Email_sent_NoShow,
               cronStatus: CronStatus.Failed,
-              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow],
               updatedCount: 0,
             },
           })
