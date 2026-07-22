@@ -1,11 +1,11 @@
 import { prisma } from '#/db'
 import {
   AppointmentStatus,
-  // CronStatus,
-  // CronType,
+  CronStatus,
+  CronType,
 } from '#/generated/prisma/enums'
-// import { cronTypeDescriptions } from '#/lib/types'
-// import { CronJobsLog } from '#/server/actions'
+import { cronTypeDescriptions } from '#/lib/types'
+import { CronJobsLog } from '#/server/actions'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/api/cron/cleanupAppointment')({
@@ -59,14 +59,14 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
 
           // const emailBatch = missedAppointments.filter
 
-          // await CronJobsLog({
-          //   data: {
-          //     cronType: CronType.Email_sent_NoShow,
-          //     cronStatus: CronStatus.Success,
-          //     cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
-          //     updatedCount: missedAppointments.length,
-          //   },
-          // })
+          await CronJobsLog({
+            data: {
+              cronType: CronType.Email_sent_NoShow,
+              cronStatus: CronStatus.Success,
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
+              updatedCount: missedAppointments.length,
+            },
+          })
           console.log(
             '✅ CRON JOB CLEAN UP APPOINTMENT SUCCESS : Updated Count:',
             missedIds.length,
@@ -77,14 +77,14 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
             updatedCount: missedIds.length,
           })
         } catch (error: any) {
-          // await CronJobsLog({
-          //   data: {
-          //     cronType: CronType.Email_sent_NoShow,
-          //     cronStatus: CronStatus.Failed,
-          //     cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
-          //     updatedCount: 0,
-          //   },
-          // })
+          await CronJobsLog({
+            data: {
+              cronType: CronType.Email_sent_NoShow,
+              cronStatus: CronStatus.Failed,
+              cronStatusText: cronTypeDescriptions[CronType.Email_sent_NoShow], //map text
+              updatedCount: 0,
+            },
+          })
           console.error('❌ CRON JOB DATABASE FAILURE:', error)
           return Response.json(
             { success: false, error: error.message },
