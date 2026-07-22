@@ -656,17 +656,3 @@ export const postPatientAppointment = createServerFn({ method: 'POST' })
 
     return { success: true }
   })
-
-export const CronJobsLog = createServerFn({ method: 'POST' })
-  .middleware([authFnMiddleware])
-  .validator(cronJobLogSchema)
-  .handler(async ({ data }) => {
-    return await prisma.cronJobsLog.create({
-      data: {
-        cronType: data.cronType,
-        cronStatus: data.cronStatus,
-        cronStatusText: data.cronStatusText,
-        updatedCount: data.updatedCount,
-      },
-    })
-  })

@@ -5,7 +5,6 @@ import {
   CronType,
 } from '#/generated/prisma/enums'
 import { cronTypeDescriptions } from '#/lib/types'
-import { CronJobsLog } from '#/server/actions'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/api/cron/cleanupAppointment')({
@@ -58,8 +57,7 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
           })
 
           // const emailBatch = missedAppointments.filter
-
-          await CronJobsLog({
+          await prisma.cronJobsLog.create({
             data: {
               cronType: CronType.Email_sent_NoShow,
               cronStatus: CronStatus.Success,
@@ -77,7 +75,7 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
             updatedCount: missedIds.length,
           })
         } catch (error: any) {
-          await CronJobsLog({
+          await prisma.cronJobsLog.create({
             data: {
               cronType: CronType.Email_sent_NoShow,
               cronStatus: CronStatus.Failed,
