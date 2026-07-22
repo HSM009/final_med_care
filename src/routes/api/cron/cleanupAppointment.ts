@@ -22,7 +22,9 @@ export const Route = createFileRoute('/api/cron/cleanupAppointment')({
           const missedAppointments = await prisma.appointment.findMany({
             where: {
               status: AppointmentStatus.Upcoming,
-              date: nowDate,
+              date: {
+                lte: nowDate,
+              },
             },
             include: {
               patient: {
